@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started with Language Models — GPT0X</title>
+    <meta name="description" content="A practical guide to getting started with large language models. Learn to choose the right model, write effective prompts, build your first LLM application, and understand the fundamentals of transformer architectures.">
+    <meta name="keywords" content="getting started with LLMs, language model beginner guide, prompt engineering basics, first LLM application, transformer tutorial">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Getting Started with Language Models — GPT0X">
+    <meta property="og:description" content="A practical beginner's guide to large language models, from choosing the right model to building your first application.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://gpt0x.com/blog/getting-started.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Getting Started with Language Models",
+        "url": "https://gpt0x.com/blog/getting-started.html",
+        "description": "A practical beginner's guide to large language models.",
+        "isPartOf": { "@type": "WebSite", "name": "GPT0X", "url": "https://gpt0x.com" }
+    }
+    </script>
+
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100">
+
+    <nav class="fixed top-0 w-full bg-gray-950/90 backdrop-blur-md z-50 border-b border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="/" class="text-2xl font-800 tracking-tight" style="color: #8b5cf6;">GPT0X</a>
+            <div class="hidden md:flex gap-8 text-sm text-gray-400">
+                <a href="/" class="hover:text-white transition">Home</a>
+                <a href="/guides.html" class="hover:text-white transition">Guides</a>
+                <a href="/tools.html" class="hover:text-white transition">Tools</a>
+                <a href="/blog/getting-started.html" class="text-white transition">Blog</a>
+                <a href="/about.html" class="hover:text-white transition">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <article class="pt-32 pb-20">
+        <div class="max-w-3xl mx-auto px-4">
+
+            <header class="mb-12">
+                <span class="text-xs font-600 uppercase tracking-wider" style="color: #8b5cf6;">Blog</span>
+                <h1 class="text-3xl md:text-5xl font-800 tracking-tight mt-3 mb-4">Getting Started with Language Models</h1>
+                <p class="text-gray-400 text-lg leading-relaxed">From understanding what LLMs are to building your first application, this guide covers the essential knowledge every language model practitioner needs.</p>
+            </header>
+
+            <div class="prose prose-invert max-w-none">
+
+                <h2 class="text-2xl font-700 mt-12 mb-4">Understanding Language Models</h2>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    Large language models are neural networks trained to predict the next token in a sequence. This seemingly simple objective, when applied to trillions of tokens of text data with billions of parameters, produces systems capable of conversation, code generation, reasoning, translation, and creative writing. The transformer architecture, introduced in the 2017 paper "Attention Is All You Need," provides the foundation for every major LLM, using self-attention mechanisms that allow each token to attend to every other token in the context window.
+                </p>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    The practical landscape of LLMs divides into commercial APIs (GPT-4, Claude, Gemini) and open-source models (LLaMA, Mistral, Phi, Qwen). Commercial APIs offer the highest capability with minimal setup but come with per-token costs and data privacy considerations. Open-source models provide full control, can run on your own infrastructure, and can be fine-tuned for specific tasks, but require more technical expertise to deploy effectively.
+                </p>
+
+                <h2 class="text-2xl font-700 mt-12 mb-4">Choosing the Right Model</h2>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    Model selection depends on your task requirements, latency constraints, budget, and privacy needs. For general-purpose applications where quality is paramount, commercial APIs from OpenAI or Anthropic provide the best out-of-the-box performance. For cost-sensitive applications with moderate quality requirements, open-source models in the 7B-13B parameter range offer excellent quality per dollar when self-hosted. For edge or on-device deployment, smaller models like Phi-3 (3.8B) or quantized versions of larger models achieve surprising capability in constrained environments.
+                </p>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    Context window size matters when your application needs to process long documents. Models range from 4K tokens to over 128K tokens. However, performance often degrades with very long contexts, a phenomenon known as the "lost in the middle" problem where models attend less to information in the center of the context. Retrieval-augmented generation (RAG) is usually more effective than relying on large context windows for knowledge-intensive tasks.
+                </p>
+
+                <h2 class="text-2xl font-700 mt-12 mb-4">Your First LLM API Call</h2>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    The fastest way to start building with LLMs is through API calls. Here is a minimal Python example using the OpenAI client library, which works with many providers including OpenAI, Together AI, and local servers running vLLM or Ollama:
+                </p>
+
+                <div class="bg-gray-900 rounded-xl p-6 my-6 overflow-x-auto">
+                    <pre class="text-sm text-gray-300"><code>from openai import OpenAI
+
+client = OpenAI(api_key="your-api-key")
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Explain transformers in 3 sentences."}
+    ],
+    temperature=0.7,
+    max_tokens=200
+)
+
+print(response.choices[0].message.content)</code></pre>
+                </div>
+
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    The system message sets the model's behavior and persona. The user message contains your actual query. Temperature controls randomness (0 for deterministic, 1 for creative). Max tokens limits the response length. This same pattern scales from simple question-answering to complex multi-turn conversations with tool use and structured output.
+                </p>
+
+                <h2 class="text-2xl font-700 mt-12 mb-4">Effective Prompt Engineering</h2>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    Prompt engineering is the art and science of crafting inputs that reliably produce the outputs you want. The most impactful techniques are straightforward. Be specific about what you want: instead of "summarize this," say "provide a 3-bullet summary focusing on the financial implications." Provide examples of desired output format through few-shot prompting. Use chain-of-thought prompting ("think step by step") for reasoning tasks. Specify the output format explicitly ("respond in JSON with keys: title, summary, sentiment").
+                </p>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    System prompts deserve particular attention for production applications. A well-crafted system prompt establishes the model's role, constraints, output format, and handling of edge cases. Test your prompts against diverse inputs including adversarial cases to identify failure modes before deployment. Version control your prompts just like code — they are a critical part of your application's logic.
+                </p>
+
+                <h2 class="text-2xl font-700 mt-12 mb-4">Building Your First Application</h2>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    Start with a simple but complete application: a document question-answering system. This exercises the core skills of prompt engineering, context management, and output parsing. Load a document, split it into chunks, find relevant chunks for a user question (even a simple keyword search works for a prototype), include them in the prompt context, and generate an answer. This basic architecture is the foundation of RAG systems used in production across industries.
+                </p>
+
+                <div class="bg-gray-900 rounded-xl p-6 my-6 overflow-x-auto">
+                    <pre class="text-sm text-gray-300"><code># Simple document QA without vector search
+def answer_question(document: str, question: str) -> str:
+    # Split document into paragraphs
+    paragraphs = document.split("\n\n")
+
+    # Simple relevance: find paragraphs containing question keywords
+    keywords = question.lower().split()
+    relevant = [p for p in paragraphs
+                if any(k in p.lower() for k in keywords)]
+
+    context = "\n\n".join(relevant[:3])  # Top 3 relevant paragraphs
+
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "Answer based only on the provided context. If the context doesn't contain the answer, say so."},
+            {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"}
+        ],
+        temperature=0.3
+    )
+    return response.choices[0].message.content</code></pre>
+                </div>
+
+                <h2 class="text-2xl font-700 mt-12 mb-4">Running Models Locally</h2>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    For development, testing, and privacy-sensitive applications, running models locally is increasingly practical. <a href="https://ollama.com" target="_blank" rel="noopener" class="text-violet-400 hover:text-violet-300 underline">Ollama</a> provides the simplest path: install it, run <code class="text-violet-300 bg-gray-800 px-1 rounded">ollama pull llama3.1</code>, and you have a local LLM accessible via API. For maximum performance on Apple Silicon, llama.cpp with Metal acceleration delivers impressive throughput. Practitioners looking for guidance on AI experimentation setups can find comprehensive comparisons at <a href="https://ml3x.com" class="text-violet-400 hover:text-violet-300 underline">ML3X</a>.
+                </p>
+
+                <h2 class="text-2xl font-700 mt-12 mb-4">Next Steps</h2>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    Once you are comfortable with basic API usage and prompt engineering, explore structured output (JSON mode, function calling), multi-turn conversations with memory, tool use and function calling for integrating external APIs, and streaming for responsive user interfaces. Each of these capabilities opens new application categories and brings you closer to building production-grade LLM systems. The field moves fast, but the fundamentals of clear prompting, robust error handling, and systematic evaluation remain constant regardless of which model is leading the benchmarks this month.
+                </p>
+            </div>
+
+        </div>
+    </article>
+
+    <footer class="py-12 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <a href="/" class="text-xl font-700 mb-4 inline-block" style="color: #8b5cf6;">GPT0X</a>
+            <p class="text-gray-500 text-sm">&copy; 2025 GPT0X. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

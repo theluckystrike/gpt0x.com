@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT0X — Guides</title>
+    <meta name="description" content="In-depth guides on language models. Master prompt engineering, fine-tuning with LoRA and QLoRA, RAG pipelines, and LLM evaluation methodologies.">
+    <meta name="keywords" content="LLM guides, prompt engineering guide, fine-tuning tutorial, RAG pipeline, LLM evaluation, GPT guide, language model tutorial">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="GPT0X — Guides">
+    <meta property="og:description" content="In-depth guides on language models covering fine-tuning, prompt engineering, RAG, and evaluation.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gpt0x.com/guides.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "GPT0X — Guides",
+        "url": "https://gpt0x.com/guides.html",
+        "description": "In-depth guides on language models covering fine-tuning, prompt engineering, and evaluation.",
+        "isPartOf": { "@type": "WebSite", "name": "GPT0X", "url": "https://gpt0x.com" }
+    }
+    </script>
+
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100">
+
+    <nav class="fixed top-0 w-full bg-gray-950/90 backdrop-blur-md z-50 border-b border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="/" class="text-2xl font-800 tracking-tight" style="color: #8b5cf6;">GPT0X</a>
+            <div class="hidden md:flex gap-8 text-sm text-gray-400">
+                <a href="/" class="hover:text-white transition">Home</a>
+                <a href="/guides.html" class="text-white transition">Guides</a>
+                <a href="/tools.html" class="hover:text-white transition">Tools</a>
+                <a href="/blog/getting-started.html" class="hover:text-white transition">Blog</a>
+                <a href="/about.html" class="hover:text-white transition">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative pt-32 pb-16 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-violet-950 via-gray-950 to-indigo-950"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-500/20 via-transparent to-transparent"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-6xl font-800 tracking-tight mb-6">
+                LLM <span style="color: #8b5cf6;">Guides</span>
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                Deep technical guides on language model fine-tuning, prompt engineering, evaluation, and production deployment.
+            </p>
+        </div>
+    </header>
+
+    <!-- Guide 1 -->
+    <section class="py-20">
+        <div class="max-w-4xl mx-auto px-4">
+            <span class="text-xs font-600 uppercase tracking-wider" style="color: #8b5cf6;">Guide 01 — Fine-Tuning</span>
+            <h2 class="text-3xl font-700 mt-3 mb-6">Fine-Tuning LLMs with QLoRA: From Dataset to Deployment</h2>
+
+            <p class="text-gray-300 leading-relaxed mb-4">
+                QLoRA (Quantized Low-Rank Adaptation) makes it possible to fine-tune language models with 70 billion or more parameters on a single consumer GPU. The technique combines 4-bit NormalFloat quantization of the base model with Low-Rank Adaptation layers that capture task-specific adaptations in a fraction of the parameter count. This approach reduces memory requirements by roughly 4x compared to standard LoRA while maintaining virtually identical output quality, unlocking fine-tuning workflows that were previously limited to multi-GPU setups.
+            </p>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                The fine-tuning pipeline begins with dataset preparation, which is often the most impactful step. For instruction-following tasks, format your data in the ChatML or Alpaca template that matches your base model's training format. Quality matters far more than quantity — 1,000 high-quality, diverse examples typically outperform 50,000 noisy ones. Each example should demonstrate exactly the behavior you want the model to exhibit, with clear instructions and ideal responses. Tools like Argilla and Label Studio help manage the annotation process for custom datasets.
+            </p>
+            <p class="text-gray-300 leading-relaxed mb-6">
+                Hyperparameter selection for QLoRA involves balancing several interacting factors. The LoRA rank (typically 16-64) determines the expressiveness of the adaptation. The learning rate (usually 1e-4 to 2e-4) must be low enough to avoid catastrophic forgetting but high enough to learn new behaviors. Training for 1-3 epochs is standard, with longer training increasing the risk of overfitting to your specific examples at the cost of general capability. The AI tools directory at <a href="https://zovo.one" class="text-violet-400 hover:text-violet-300 underline">zovo.one</a> provides excellent comparisons of fine-tuning platforms and infrastructure options to help you choose the right setup for your project scale.
+            </p>
+
+            <div class="bg-violet-500/10 border border-violet-500/20 rounded-xl p-6 mb-6">
+                <h4 class="text-sm font-600 uppercase tracking-wider text-violet-400 mb-2">Key Takeaway</h4>
+                <p class="text-gray-300">Dataset quality is the single most important factor in fine-tuning success. Invest 80% of your effort in curating high-quality training examples and 20% in hyperparameter optimization. QLoRA makes the compute side accessible; the data side remains the real challenge.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Guide 2 -->
+    <section class="py-20 bg-gray-900/50">
+        <div class="max-w-4xl mx-auto px-4">
+            <span class="text-xs font-600 uppercase tracking-wider" style="color: #8b5cf6;">Guide 02 — RAG</span>
+            <h2 class="text-3xl font-700 mt-3 mb-6">Building Production-Ready RAG Pipelines</h2>
+
+            <p class="text-gray-300 leading-relaxed mb-4">
+                Retrieval-Augmented Generation addresses the fundamental limitation of LLMs: they cannot access information beyond their training data. RAG pipelines retrieve relevant documents from an external knowledge base at query time and include them in the model's context, enabling accurate responses about proprietary data, recent events, or specialized domains. The architecture has become the standard approach for enterprise LLM applications where factual accuracy is non-negotiable.
+            </p>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                The retrieval quality of a RAG system depends critically on three components: chunking strategy, embedding model, and reranking. Chunking determines how source documents are split into retrievable units. Fixed-size chunks (256-512 tokens) with overlap are the simplest approach, but semantic chunking that respects paragraph and section boundaries produces better results for structured documents. The embedding model converts chunks into dense vectors for similarity search — models like BGE, E5, and Cohere's embed API vary significantly in quality across different document types. After initial vector similarity retrieval, a cross-encoder reranker like Cohere Rerank or BGE-reranker rescores candidates with much higher accuracy, typically improving end-to-end quality by 10-15%.
+            </p>
+            <p class="text-gray-300 leading-relaxed mb-6">
+                Evaluating RAG systems requires measuring both retrieval and generation quality independently. Retrieval metrics like recall@k and MRR tell you whether the right documents are being found. Generation metrics like faithfulness (does the answer reflect the retrieved context?) and relevance (does the answer address the question?) measure the LLM's use of retrieved information. Frameworks like RAGAS and DeepEval automate these evaluations using LLM-as-judge approaches. LLM workflow tools like those reviewed at <a href="https://lochbot.com" class="text-violet-400 hover:text-violet-300 underline">LochBot</a> can help streamline the evaluation and iteration process for complex RAG pipelines.
+            </p>
+
+            <div class="bg-violet-500/10 border border-violet-500/20 rounded-xl p-6 mb-6">
+                <h4 class="text-sm font-600 uppercase tracking-wider text-violet-400 mb-2">Key Takeaway</h4>
+                <p class="text-gray-300">RAG quality is determined by retrieval quality. The best LLM in the world cannot generate accurate answers from irrelevant retrieved passages. Invest in chunking, embedding quality, and reranking before optimizing the generation prompt.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Guide 3 -->
+    <section class="py-20">
+        <div class="max-w-4xl mx-auto px-4">
+            <span class="text-xs font-600 uppercase tracking-wider" style="color: #8b5cf6;">Guide 03 — Evaluation</span>
+            <h2 class="text-3xl font-700 mt-3 mb-6">LLM Evaluation: Benchmarks, Human Eval, and LLM-as-Judge</h2>
+
+            <p class="text-gray-300 leading-relaxed mb-4">
+                Evaluating language models is one of the most challenging problems in AI engineering because the quality of text output is inherently subjective and task-dependent. A model that excels at code generation may underperform at creative writing. A model optimized for safety may be less helpful for technical tasks. Standard benchmarks like MMLU, HumanEval, and MT-Bench each capture different dimensions of capability, and no single number can summarize a model's overall quality.
+            </p>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                For custom applications, you need custom evaluations. The LLM-as-judge approach uses a strong model (like GPT-4 or Claude) to evaluate the outputs of the model being tested, following a rubric you define. This scales much better than human evaluation while correlating reasonably well with human preferences when the rubric is well-designed. The key is specificity: instead of asking "is this response good?", ask "does this response cite specific evidence from the provided context?" or "does this response follow the requested JSON format exactly?" Specific criteria produce consistent, actionable evaluations.
+            </p>
+            <p class="text-gray-300 leading-relaxed mb-6">
+                Human evaluation remains the gold standard for subjective quality assessment. For conversational AI, the <a href="https://en.wikipedia.org/wiki/Elo_rating_system" target="_blank" rel="noopener" class="text-violet-400 hover:text-violet-300 underline">Elo rating system</a> used by LMSys Chatbot Arena provides a robust framework for pairwise comparison. For domain-specific tasks, structured annotation protocols with clear guidelines and inter-annotator agreement metrics ensure consistency. The practical approach is to combine automated evaluations for rapid iteration with targeted human evaluations for final quality validation before deployment. Resources from <a href="https://kickllm.com" class="text-violet-400 hover:text-violet-300 underline">KickLLM</a> offer additional perspectives on setting up effective LLM evaluation pipelines.
+            </p>
+
+            <div class="bg-violet-500/10 border border-violet-500/20 rounded-xl p-6 mb-6">
+                <h4 class="text-sm font-600 uppercase tracking-wider text-violet-400 mb-2">Key Takeaway</h4>
+                <p class="text-gray-300">Build custom evaluations that measure what matters for your specific use case. Generic benchmarks tell you about general capability; task-specific evaluations with clear rubrics tell you whether your model actually works for your users.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Guide 4 -->
+    <section class="py-20 bg-gray-900/50">
+        <div class="max-w-4xl mx-auto px-4">
+            <span class="text-xs font-600 uppercase tracking-wider" style="color: #8b5cf6;">Guide 04 — Deployment</span>
+            <h2 class="text-3xl font-700 mt-3 mb-6">Serving LLMs in Production: Architecture Patterns and Optimization</h2>
+
+            <p class="text-gray-300 leading-relaxed mb-4">
+                Moving an LLM from prototype to production involves solving a distinct set of engineering challenges: latency management, throughput optimization, cost control, and reliability. The inference serving layer is where these concerns converge, and the choice of serving framework significantly impacts all four dimensions. vLLM, TGI (Text Generation Inference), and TensorRT-LLM represent the leading open-source options, each with different strengths.
+            </p>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                vLLM's PagedAttention mechanism manages KV cache memory like an operating system manages virtual memory, dramatically improving throughput by eliminating memory waste from fixed-size cache allocation. Continuous batching allows new requests to begin processing as soon as a slot opens in the batch, rather than waiting for all current requests to complete. These techniques together can increase throughput by 2-4x compared to naive serving approaches, directly translating to cost savings.
+            </p>
+            <p class="text-gray-300 leading-relaxed mb-6">
+                Speculative decoding offers another optimization avenue: a small, fast draft model generates candidate tokens that a larger target model then verifies in parallel, potentially generating multiple tokens per forward pass. This technique reduces latency without affecting output quality, making it especially valuable for interactive applications. The choice between hosting your own inference infrastructure versus using managed APIs (OpenAI, Anthropic, Together AI) depends on volume, latency requirements, data privacy constraints, and whether you need custom or fine-tuned models.
+            </p>
+
+            <div class="bg-violet-500/10 border border-violet-500/20 rounded-xl p-6 mb-6">
+                <h4 class="text-sm font-600 uppercase tracking-wider text-violet-400 mb-2">Key Takeaway</h4>
+                <p class="text-gray-300">LLM serving optimization can reduce costs by 2-4x through techniques like PagedAttention, continuous batching, and quantization. Always benchmark with your actual traffic patterns rather than relying on published benchmarks that may not reflect your workload characteristics.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <a href="/" class="text-xl font-700 mb-4 inline-block" style="color: #8b5cf6;">GPT0X</a>
+            <p class="text-gray-500 text-sm">&copy; 2025 GPT0X. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
