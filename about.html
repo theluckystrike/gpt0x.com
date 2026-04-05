@@ -1,111 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About GPT0X</title>
-    <meta name="description" content="GPT0X is an advanced resource for language model practitioners. Learn about our mission to provide deep technical content on LLM fine-tuning, evaluation, and deployment.">
-    <meta name="keywords" content="about GPT0X, language model resource, LLM engineering, AI education">
-    <meta name="robots" content="index, follow">
-
-    <meta property="og:title" content="About GPT0X">
-    <meta property="og:description" content="GPT0X provides deep technical content on language model engineering, from fine-tuning to production deployment.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gpt0x.com/about.html">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        "name": "About GPT0X",
-        "url": "https://gpt0x.com/about.html",
-        "description": "GPT0X is an advanced resource for language model engineering.",
-        "isPartOf": { "@type": "WebSite", "name": "GPT0X", "url": "https://gpt0x.com" }
-    }
-    </script>
-
-    <style>
-        * { font-family: 'Inter', sans-serif; }
-        html { scroll-behavior: smooth; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | gpt0x.com</title>
+  <meta name="description" content="About gpt0x.com — a searchable database of 40+ AI models with specs, comparisons, and filtering.">
+  <link rel="canonical" href="https://gpt0x.com/about.html">
+  <link rel="stylesheet" href="assets/style.css">
 </head>
-<body class="bg-gray-950 text-gray-100">
+<body>
+  <header>
+    <div class="container">
+      <a href="/" class="logo">gpt0x</a>
+      <nav>
+        <a href="/">Database</a>
+        <a href="/blog/">Blog</a>
+        <a href="/about.html">About</a>
+      </nav>
+    </div>
+  </header>
 
-    <nav class="fixed top-0 w-full bg-gray-950/90 backdrop-blur-md z-50 border-b border-gray-800">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-            <a href="/" class="text-2xl font-800 tracking-tight" style="color: #8b5cf6;">GPT0X</a>
-            <div class="hidden md:flex gap-8 text-sm text-gray-400">
-                <a href="/" class="hover:text-white transition">Home</a>
-                <a href="/guides.html" class="hover:text-white transition">Guides</a>
-                <a href="/tools.html" class="hover:text-white transition">Tools</a>
-                <a href="/blog/getting-started.html" class="hover:text-white transition">Blog</a>
-                <a href="/about.html" class="text-white transition">About</a>
-            </div>
-        </div>
-    </nav>
+  <main class="about-content">
+    <h1>About <span>gpt0x</span></h1>
+    <p>gpt0x.com is a searchable reference database of 40+ AI models. Compare models by provider, type, parameter count, context window, open-source status, and API availability.</p>
+    <p>The AI landscape moves fast. New models launch monthly, and keeping track of which model does what, how big it is, and whether you can actually use it via API is a genuine challenge. gpt0x aims to be the quick-reference you check before choosing a model for your project.</p>
 
-    <header class="relative pt-32 pb-16 overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-violet-950 via-gray-950 to-indigo-950"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-500/20 via-transparent to-transparent"></div>
-        <div class="relative z-10 max-w-4xl mx-auto px-4 text-center">
-            <h1 class="text-4xl md:text-6xl font-800 tracking-tight mb-6">
-                About <span style="color: #8b5cf6;">GPT0X</span>
-            </h1>
-            <p class="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                Advanced language model engineering for practitioners who build with LLMs.
-            </p>
-        </div>
-    </header>
+    <h2>What's Included</h2>
+    <ul>
+      <li>Text models: GPT-4, Claude, Gemini, Llama, Mistral, Phi, Qwen, and more</li>
+      <li>Image models: DALL-E 3, Stable Diffusion, Midjourney, FLUX</li>
+      <li>Audio models: Whisper, Suno</li>
+      <li>Multimodal models: GPT-4o, Gemini 1.5 Pro</li>
+    </ul>
 
-    <section class="py-20">
-        <div class="max-w-3xl mx-auto px-4">
-            <h2 class="text-2xl font-700 mb-6">Our Mission</h2>
-            <p class="text-gray-300 leading-relaxed mb-4">
-                GPT0X exists because the gap between using an LLM and engineering with LLMs is vast and growing. Anyone can send a prompt to an API, but building production systems that are reliable, cost-effective, and measurably good requires deep technical knowledge spanning model selection, prompt engineering, fine-tuning, evaluation, and deployment optimization. We provide the technical depth that serious practitioners need.
-            </p>
-            <p class="text-gray-300 leading-relaxed mb-4">
-                Our content focuses on the engineering challenges that matter in practice: how to fine-tune models that actually improve on the base model for your specific task, how to build RAG systems that retrieve the right information and generate faithful answers, how to evaluate LLM outputs systematically when "correct" is subjective, and how to serve models at scale without burning through your compute budget. Every guide is based on real implementation experience and includes the practical details that tutorials often skip.
-            </p>
-            <p class="text-gray-300 leading-relaxed mb-4">
-                We cover both the commercial LLM ecosystem (GPT-4, Claude, Gemini) and the rapidly maturing open-source landscape (LLaMA, Mistral, Qwen, Phi). Understanding both sides is essential because the right choice depends on your constraints, and those constraints change as models improve and costs decrease. We help you navigate these tradeoffs with data-driven analysis rather than hype.
-            </p>
-            <p class="text-gray-300 leading-relaxed mb-8">
-                GPT0X is part of a network of specialized AI and ML resources. Our flagship resource, <a href="https://zovo.one" class="text-violet-400 hover:text-violet-300 underline">zovo.one</a>, provides a comprehensive directory of AI tools spanning the entire ecosystem. Together with our partner sites, we aim to cover every aspect of modern AI development.
-            </p>
+    <h2>Part of the zovo.one Network</h2>
+    <p>gpt0x.com is built by <a href="https://zovo.one">zovo.one</a>. Check out our other tools:</p>
+    <ul>
+      <li><a href="https://ml0x.com">ml0x.com</a> — ML cheat sheet generator with formulas and code</li>
+      <li><a href="https://enhio.com">enhio.com</a> — text analysis and readability scoring tool</li>
+      <li><a href="https://abwex.com">abwex.com</a> — A/B test significance calculator</li>
+    </ul>
+  </main>
 
-            <h2 class="text-2xl font-700 mb-6">Related Sites</h2>
-            <div class="grid sm:grid-cols-2 gap-4">
-                <a href="https://ml0x.com" class="block bg-gray-800/50 rounded-xl p-5 border border-gray-700/50 hover:border-violet-500/30 transition">
-                    <h3 class="text-lg font-600 mb-1">ML0X</h3>
-                    <p class="text-gray-400 text-sm">Foundational machine learning from first principles with math and code.</p>
-                </a>
-                <a href="https://gen8x.com" class="block bg-gray-800/50 rounded-xl p-5 border border-gray-700/50 hover:border-violet-500/30 transition">
-                    <h3 class="text-lg font-600 mb-1">Gen8X</h3>
-                    <p class="text-gray-400 text-sm">Generative AI tutorials covering diffusion models and creative AI.</p>
-                </a>
-                <a href="https://krzen.com" class="block bg-gray-800/50 rounded-xl p-5 border border-gray-700/50 hover:border-violet-500/30 transition">
-                    <h3 class="text-lg font-600 mb-1">Krzen</h3>
-                    <p class="text-gray-400 text-sm">Model compression, quantization, and deployment optimization.</p>
-                </a>
-                <a href="https://abwex.com" class="block bg-gray-800/50 rounded-xl p-5 border border-gray-700/50 hover:border-violet-500/30 transition">
-                    <h3 class="text-lg font-600 mb-1">Abwex</h3>
-                    <p class="text-gray-400 text-sm">AI experimentation frameworks, A/B testing, and rapid prototyping.</p>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <footer class="py-12 border-t border-gray-800">
-        <div class="max-w-6xl mx-auto px-4 text-center">
-            <a href="/" class="text-xl font-700 mb-4 inline-block" style="color: #8b5cf6;">GPT0X</a>
-            <p class="text-gray-500 text-sm">&copy; 2025 GPT0X. All rights reserved.</p>
-        </div>
-    </footer>
-
+  <footer>
+    <div class="container">
+      <span>Built by <a href="https://zovo.one">zovo.one</a> &middot; More tools: <a href="https://enhio.com">enhio.com</a>, <a href="https://abwex.com">abwex.com</a></span>
+      <span>&copy; 2025 gpt0x.com</span>
+    </div>
+  </footer>
 </body>
 </html>
