@@ -20,9 +20,7 @@ Open the database and browse the full model catalog or use the filter panel to n
 
 - Vanilla JavaScript (no frameworks, no dependencies)
 - Client-side only — your data never leaves your browser
-- Part of the [Zovo Tools](https://zovo.one) open network
 
-## Related Tools
 
 - [LLM Cost Calculator](https://kickllm.com) — estimate API costs for any model in the database
 - [ML Model Comparison](https://lockml.com) — deep-dive comparison of ML model architectures
