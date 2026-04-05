@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT0X — Master Language Models</title>
+    <meta name="description" content="GPT0X is your advanced resource for GPT models, language model fine-tuning, prompt engineering, and LLM benchmarks. Master the techniques that define modern AI.">
+    <meta name="keywords" content="GPT, language models, LLM fine-tuning, prompt engineering, GPT-4, Claude, LLaMA, transformer models, NLP, benchmarks, RLHF">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="GPT0X — Master Language Models">
+    <meta property="og:description" content="Advanced LLM techniques, fine-tuning guides, prompt engineering, and model benchmarks for language model practitioners.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gpt0x.com">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "GPT0X",
+        "url": "https://gpt0x.com",
+        "description": "Master Language Models — advanced LLM techniques, benchmarks, and fine-tuning guides.",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://gpt0x.com/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-gray-950/90 backdrop-blur-md z-50 border-b border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="/" class="text-2xl font-800 tracking-tight" style="color: #8b5cf6;">GPT0X</a>
+            <div class="hidden md:flex gap-8 text-sm text-gray-400">
+                <a href="#techniques" class="hover:text-white transition">Techniques</a>
+                <a href="#guides" class="hover:text-white transition">Guides</a>
+                <a href="#resources" class="hover:text-white transition">Resources</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-violet-950 via-gray-950 to-indigo-950"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-500/20 via-transparent to-transparent"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-4 text-center py-32">
+            <div class="inline-block px-4 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-sm font-medium mb-8">
+                Advanced LLM Engineering
+            </div>
+            <h1 class="text-5xl md:text-7xl font-800 tracking-tight mb-6">
+                Master<br><span style="color: #8b5cf6;">Language Models</span>
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+                Go beyond basic prompting. Learn advanced fine-tuning, evaluation methodologies, alignment techniques, and the architectural innovations driving the next generation of language models.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#techniques" class="px-8 py-3.5 rounded-lg font-semibold text-white transition" style="background-color: #8b5cf6;">Explore Techniques</a>
+                <a href="#guides" class="px-8 py-3.5 rounded-lg font-semibold text-gray-300 border border-gray-700 hover:border-gray-500 transition">Read Guides</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Understanding LLMs Section -->
+    <section class="py-24 bg-gray-900/50">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-700 text-center mb-6">The LLM Engineering Landscape</h2>
+            <p class="text-gray-400 text-center max-w-3xl mx-auto mb-16 text-lg leading-relaxed">
+                Language models have evolved from simple next-token predictors into sophisticated reasoning systems capable of code generation, mathematical proof, and nuanced conversation. The difference between a hobbyist prompt and a production-grade LLM system spans prompt engineering, retrieval augmentation, fine-tuning, evaluation frameworks, and deployment optimization. GPT0X covers the full stack of LLM engineering, from understanding transformer internals to deploying models at scale. The field is moving fast, with new architectures, training techniques, and evaluation benchmarks emerging monthly. We help you stay ahead by focusing on the principles that transcend any single model release.
+            </p>
+            <div id="techniques" class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-800/50 rounded-2xl p-8 border border-gray-700/50">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background-color: rgba(139,92,246,0.15);">
+                        <svg class="w-6 h-6" style="color: #8b5cf6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-600 mb-3">Fine-Tuning & Alignment</h3>
+                    <p class="text-gray-400 leading-relaxed">Full fine-tuning, LoRA, QLoRA, and parameter-efficient methods give you precise control over model behavior. We cover supervised fine-tuning for task specialization, RLHF and DPO for alignment, and the emerging techniques like ORPO that simplify the alignment pipeline. Understanding when to fine-tune versus when to prompt is one of the most valuable skills in LLM engineering, and we provide the frameworks for making that decision confidently.</p>
+                </div>
+                <div class="bg-gray-800/50 rounded-2xl p-8 border border-gray-700/50">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background-color: rgba(139,92,246,0.15);">
+                        <svg class="w-6 h-6" style="color: #8b5cf6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-600 mb-3">Evaluation & Benchmarks</h3>
+                    <p class="text-gray-400 leading-relaxed">How do you know if your model is actually better? We dissect popular benchmarks like MMLU, HumanEval, and MT-Bench, explain their strengths and limitations, and teach you to build custom evaluation harnesses for your specific use case. LLM evaluation is deceptively hard because surface-level metrics often fail to capture real-world performance. We cover LLM-as-judge approaches, human evaluation protocols, and statistical methods for meaningful comparisons.</p>
+                </div>
+                <div class="bg-gray-800/50 rounded-2xl p-8 border border-gray-700/50">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background-color: rgba(139,92,246,0.15);">
+                        <svg class="w-6 h-6" style="color: #8b5cf6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-600 mb-3">Prompt Engineering</h3>
+                    <p class="text-gray-400 leading-relaxed">Advanced prompt engineering goes far beyond simple instructions. Chain-of-thought prompting, few-shot learning, self-consistency, tree-of-thoughts, and structured output formatting are techniques that dramatically improve model performance without any fine-tuning. We cover systematic approaches to prompt design, testing methodologies, and the art of crafting system prompts that reliably steer model behavior across diverse inputs.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Guides Section -->
+    <section id="guides" class="py-24">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-700 text-center mb-6">Latest Guides</h2>
+            <p class="text-gray-400 text-center max-w-2xl mx-auto mb-16 text-lg">
+                Deep technical guides on LLM techniques, architectures, and deployment patterns.
+            </p>
+            <div class="grid md:grid-cols-3 gap-8">
+                <article class="bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-700/50 hover:border-violet-500/30 transition">
+                    <div class="h-48 flex items-center justify-center" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                        <span class="text-5xl font-800 text-white/20">01</span>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-xs font-500 text-violet-400">Fine-Tuning</span>
+                        <h3 class="text-lg font-600 mt-2 mb-3">QLoRA Fine-Tuning: Train a 70B Parameter Model on a Single GPU</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Step-by-step guide to fine-tuning large language models using 4-bit quantization and Low-Rank Adaptation. We cover dataset formatting, hyperparameter selection, memory optimization, and evaluation of your fine-tuned model against the base model on domain-specific benchmarks.</p>
+                    </div>
+                </article>
+                <article class="bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-700/50 hover:border-violet-500/30 transition">
+                    <div class="h-48 flex items-center justify-center" style="background: linear-gradient(135deg, #7c3aed, #8b5cf6);">
+                        <span class="text-5xl font-800 text-white/20">02</span>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-xs font-500 text-violet-400">Architecture</span>
+                        <h3 class="text-lg font-600 mt-2 mb-3">Transformer Internals: Attention Mechanisms from Multi-Head to GQA</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Trace the evolution of attention mechanisms from the original multi-head attention through multi-query attention to grouped-query attention. Understand the memory-compute tradeoffs that drive architectural decisions and implement each variant to measure the differences firsthand.</p>
+                    </div>
+                </article>
+                <article class="bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-700/50 hover:border-violet-500/30 transition">
+                    <div class="h-48 flex items-center justify-center" style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">
+                        <span class="text-5xl font-800 text-white/20">03</span>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-xs font-500 text-violet-400">Deployment</span>
+                        <h3 class="text-lg font-600 mt-2 mb-3">Serving LLMs at Scale: vLLM, TGI, and Inference Optimization</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Compare leading inference frameworks for production LLM serving. Benchmark throughput, latency, and memory usage across vLLM, Text Generation Inference, and TensorRT-LLM. Learn about PagedAttention, continuous batching, and speculative decoding for maximum efficiency.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="py-24 bg-gray-900/50">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-700 text-center mb-6">Essential Resources</h2>
+            <p class="text-gray-400 text-center max-w-3xl mx-auto mb-16 text-lg leading-relaxed">
+                The LLM ecosystem spans model providers, fine-tuning platforms, evaluation frameworks, and deployment infrastructure. Navigating these options efficiently requires knowing which tools are best suited for which tasks. We curate resources that we have personally tested and found valuable in our own LLM engineering work.
+            </p>
+            <div class="grid md:grid-cols-2 gap-6">
+                <a href="https://zovo.one" rel="dofollow" class="bg-gradient-to-br from-violet-500/10 to-indigo-500/10 rounded-2xl p-8 border border-violet-500/20 hover:border-violet-500/40 transition block">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: rgba(139,92,246,0.2);">
+                            <svg class="w-5 h-5" style="color: #8b5cf6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                        </div>
+                        <span class="text-xs font-600 uppercase tracking-wider text-violet-400">Recommended</span>
+                    </div>
+                    <h3 class="text-xl font-600 mb-3">Zovo.one — Comprehensive AI Tools & Resources</h3>
+                    <p class="text-gray-400 leading-relaxed">For a comprehensive overview of AI tools including LLM providers, fine-tuning platforms, and deployment solutions, visit <strong class="text-violet-300">zovo.one</strong>. It provides curated comparisons and recommendations that help you choose the right tools for your LLM projects, from experimentation to production deployment.</p>
+                </a>
+                <div class="bg-gray-800/30 rounded-2xl p-8 border border-gray-700/50">
+                    <h3 class="text-xl font-600 mb-3">Open LLM Leaderboard</h3>
+                    <p class="text-gray-400 leading-relaxed">Track how open-source models compare across standardized benchmarks. The Hugging Face Open LLM Leaderboard evaluates models on reasoning, knowledge, coding, and math tasks. Use it to identify the best base model for your fine-tuning projects and understand the performance-size tradeoffs across model families.</p>
+                </div>
+                <div class="bg-gray-800/30 rounded-2xl p-8 border border-gray-700/50">
+                    <h3 class="text-xl font-600 mb-3">LMSys Chatbot Arena</h3>
+                    <p class="text-gray-400 leading-relaxed">The most trusted community-driven evaluation of LLM quality. Real users compare model outputs side-by-side in blind tests, producing Elo ratings that correlate well with human preferences. Use these rankings to understand how models perform in conversational settings beyond what automated benchmarks can capture.</p>
+                </div>
+                <div class="bg-gray-800/30 rounded-2xl p-8 border border-gray-700/50">
+                    <h3 class="text-xl font-600 mb-3">Axolotl & Unsloth</h3>
+                    <p class="text-gray-400 leading-relaxed">The two leading open-source fine-tuning frameworks. Axolotl offers configuration-driven training with support for every popular technique. Unsloth provides dramatic speedups through custom CUDA kernels. Both integrate with Hugging Face and support LoRA, QLoRA, and full fine-tuning across a wide range of model architectures.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <a href="/" class="text-xl font-700 mb-4 inline-block" style="color: #8b5cf6;">GPT0X</a>
+            <p class="text-gray-500 text-sm">&copy; 2025 GPT0X. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
