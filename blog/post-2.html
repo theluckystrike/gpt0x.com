@@ -80,6 +80,8 @@
 
     <h2>Customization: Fine-tuning Changes Everything</h2>
     <p>Open models can be fine-tuned on your data, which is the single most impactful way to improve performance for a specific task. A fine-tuned Llama 3.1 8B model for your domain often outperforms a general-purpose GPT-4 on that specific task, at a fraction of the cost.</p>
+
+    <p>Need developer utilities for API testing? Check out <a href="https://kappakit.com/tools/">KappaKit's developer toolkit</a>.</p>
     <p>Closed providers offer fine-tuning APIs (OpenAI's fine-tuning, Anthropic's upcoming options), but the control is limited. You cannot modify the architecture, adjust the training loop, or inspect the weights. With open models, you have full control:</p>
     <pre># Fine-tune Llama 3.1 8B with LoRA
 from transformers import AutoModelForCausalLM
