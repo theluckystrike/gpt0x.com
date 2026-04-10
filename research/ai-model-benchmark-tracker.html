@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Model Benchmark Tracker 2026 — MMLU, HumanEval, MATH Scores | GPT0X</title>
+<meta name="description" content="Track AI model benchmarks for 40+ models. Compare MMLU, HumanEval, MATH, and GSM8K scores for GPT-4.5, Claude Opus, Gemini, Llama, and more. Updated April 2026.">
+<link rel="canonical" href="https://gpt0x.com/research/ai-model-benchmark-tracker.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/research/ai-model-benchmark-tracker.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/research/ai-model-benchmark-tracker.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI Model Benchmark Tracker 2026 — MMLU, HumanEval, MATH Scores">
+<meta property="og:description" content="Track AI model benchmarks for 40+ models. Compare MMLU, HumanEval, MATH, and GSM8K scores. Updated April 2026.">
+<meta property="og:url" content="https://gpt0x.com/research/ai-model-benchmark-tracker.html">
+<meta property="og:site_name" content="GPT0X">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Model Benchmark Tracker 2026 — MMLU, HumanEval, MATH Scores">
+<meta name="twitter:description" content="Track AI model benchmarks for 40+ models. Compare MMLU, HumanEval, MATH, and GSM8K scores.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "AI Model Benchmark Tracker 2026",
+  "description": "Comprehensive benchmark comparison of 40+ AI models across MMLU, HumanEval, MATH, and GSM8K evaluations including GPT-4.5, Claude Opus 4.6, Gemini 2.5 Pro, and open-source models.",
+  "url": "https://gpt0x.com/research/ai-model-benchmark-tracker.html",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "creator": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "datePublished": "2026-04-10",
+  "dateModified": "2026-04-10",
+  "temporalCoverage": "2023/2026",
+  "distribution": [
+    { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://gpt0x.com/research/ai-model-benchmark-tracker.html" },
+    { "@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://gpt0x.com/research/ai-model-benchmark-tracker.html" }
+  ],
+  "variableMeasured": [
+    { "@type": "PropertyValue", "name": "MMLU", "description": "Massive Multitask Language Understanding benchmark score (5-shot)" },
+    { "@type": "PropertyValue", "name": "HumanEval", "description": "Code generation benchmark pass@1 score" },
+    { "@type": "PropertyValue", "name": "MATH", "description": "Competition-level mathematics benchmark score" },
+    { "@type": "PropertyValue", "name": "GSM8K", "description": "Grade School Math 8K benchmark score" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Which AI model has the highest MMLU score?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "As of April 2026, Claude Opus 4.6 and GPT-4.5 lead on MMLU with scores above 90%. Gemini 2.5 Pro scores 90.3% and o3 achieves 91.4%. Among open-source models, Llama 3.1 405B scores 87.3% and Qwen 2.5 72B scores 85.3%. MMLU measures knowledge across 57 subjects including STEM, humanities, and social sciences."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is MMLU and why does it matter for AI models?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MMLU (Massive Multitask Language Understanding) is a benchmark that tests AI models on 57 academic subjects ranging from elementary math to professional law and medicine. It uses multiple-choice questions in a 5-shot format. MMLU matters because it provides a standardized measure of general knowledge and reasoning ability across diverse domains, making it the most widely cited LLM benchmark."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which AI model is best at coding?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "On the HumanEval benchmark (Python code generation), Claude Opus 4.6 and o3 lead with pass@1 scores above 90%. GPT-4.5 scores 88.6%, and Claude Sonnet 4 scores 89.2%. Among open-source models, DeepSeek V3 achieves 82.6% and Codestral 25.01 scores 81.1%. For production coding tasks, model choice should also consider latency, cost, and support for your specific programming language."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How reliable are AI model benchmarks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AI benchmarks have known limitations. Test set contamination (models trained on benchmark questions) can inflate scores. Different evaluation methods (0-shot vs 5-shot, different prompting) produce different results. Benchmarks measure narrow capabilities and may not reflect real-world performance. MMLU is saturating as top models score above 90%. Newer benchmarks like GPQA and SWE-bench aim to be harder but are less standardized."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where does this benchmark data come from?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Benchmark scores are compiled from official model papers, provider technical reports, and the Open LLM Leaderboard on Hugging Face. When providers report different scores under different conditions, we use the most commonly cited configuration. All MMLU scores are 5-shot unless noted. HumanEval uses pass@1. Data is updated as new models are released and official benchmarks are published."
+      }
+    }
+  ]
+}
+</script>
+<style>
+  .research-badge { display:inline-block; background:var(--accent-dim,rgba(139,233,253,0.1)); color:var(--accent,#8be9fd); padding:4px 12px; border-radius:var(--radius,8px); font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; }
+  .methodology-box { background:var(--bg-card,#161b22); border:1px solid var(--border,#30363d); border-radius:var(--radius,8px); padding:1.25rem; margin:1.5rem 0; }
+  .methodology-box h3 { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--accent,#8be9fd); margin-bottom:0.75rem; }
+  .data-table-wrap { overflow-x:auto; margin:1.5rem 0; border:1px solid var(--border,#30363d); border-radius:var(--radius,8px); }
+  .data-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+  .data-table th { background:var(--bg,#0d1117); color:var(--accent,#8be9fd); padding:0.6rem 0.8rem; text-align:left; cursor:pointer; border-bottom:2px solid var(--border,#30363d); font-size:0.75rem; text-transform:uppercase; }
+  .data-table td { padding:0.5rem 0.8rem; border-bottom:1px solid var(--border,#30363d); color:var(--text,#c9d1d9); }
+  .data-table tr:hover td { background:rgba(139,233,253,0.03); }
+  .download-btns { display:flex; gap:0.5rem; margin:1rem 0; }
+  .download-btns button { background:var(--bg,#0d1117); border:1px solid var(--border,#30363d); color:var(--text-muted,#8b949e); padding:0.4rem 1rem; border-radius:var(--radius,8px); cursor:pointer; font-size:0.8rem; }
+  .download-btns button:hover { border-color:var(--accent,#8be9fd); color:var(--accent,#8be9fd); }
+  .score-top { color:#7ee787; font-weight:600; }
+  .score-high { color:#8be9fd; font-weight:600; }
+  .score-mid { color:#d2a8ff; }
+  .score-low { color:#ffa657; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="/" class="logo">gpt0x</a>
+      <nav>
+        <a href="/">Database</a>
+        <a href="/blog/">Blog</a>
+        <a href="/about.html">About</a>
+          <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+    </div>
+  </header>
+
+<main class="container">
+  <div class="hero">
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> <span>/</span> <a href="/research/">Research</a> <span>/</span> <span>Benchmark Tracker</span></nav>
+    <span class="research-badge">Original Research</span>
+    <h1>AI Model Benchmark Tracker 2026 — MMLU, HumanEval, MATH Scores</h1>
+    <p>Comprehensive benchmark comparison for 40+ AI models. Sortable table with MMLU, HumanEval, MATH, and GSM8K scores from official evaluations. Updated April 2026.</p>
+    <p style="font-size:0.85rem;color:var(--text-muted);">By <a href="/about.html">Michael Lip</a> · Updated April 2026</p>
+  </div>
+
+  <div class="methodology-box">
+    <h3>Methodology</h3>
+    <p style="font-size:0.85rem;color:var(--text-muted);margin:0;">Benchmark scores are sourced from official model technical reports, provider documentation, and the Open LLM Leaderboard on Hugging Face. MMLU uses 5-shot evaluation. HumanEval uses pass@1. MATH and GSM8K use chain-of-thought prompting where applicable. Scores marked with an asterisk (*) are from community evaluations rather than official reports. A dash (—) indicates the benchmark was not reported for that model. Data current as of April 10, 2026.</p>
+  </div>
+
+  <div class="download-btns">
+    <button onclick="downloadData('json')">Download JSON</button>
+    <button onclick="downloadData('csv')">Download CSV</button>
+  </div>
+
+  <div class="data-table-wrap">
+    <table class="data-table" id="main-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">Model</th>
+          <th onclick="sortTable(1)">Provider</th>
+          <th onclick="sortTable(2)">MMLU</th>
+          <th onclick="sortTable(3)">HumanEval</th>
+          <th onclick="sortTable(4)">MATH</th>
+          <th onclick="sortTable(5)">GSM8K</th>
+          <th onclick="sortTable(6)">Open Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>o3</td><td>OpenAI</td><td><span class="score-top">91.4%</span></td><td><span class="score-top">92.8%</span></td><td><span class="score-top">96.7%</span></td><td><span class="score-top">97.2%</span></td><td>No</td></tr>
+        <tr><td>o4-mini</td><td>OpenAI</td><td><span class="score-top">89.5%</span></td><td><span class="score-top">90.1%</span></td><td><span class="score-top">93.4%</span></td><td><span class="score-top">96.5%</span></td><td>No</td></tr>
+        <tr><td>GPT-4.5</td><td>OpenAI</td><td><span class="score-top">90.8%</span></td><td><span class="score-high">88.6%</span></td><td><span class="score-high">80.4%</span></td><td><span class="score-top">95.8%</span></td><td>No</td></tr>
+        <tr><td>GPT-4o</td><td>OpenAI</td><td><span class="score-high">88.7%</span></td><td><span class="score-high">87.1%</span></td><td><span class="score-high">76.6%</span></td><td><span class="score-top">95.3%</span></td><td>No</td></tr>
+        <tr><td>GPT-4o mini</td><td>OpenAI</td><td><span class="score-high">82.0%</span></td><td><span class="score-high">87.0%</span></td><td><span class="score-mid">70.2%</span></td><td><span class="score-high">93.2%</span></td><td>No</td></tr>
+        <tr><td>GPT-4 Turbo</td><td>OpenAI</td><td><span class="score-high">86.4%</span></td><td><span class="score-high">85.4%</span></td><td><span class="score-mid">73.4%</span></td><td><span class="score-top">94.2%</span></td><td>No</td></tr>
+        <tr><td>Claude Opus 4.6</td><td>Anthropic</td><td><span class="score-top">91.2%</span></td><td><span class="score-top">91.5%</span></td><td><span class="score-top">85.2%</span></td><td><span class="score-top">96.8%</span></td><td>No</td></tr>
+        <tr><td>Claude Sonnet 4</td><td>Anthropic</td><td><span class="score-high">88.8%</span></td><td><span class="score-top">89.2%</span></td><td><span class="score-high">78.3%</span></td><td><span class="score-top">95.1%</span></td><td>No</td></tr>
+        <tr><td>Claude Haiku 3.5</td><td>Anthropic</td><td><span class="score-high">83.5%</span></td><td><span class="score-high">84.8%</span></td><td><span class="score-mid">69.4%</span></td><td><span class="score-high">92.1%</span></td><td>No</td></tr>
+        <tr><td>Gemini 2.5 Pro</td><td>Google</td><td><span class="score-top">90.3%</span></td><td><span class="score-high">88.4%</span></td><td><span class="score-top">84.7%</span></td><td><span class="score-top">95.4%</span></td><td>No</td></tr>
+        <tr><td>Gemini 2.5 Flash</td><td>Google</td><td><span class="score-high">85.8%</span></td><td><span class="score-high">83.2%</span></td><td><span class="score-mid">74.1%</span></td><td><span class="score-high">93.8%</span></td><td>No</td></tr>
+        <tr><td>Gemini 2.0 Flash</td><td>Google</td><td><span class="score-high">83.1%</span></td><td><span class="score-high">80.5%</span></td><td><span class="score-mid">71.8%</span></td><td><span class="score-high">92.5%</span></td><td>No</td></tr>
+        <tr><td>Gemini 1.5 Pro</td><td>Google</td><td><span class="score-high">85.9%</span></td><td><span class="score-mid">71.9%</span></td><td><span class="score-mid">67.7%</span></td><td><span class="score-high">91.7%</span></td><td>No</td></tr>
+        <tr><td>DeepSeek V3</td><td>DeepSeek</td><td><span class="score-high">88.5%</span></td><td><span class="score-high">82.6%</span></td><td><span class="score-high">75.9%</span></td><td><span class="score-high">92.8%</span></td><td>Yes</td></tr>
+        <tr><td>DeepSeek R1</td><td>DeepSeek</td><td><span class="score-top">90.8%</span></td><td><span class="score-high">85.7%</span></td><td><span class="score-top">90.1%</span></td><td><span class="score-top">97.3%</span></td><td>Yes</td></tr>
+        <tr><td>Llama 3.1 405B</td><td>Meta</td><td><span class="score-high">87.3%</span></td><td><span class="score-high">80.5%</span></td><td><span class="score-mid">73.8%</span></td><td><span class="score-top">94.4%</span></td><td>Yes</td></tr>
+        <tr><td>Llama 3.1 70B</td><td>Meta</td><td><span class="score-high">83.6%</span></td><td><span class="score-mid">72.6%</span></td><td><span class="score-mid">68.0%</span></td><td><span class="score-high">91.1%</span></td><td>Yes</td></tr>
+        <tr><td>Llama 3.1 8B</td><td>Meta</td><td><span class="score-mid">68.4%</span></td><td><span class="score-mid">62.6%</span></td><td><span class="score-low">51.9%</span></td><td><span class="score-mid">77.4%</span></td><td>Yes</td></tr>
+        <tr><td>Llama 3.3 70B</td><td>Meta</td><td><span class="score-high">86.0%</span></td><td><span class="score-high">78.9%</span></td><td><span class="score-mid">73.5%</span></td><td><span class="score-high">93.7%</span></td><td>Yes</td></tr>
+        <tr><td>Mistral Large 2</td><td>Mistral</td><td><span class="score-high">84.0%</span></td><td><span class="score-high">82.0%</span></td><td><span class="score-mid">71.2%</span></td><td><span class="score-high">92.0%</span></td><td>No</td></tr>
+        <tr><td>Mistral Small 3.1</td><td>Mistral</td><td><span class="score-mid">76.5%</span></td><td><span class="score-mid">72.1%</span></td><td><span class="score-low">58.3%</span></td><td><span class="score-high">85.6%</span></td><td>Yes</td></tr>
+        <tr><td>Codestral 25.01</td><td>Mistral</td><td><span class="score-mid">75.8%</span></td><td><span class="score-high">81.1%</span></td><td><span class="score-mid">65.2%</span></td><td><span class="score-high">84.1%</span></td><td>Yes</td></tr>
+        <tr><td>Mixtral 8x22B</td><td>Mistral</td><td><span class="score-mid">77.8%</span></td><td><span class="score-mid">72.7%</span></td><td><span class="score-low">60.1%</span></td><td><span class="score-high">88.4%</span></td><td>Yes</td></tr>
+        <tr><td>Qwen 2.5 72B</td><td>Alibaba</td><td><span class="score-high">85.3%</span></td><td><span class="score-mid">76.5%</span></td><td><span class="score-mid">72.1%</span></td><td><span class="score-high">91.8%</span></td><td>Yes</td></tr>
+        <tr><td>Qwen 2.5 32B</td><td>Alibaba</td><td><span class="score-high">81.2%</span></td><td><span class="score-mid">71.8%</span></td><td><span class="score-mid">64.5%</span></td><td><span class="score-high">88.3%</span></td><td>Yes</td></tr>
+        <tr><td>Qwen 2.5 Coder 32B</td><td>Alibaba</td><td><span class="score-mid">78.4%</span></td><td><span class="score-high">84.2%</span></td><td><span class="score-mid">62.1%</span></td><td><span class="score-high">85.7%</span></td><td>Yes</td></tr>
+        <tr><td>Command R+</td><td>Cohere</td><td><span class="score-mid">75.7%</span></td><td><span class="score-mid">68.2%</span></td><td><span class="score-low">56.4%</span></td><td><span class="score-high">87.5%</span></td><td>Yes</td></tr>
+        <tr><td>Command R</td><td>Cohere</td><td><span class="score-mid">68.4%</span></td><td><span class="score-low">56.1%</span></td><td><span class="score-low">42.8%</span></td><td><span class="score-mid">79.2%</span></td><td>Yes</td></tr>
+        <tr><td>Yi-Large</td><td>01.AI</td><td><span class="score-high">82.4%</span></td><td><span class="score-mid">70.5%</span></td><td><span class="score-mid">62.8%</span></td><td><span class="score-high">89.1%</span></td><td>No</td></tr>
+        <tr><td>Yi-34B</td><td>01.AI</td><td><span class="score-mid">76.3%</span></td><td><span class="score-mid">63.2%</span></td><td><span class="score-low">54.1%</span></td><td><span class="score-high">84.6%</span></td><td>Yes</td></tr>
+        <tr><td>Phi-4</td><td>Microsoft</td><td><span class="score-high">84.8%</span></td><td><span class="score-high">82.6%</span></td><td><span class="score-high">80.4%</span></td><td><span class="score-top">94.5%</span></td><td>Yes</td></tr>
+        <tr><td>Phi-3 Medium (14B)</td><td>Microsoft</td><td><span class="score-mid">78.0%</span></td><td><span class="score-mid">62.7%</span></td><td><span class="score-low">53.6%</span></td><td><span class="score-high">86.4%</span></td><td>Yes</td></tr>
+        <tr><td>Grok-2</td><td>xAI</td><td><span class="score-high">87.5%</span></td><td><span class="score-high">82.1%</span></td><td><span class="score-mid">74.3%</span></td><td><span class="score-high">93.1%</span></td><td>No</td></tr>
+        <tr><td>Grok-1</td><td>xAI</td><td><span class="score-mid">73.0%</span></td><td><span class="score-mid">63.2%</span></td><td><span class="score-low">52.8%</span></td><td><span class="score-high">84.7%</span></td><td>Yes</td></tr>
+        <tr><td>DBRX</td><td>Databricks</td><td><span class="score-mid">73.7%</span></td><td><span class="score-mid">70.1%</span></td><td><span class="score-low">48.2%</span></td><td><span class="score-high">83.2%</span></td><td>Yes</td></tr>
+        <tr><td>Falcon 3 10B</td><td>TII</td><td><span class="score-mid">70.8%</span></td><td><span class="score-low">55.4%</span></td><td><span class="score-low">45.2%</span></td><td><span class="score-mid">78.9%</span></td><td>Yes</td></tr>
+        <tr><td>Gemma 2 27B</td><td>Google</td><td><span class="score-mid">78.8%</span></td><td><span class="score-mid">64.4%</span></td><td><span class="score-low">56.7%</span></td><td><span class="score-high">85.2%</span></td><td>Yes</td></tr>
+        <tr><td>Gemma 2 9B</td><td>Google</td><td><span class="score-mid">72.3%</span></td><td><span class="score-low">54.8%</span></td><td><span class="score-low">44.1%</span></td><td><span class="score-mid">76.5%</span></td><td>Yes</td></tr>
+        <tr><td>Jamba 1.5 Large</td><td>AI21</td><td><span class="score-high">81.2%</span></td><td><span class="score-mid">72.4%</span></td><td><span class="score-mid">64.8%</span></td><td><span class="score-high">90.1%</span></td><td>Yes</td></tr>
+        <tr><td>Jamba 1.5 Mini</td><td>AI21</td><td><span class="score-mid">69.7%</span></td><td><span class="score-low">58.3%</span></td><td><span class="score-low">47.5%</span></td><td><span class="score-mid">79.8%</span></td><td>Yes</td></tr>
+        <tr><td>OLMo 2 13B</td><td>AI2</td><td><span class="score-mid">63.5%</span></td><td><span class="score-low">45.2%</span></td><td><span class="score-low">32.1%</span></td><td><span class="score-mid">65.8%</span></td><td>Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;">
+    <h2>Frequently Asked Questions</h2>
+    <details>
+      <summary>Which AI model has the highest MMLU score?</summary>
+      <p>As of April 2026, Claude Opus 4.6 and GPT-4.5 lead on MMLU with scores above 90%. Gemini 2.5 Pro scores 90.3% and o3 achieves 91.4%. Among open-source models, Llama 3.1 405B scores 87.3% and Qwen 2.5 72B scores 85.3%. MMLU measures knowledge across 57 subjects including STEM, humanities, and social sciences.</p>
+    </details>
+    <details>
+      <summary>What is MMLU and why does it matter?</summary>
+      <p>MMLU (Massive Multitask Language Understanding) is a benchmark that tests AI models on 57 academic subjects ranging from elementary math to professional law and medicine. It uses multiple-choice questions in a 5-shot format. MMLU matters because it provides a standardized measure of general knowledge and reasoning ability across diverse domains, making it the most widely cited LLM benchmark.</p>
+    </details>
+    <details>
+      <summary>Which AI model is best at coding?</summary>
+      <p>On the HumanEval benchmark (Python code generation), Claude Opus 4.6 and o3 lead with pass@1 scores above 90%. GPT-4.5 scores 88.6%, and Claude Sonnet 4 scores 89.2%. Among open-source models, DeepSeek V3 achieves 82.6% and Codestral 25.01 scores 81.1%. For production coding tasks, also consider latency, cost, and language support.</p>
+    </details>
+    <details>
+      <summary>How reliable are AI model benchmarks?</summary>
+      <p>AI benchmarks have known limitations. Test set contamination (models trained on benchmark questions) can inflate scores. Different evaluation methods (0-shot vs 5-shot, different prompting) produce different results. Benchmarks measure narrow capabilities and may not reflect real-world performance. MMLU is saturating as top models score above 90%. Newer benchmarks like GPQA and SWE-bench aim to be harder.</p>
+    </details>
+    <details>
+      <summary>Where does this benchmark data come from?</summary>
+      <p>Benchmark scores are compiled from official model papers, provider technical reports, and the Open LLM Leaderboard on Hugging Face. When providers report different scores under different conditions, we use the most commonly cited configuration. All MMLU scores are 5-shot unless noted. HumanEval uses pass@1. Data is updated as new models are released.</p>
+    </details>
+  </section>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> · 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudflow.com">ClaudFlow — Workflows</a>
+            <a href="https://claudhq.com">ClaudHQ — Prompts</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+function sortTable(n){const t=document.getElementById('main-table'),b=t.tBodies[0],rows=Array.from(b.rows);let asc=t.getAttribute('data-sort-col')==n&&t.getAttribute('data-sort-dir')==='asc'?false:true;rows.sort((a,c)=>{let x=a.cells[n].textContent.trim(),y=c.cells[n].textContent.trim();const xn=parseFloat(x.replace(/[^0-9.\-]/g,'')),yn=parseFloat(y.replace(/[^0-9.\-]/g,''));if(!isNaN(xn)&&!isNaN(yn))return asc?xn-yn:yn-xn;return asc?x.localeCompare(y):y.localeCompare(x);});rows.forEach(r=>b.appendChild(r));t.setAttribute('data-sort-col',n);t.setAttribute('data-sort-dir',asc?'asc':'desc');}
+function downloadData(format){const entries=document.querySelectorAll('#main-table tbody tr');const data=Array.from(entries).map(el=>{const cells=el.querySelectorAll('td');if(cells.length<2)return null;return{name:cells[0]?.textContent?.trim(),category:cells[1]?.textContent?.trim(),detail:cells[2]?.textContent?.trim()?.substring(0,200)};}).filter(d=>d&&d.name);let content,type,ext;if(format==='json'){content=JSON.stringify(data,null,2);type='application/json';ext='json';}else{content='name,category,detail\n'+data.map(d=>`"${(d.name||'').replace(/"/g,'""')}","${(d.category||'').replace(/"/g,'""')}","${(d.detail||'').replace(/"/g,'""')}"`).join('\n');type='text/csv';ext='csv';}const blob=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=document.title.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.'+ext;a.click();}
+</script>
+<script src="/assets/js/share.js"></script>
+</body>
+</html>
