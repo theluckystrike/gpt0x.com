@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vector Embedding Model Comparison — Dimensions, Cost & Performance (2026) | GPT0X</title>
+<meta name="description" content="Compare vector embedding models: OpenAI text-embedding-3, Cohere Embed v4, Voyage AI, Google Gecko, and open-source alternatives. Dimensions, cost per million tokens, MTEB scores, and use-case recommendations.">
+<meta name="keywords" content="embedding model comparison, vector embeddings, text-embedding-3, Cohere embed, Voyage AI, embedding dimensions, RAG embeddings, semantic search, embedding cost comparison">
+<link rel="canonical" href="https://gpt0x.com/answers/embedding-model-comparison.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/answers/embedding-model-comparison.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/answers/embedding-model-comparison.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vector Embedding Model Comparison — Dimensions, Cost & Performance (2026)">
+<meta property="og:description" content="Compare vector embedding models by dimensions, cost per million tokens, MTEB scores, and use-case fit.">
+<meta property="og:url" content="https://gpt0x.com/answers/embedding-model-comparison.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Vector Embedding Model Comparison — Dimensions, Cost & Performance (2026)">
+<meta name="twitter:description" content="Compare vector embedding models by dimensions, cost, MTEB scores, and use-case fit.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Vector Embedding Model Comparison — Dimensions, Cost & Performance",
+  "url": "https://gpt0x.com/answers/embedding-model-comparison.html",
+  "description": "Compare vector embedding models across dimensions, pricing, MTEB benchmarks, and use-case recommendations.",
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "publisher": { "@type": "Organization", "name": "GPT0X", "url": "https://gpt0x.com" },
+  "datePublished": "2026-05-25",
+  "dateModified": "2026-05-25",
+  "mainEntityOfPage": "https://gpt0x.com/answers/embedding-model-comparison.html"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What are the best embedding models in 2026?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The top embedding models in 2026 are: OpenAI text-embedding-3-large (3072 dimensions, $0.13/1M tokens, strong general-purpose performance), Cohere Embed v4 (1024 dimensions, multilingual leader), Voyage AI voyage-3-large (1024 dimensions, top MTEB retrieval scores), and for open-source, NV-Embed-v2 and GTE-Qwen2 lead the MTEB leaderboard. The best choice depends on your use case: text-embedding-3-small offers the best cost/performance ratio for most applications, while Voyage AI leads for retrieval-heavy RAG pipelines." }
+    },
+    {
+      "@type": "Question",
+      "name": "How many dimensions should my embeddings have?",
+      "acceptedAnswer": { "@type": "Answer", "text": "For most applications, 768-1024 dimensions provide the best balance of quality and efficiency. Higher dimensions (1536-3072) capture more semantic nuance but increase storage costs linearly and slow down similarity search. Lower dimensions (256-512) are faster and cheaper but lose semantic precision. OpenAI's text-embedding-3 models support dimension reduction via the dimensions parameter, letting you trade quality for efficiency without retraining. For production RAG systems, 1024 dimensions is the sweet spot — it fits standard vector database indexes efficiently and captures enough semantic detail for accurate retrieval." }
+    },
+    {
+      "@type": "Question",
+      "name": "How much do vector embeddings cost to store?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Storage cost depends on dimensions and database choice. A 1536-dimension float32 embedding uses 6,144 bytes (6KB). One million embeddings at 1536 dimensions = ~6GB. Using float16 (half precision) halves storage with minimal quality loss. Pinecone charges $0.33/GB/month for pod-based plans. Qdrant Cloud starts at $0.025/GB. Self-hosted with pgvector is limited to your PostgreSQL storage costs. For 10 million documents at 1024 dimensions: ~40GB float32, ~20GB float16. At Pinecone pod pricing, that is ~$13/month for float32 or ~$6.50 for float16." }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I use open-source or commercial embedding models?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Open-source embedding models (GTE-Qwen2, NV-Embed-v2, BGE-M3) now match or exceed commercial APIs on MTEB benchmarks. The tradeoff is operational: commercial APIs (OpenAI, Cohere, Voyage) require zero infrastructure — you send text and get vectors back. Open-source models require GPU hosting for inference (~$0.50-2.00/hr for a single A10G) but have zero per-token costs. At scale (10M+ embeddings), self-hosted open-source models are 5-20x cheaper. For prototyping and small-to-medium scale (<1M docs), commercial APIs are simpler and often cheaper when you factor in engineering time." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I switch embedding models after building my vector database?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Switching embedding models requires re-embedding your entire corpus because different models produce incompatible vector spaces — you cannot mix vectors from different models in the same index. For a 1 million document corpus, re-embedding costs $13-130 in API fees (depending on model and document length) and takes 2-8 hours. Plan for this by storing original text alongside vectors, using versioned collection names in your vector database, and building re-embedding pipelines early. Some teams maintain dual indexes during migration, gradually shifting traffic to the new model." }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Answers", "item": "https://gpt0x.com/answers/" },
+    { "@type": "ListItem", "position": 3, "name": "Embedding Model Comparison", "item": "https://gpt0x.com/answers/embedding-model-comparison.html" }
+  ]
+}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}
+.tool-hero h1 span{color:var(--accent)}
+.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.em-table-wrap{overflow-x:auto;margin-bottom:2rem}
+.em-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.em-table th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.3px;padding:.6rem .5rem;text-align:left;border:1px solid var(--border);white-space:nowrap}
+.em-table td{padding:.5rem;border:1px solid var(--border);color:var(--text-muted)}
+.em-table tr:hover td{background:var(--bg-card)}
+.em-table .em-highlight{color:var(--accent);font-weight:600}
+.em-table .em-name{font-weight:600;color:var(--text)}
+.em-filters{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.em-filters select{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 12px;font-family:var(--font-body);font-size:.83rem}
+.em-filters select:focus{outline:none;border-color:var(--accent)}
+.em-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.em-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.em-field{margin-bottom:1rem}
+.em-field label{display:block;font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:4px}
+.em-field input,.em-field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-family:var(--font-body);font-size:.85rem}
+.em-field input:focus,.em-field select:focus{outline:none;border-color:var(--accent)}
+.em-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;background:var(--accent);color:#000}
+.em-btn:hover{opacity:.85}
+.em-result{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-top:1rem;font-size:.85rem;color:var(--text-muted)}
+.em-result strong{color:var(--accent)}
+.em-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+@media(max-width:768px){.em-grid{grid-template-columns:1fr}}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}
+.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}
+.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}
+.explainer p{color:var(--text-muted);margin-bottom:1rem}
+.explainer ul,.explainer ol{color:var(--text-muted);margin:0 0 1rem 1.5rem}
+.explainer li{margin-bottom:.4rem}
+.explainer table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}
+.explainer th,.explainer td{padding:.5rem .75rem;border:1px solid var(--border);text-align:left}
+.explainer th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}
+.explainer td{color:var(--text-muted)}
+.faq-section{max-width:780px;margin:2.5rem auto}
+.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}
+.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}
+.faq-section summary:hover{color:var(--accent)}
+.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}
+.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}
+.related-card:hover{border-color:var(--accent);text-decoration:none}
+.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}
+.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}
+.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">gpt0x</a>
+    <nav>
+      <a href="/">Database</a>
+      <a href="/research/">Research</a>
+      <a href="/tools/">Tools</a>
+      <a href="/answers/">Answers</a>
+      <a href="/blog/">Blog</a>
+      <a href="/about.html">About</a>
+      <div class="nav-right">
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+        <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-container">
+  <div class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/answers/">Answers</a> &rsaquo; Embedding Model Comparison
+  </div>
+
+  <div class="tool-hero">
+    <h1>Vector <span>Embedding</span> Model Comparison</h1>
+    <p>Compare embedding models from OpenAI, Cohere, Voyage AI, Google, and open-source alternatives. Interactive table with dimensions, cost per million tokens, MTEB benchmark scores, max sequence length, and storage cost calculator. Find the best embedding model for your RAG pipeline, semantic search, or classification task.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="em-filters">
+    <select id="em-type-filter" onchange="em.filterTable()">
+      <option value="all">All Types</option>
+      <option value="api">API (Commercial)</option>
+      <option value="oss">Open Source</option>
+    </select>
+    <select id="em-sort" onchange="em.filterTable()">
+      <option value="mteb">Sort by MTEB Score</option>
+      <option value="cost">Sort by Cost (Low to High)</option>
+      <option value="dims">Sort by Dimensions</option>
+      <option value="name">Sort by Name</option>
+    </select>
+  </div>
+
+  <div class="em-table-wrap">
+    <table class="em-table" id="em-main-table">
+      <thead>
+        <tr><th>Model</th><th>Provider</th><th>Type</th><th>Dims</th><th>Max Tokens</th><th>MTEB Avg</th><th>Cost/1M Tokens</th><th>Storage/1M Docs</th></tr>
+      </thead>
+      <tbody id="em-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="em-grid">
+    <div class="em-panel">
+      <h3>Storage Cost Calculator</h3>
+      <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Estimate vector storage costs based on your corpus size and embedding dimensions.</p>
+      <div class="em-field">
+        <label>Number of documents</label>
+        <input type="number" id="em-docs" value="1000000" min="1000">
+      </div>
+      <div class="em-field">
+        <label>Embedding dimensions</label>
+        <input type="number" id="em-dims" value="1536" min="64" max="4096">
+      </div>
+      <div class="em-field">
+        <label>Precision</label>
+        <select id="em-precision">
+          <option value="4">float32 (4 bytes)</option>
+          <option value="2">float16 (2 bytes)</option>
+          <option value="1">int8 (1 byte)</option>
+          <option value="0.125">binary (1 bit)</option>
+        </select>
+      </div>
+      <button class="em-btn" onclick="em.calcStorage()">Calculate</button>
+      <div class="em-result" id="em-storage-result">Click "Calculate" to estimate storage requirements.</div>
+    </div>
+
+    <div class="em-panel">
+      <h3>Embedding Cost Estimator</h3>
+      <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Estimate the total cost to embed your document corpus.</p>
+      <div class="em-field">
+        <label>Number of documents</label>
+        <input type="number" id="em-cost-docs" value="100000" min="100">
+      </div>
+      <div class="em-field">
+        <label>Average tokens per document</label>
+        <input type="number" id="em-cost-tokens" value="500" min="10">
+      </div>
+      <div class="em-field">
+        <label>Embedding model</label>
+        <select id="em-cost-model">
+          <option value="0.02">text-embedding-3-small ($0.02/1M)</option>
+          <option value="0.13">text-embedding-3-large ($0.13/1M)</option>
+          <option value="0.10">Cohere Embed v4 ($0.10/1M)</option>
+          <option value="0.06">Voyage AI voyage-3 ($0.06/1M)</option>
+          <option value="0.18">Voyage AI voyage-3-large ($0.18/1M)</option>
+          <option value="0.00">Open Source (self-hosted)</option>
+        </select>
+      </div>
+      <button class="em-btn" onclick="em.calcCost()">Calculate</button>
+      <div class="em-result" id="em-cost-result">Click "Calculate" to estimate embedding costs.</div>
+    </div>
+  </div>
+
+  <section class="explainer">
+    <h2>Understanding Vector Embeddings in 2026</h2>
+    <p>Vector embeddings transform text into dense numerical representations — arrays of floating-point numbers — that capture semantic meaning. Two sentences with similar meanings produce vectors that are close together in the embedding space, even if they use completely different words. This property makes embeddings the foundation of semantic search, retrieval-augmented generation (RAG), clustering, classification, and recommendation systems. The embedding model you choose affects the quality, cost, and performance of every downstream application.</p>
+
+    <h2>Key Embedding Model Metrics</h2>
+    <h3>Dimensions</h3>
+    <p>The number of dimensions determines the expressiveness of each embedding vector. Higher dimensions capture more semantic nuance but increase storage costs and search latency linearly. A 3072-dimension vector stores 12KB in float32, while a 384-dimension vector stores just 1.5KB — an 8x difference. For most applications, the quality improvement from 1024 to 3072 dimensions is measurable but modest (1-3% on MTEB benchmarks), while storage costs triple. OpenAI's text-embedding-3 models support a useful feature: you can request lower-dimension outputs (e.g., 256 from the 3072-dimension model) via the dimensions API parameter, automatically performing Matryoshka dimension reduction.</p>
+
+    <h3>MTEB Benchmark</h3>
+    <p>The Massive Text Embedding Benchmark (MTEB) is the standard evaluation suite for embedding models, covering retrieval, clustering, classification, reranking, pair classification, STS (semantic textual similarity), and summarization tasks across 56+ datasets and 112+ languages. MTEB scores range from 0 to 100, with current leaders scoring 68-72 on the overall average. For RAG applications, focus on the retrieval subset scores rather than the overall average — a model with high retrieval scores but lower clustering scores is often the best choice for search applications.</p>
+
+    <h3>Max Sequence Length</h3>
+    <p>Each embedding model has a maximum input token length. Text-embedding-3 models accept up to 8,191 tokens. Cohere Embed v4 handles up to 512 tokens. Voyage AI supports up to 32,000 tokens for their long-context model. For RAG applications where you embed document chunks, the chunk size should respect the model's max length — embedding truncated text loses information from the end of the chunk. Models with longer max lengths are valuable for embedding full documents or lengthy passages without chunking.</p>
+
+    <h2>Embedding Model Comparison Table</h2>
+    <table>
+      <tr><th>Model</th><th>Dims</th><th>Max Tokens</th><th>MTEB Retrieval</th><th>Cost/1M</th></tr>
+      <tr><td>text-embedding-3-small</td><td>1536</td><td>8,191</td><td>62.3</td><td>$0.02</td></tr>
+      <tr><td>text-embedding-3-large</td><td>3072</td><td>8,191</td><td>66.0</td><td>$0.13</td></tr>
+      <tr><td>Cohere Embed v4</td><td>1024</td><td>512</td><td>64.5</td><td>$0.10</td></tr>
+      <tr><td>Voyage AI voyage-3-large</td><td>1024</td><td>32,000</td><td>68.2</td><td>$0.18</td></tr>
+      <tr><td>Voyage AI voyage-3</td><td>1024</td><td>32,000</td><td>65.8</td><td>$0.06</td></tr>
+      <tr><td>Google text-embedding-005</td><td>768</td><td>2,048</td><td>63.1</td><td>$0.025</td></tr>
+      <tr><td>NV-Embed-v2 (OSS)</td><td>4096</td><td>32,768</td><td>69.1</td><td>Self-hosted</td></tr>
+      <tr><td>GTE-Qwen2 (OSS)</td><td>1024</td><td>8,192</td><td>67.3</td><td>Self-hosted</td></tr>
+      <tr><td>BGE-M3 (OSS)</td><td>1024</td><td>8,192</td><td>65.9</td><td>Self-hosted</td></tr>
+    </table>
+
+    <h2>Choosing the Right Embedding Model</h2>
+    <h3>For RAG Pipelines</h3>
+    <p>RAG applications need high retrieval accuracy to find the most relevant document chunks for the LLM to use as context. Voyage AI voyage-3-large currently leads on retrieval benchmarks. For cost-sensitive applications, text-embedding-3-small offers the best value — 95% of the retrieval quality at 7x lower cost than text-embedding-3-large. Open-source models like GTE-Qwen2 match commercial APIs on benchmarks and eliminate per-token costs entirely for high-volume applications.</p>
+
+    <h3>For Semantic Search</h3>
+    <p>Semantic search requires balancing embedding quality with query latency. Lower-dimension embeddings produce faster similarity searches — 384 dimensions is 4x faster than 1536 dimensions for approximate nearest neighbor search. Consider Matryoshka embeddings from OpenAI's text-embedding-3 family, which allow you to use higher dimensions for indexing but lower dimensions for fast approximate search, then re-rank top results using full-dimension vectors.</p>
+
+    <h3>For Multilingual Applications</h3>
+    <p>Cohere Embed v4 leads for multilingual embedding quality, supporting 100+ languages with consistent cross-lingual performance. BGE-M3 is the top open-source choice for multilingual, supporting dense, sparse, and multi-vector retrieval in a single model. For English-only applications, language-specific models outperform multilingual ones because they can dedicate their full capacity to one language's semantics.</p>
+
+    <h2>Vector Database Storage Costs</h2>
+    <p>The total cost of an embedding-based system includes three components: embedding generation (one-time per document), vector storage (ongoing), and query processing (per search). Storage costs depend on vector dimensions, precision, and database choice. Using float16 instead of float32 halves storage with less than 1% quality loss. Binary quantization reduces storage by 32x but only works for reranking workflows where approximate search is refined by a second-stage retriever.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details><summary>What are the best embedding models in 2026?</summary><p>The top embedding models in 2026 are: OpenAI text-embedding-3-large (3072 dimensions, $0.13/1M tokens, strong general-purpose performance), Cohere Embed v4 (1024 dimensions, multilingual leader), Voyage AI voyage-3-large (1024 dimensions, top MTEB retrieval scores), and for open-source, NV-Embed-v2 and GTE-Qwen2. The best choice depends on your use case.</p></details>
+    <details><summary>How many dimensions should my embeddings have?</summary><p>For most applications, 768-1024 dimensions provide the best balance of quality and efficiency. Higher dimensions (1536-3072) capture more nuance but increase storage costs linearly. Lower dimensions (256-512) are faster and cheaper but lose precision. The sweet spot is 1024 dimensions.</p></details>
+    <details><summary>How much do vector embeddings cost to store?</summary><p>A 1536-dimension float32 embedding uses 6KB. One million embeddings at 1536 dimensions = ~6GB. Pinecone charges $0.33/GB/month. Self-hosted pgvector is limited to your PostgreSQL storage costs. Using float16 halves storage with minimal quality loss.</p></details>
+    <details><summary>Should I use open-source or commercial embedding models?</summary><p>Open-source models now match or exceed commercial APIs on MTEB benchmarks. The tradeoff is operational: commercial APIs require zero infrastructure. Open-source requires GPU hosting but has zero per-token costs. At scale (10M+ docs), open-source is 5-20x cheaper.</p></details>
+    <details><summary>Can I switch embedding models after building my vector database?</summary><p>Switching requires re-embedding your entire corpus. Different models produce incompatible vector spaces. Plan for this by storing original text alongside vectors, using versioned collection names, and building re-embedding pipelines early.</p></details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/guides/rag-pipeline-builder.html" class="related-card"><h3>RAG Pipeline Builder</h3><p>Design RAG architectures with chunking strategy optimizer.</p></a>
+      <a href="/tools/token-counter.html" class="related-card"><h3>Token Counter</h3><p>Count tokens to estimate embedding costs for your documents.</p></a>
+      <a href="/tools/ai-cost-estimator.html" class="related-card"><h3>AI Cost Estimator</h3><p>Project total monthly AI costs including embeddings and inference.</p></a>
+    </div>
+  </section>
+
+  <div class="author-bio">
+    <h3>About the Author</h3>
+    <p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p>
+  </div>
+</main>
+
+<footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Zovo Tools</div><div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div><a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a><div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div></div></footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network"><div class="zovo-network-inner"><h3 class="zovo-network-title">Explore More Tools</h3><div class="zovo-network-links"><a href="https://abwex.com">ABWex — A/B Testing</a><a href="https://claudflow.com">ClaudFlow — Workflows</a><a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a><a href="https://claudkit.com">ClaudKit — API</a><a href="https://enhio.com">Enhio — Text Tools</a><a href="https://epochpilot.com">EpochPilot — Timestamps</a><a href="https://gen8x.com">Gen8X — Color Tools</a><a href="https://heytensor.com">HeyTensor — ML Tools</a><a href="https://invokebot.com">InvokeBot — Webhooks</a><a href="https://kappafy.com">Kappafy — JSON</a><a href="https://kappakit.com">KappaKit — Dev Toolkit</a><a href="https://kickllm.com">KickLLM — LLM Costs</a><a href="https://krzen.com">Krzen — Image Tools</a><a href="https://lochbot.com">LochBot — Security</a><a href="https://lockml.com">LockML — ML Compare</a><a href="https://ml3x.com">ML3X — Matrix Math</a></div></div></nav>
+
+<script>
+(function(){
+  const models = [
+    { name:'text-embedding-3-small', provider:'OpenAI', type:'api', dims:1536, maxTokens:8191, mteb:62.3, cost:0.02, storagePer1M:'9.2 GB' },
+    { name:'text-embedding-3-large', provider:'OpenAI', type:'api', dims:3072, maxTokens:8191, mteb:66.0, cost:0.13, storagePer1M:'18.4 GB' },
+    { name:'Embed v4', provider:'Cohere', type:'api', dims:1024, maxTokens:512, mteb:64.5, cost:0.10, storagePer1M:'6.1 GB' },
+    { name:'voyage-3-large', provider:'Voyage AI', type:'api', dims:1024, maxTokens:32000, mteb:68.2, cost:0.18, storagePer1M:'6.1 GB' },
+    { name:'voyage-3', provider:'Voyage AI', type:'api', dims:1024, maxTokens:32000, mteb:65.8, cost:0.06, storagePer1M:'6.1 GB' },
+    { name:'voyage-3-lite', provider:'Voyage AI', type:'api', dims:512, maxTokens:32000, mteb:61.5, cost:0.02, storagePer1M:'3.1 GB' },
+    { name:'text-embedding-005', provider:'Google', type:'api', dims:768, maxTokens:2048, mteb:63.1, cost:0.025, storagePer1M:'4.6 GB' },
+    { name:'NV-Embed-v2', provider:'NVIDIA', type:'oss', dims:4096, maxTokens:32768, mteb:69.1, cost:0, storagePer1M:'24.6 GB' },
+    { name:'GTE-Qwen2-7B', provider:'Alibaba', type:'oss', dims:1024, maxTokens:8192, mteb:67.3, cost:0, storagePer1M:'6.1 GB' },
+    { name:'BGE-M3', provider:'BAAI', type:'oss', dims:1024, maxTokens:8192, mteb:65.9, cost:0, storagePer1M:'6.1 GB' },
+    { name:'E5-Mistral-7B', provider:'Microsoft', type:'oss', dims:4096, maxTokens:32768, mteb:66.6, cost:0, storagePer1M:'24.6 GB' },
+    { name:'Jina-v3', provider:'Jina AI', type:'api', dims:1024, maxTokens:8192, mteb:65.4, cost:0.02, storagePer1M:'6.1 GB' }
+  ];
+
+  function renderTable(data) {
+    const tbody = document.getElementById('em-tbody');
+    let html = '';
+    data.forEach(m => {
+      html += '<tr>';
+      html += '<td class="em-name">'+m.name+'</td>';
+      html += '<td>'+m.provider+'</td>';
+      html += '<td>'+(m.type==='api'?'API':'Open Source')+'</td>';
+      html += '<td class="em-highlight">'+m.dims.toLocaleString()+'</td>';
+      html += '<td>'+m.maxTokens.toLocaleString()+'</td>';
+      html += '<td class="em-highlight">'+m.mteb.toFixed(1)+'</td>';
+      html += '<td>'+(m.cost > 0 ? '$'+m.cost.toFixed(3) : 'Self-hosted')+'</td>';
+      html += '<td>'+m.storagePer1M+'</td>';
+      html += '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  function filterTable() {
+    const type = document.getElementById('em-type-filter').value;
+    const sort = document.getElementById('em-sort').value;
+    let filtered = [...models];
+    if (type !== 'all') filtered = filtered.filter(m => m.type === type);
+    if (sort === 'mteb') filtered.sort((a,b) => b.mteb - a.mteb);
+    else if (sort === 'cost') filtered.sort((a,b) => a.cost - b.cost);
+    else if (sort === 'dims') filtered.sort((a,b) => b.dims - a.dims);
+    else filtered.sort((a,b) => a.name.localeCompare(b.name));
+    renderTable(filtered);
+  }
+
+  function calcStorage() {
+    const docs = parseInt(document.getElementById('em-docs').value) || 1000000;
+    const dims = parseInt(document.getElementById('em-dims').value) || 1536;
+    const bytesPerDim = parseFloat(document.getElementById('em-precision').value);
+    const totalBytes = docs * dims * bytesPerDim;
+    const gb = totalBytes / (1024*1024*1024);
+    const pineconeCost = gb * 0.33;
+    const qdrantCost = gb * 0.025;
+    document.getElementById('em-storage-result').innerHTML =
+      'Total storage: <strong>'+gb.toFixed(2)+' GB</strong> ('+docs.toLocaleString()+' docs x '+dims+' dims x '+bytesPerDim+' bytes)<br>'+
+      'Pinecone (~$0.33/GB/mo): <strong>$'+pineconeCost.toFixed(2)+'/month</strong><br>'+
+      'Qdrant Cloud (~$0.025/GB/mo): <strong>$'+qdrantCost.toFixed(2)+'/month</strong><br>'+
+      'pgvector (self-hosted): <strong>'+gb.toFixed(2)+' GB disk</strong>';
+  }
+
+  function calcCost() {
+    const docs = parseInt(document.getElementById('em-cost-docs').value) || 100000;
+    const tokens = parseInt(document.getElementById('em-cost-tokens').value) || 500;
+    const costPer1M = parseFloat(document.getElementById('em-cost-model').value);
+    const totalTokens = docs * tokens;
+    const cost = (totalTokens / 1000000) * costPer1M;
+    document.getElementById('em-cost-result').innerHTML =
+      'Total tokens: <strong>'+totalTokens.toLocaleString()+'</strong> ('+docs.toLocaleString()+' docs x '+tokens+' tokens/doc)<br>'+
+      'Embedding cost: <strong>'+(costPer1M > 0 ? '$'+cost.toFixed(2) : 'Free (self-hosted GPU cost only)')+'</strong><br>'+
+      (costPer1M > 0 ? 'Cost per document: <strong>$'+(cost/docs).toFixed(6)+'</strong>' : 'GPU cost: ~$1-3/hr for 100K docs on A10G');
+  }
+
+  document.addEventListener('DOMContentLoaded', function() { filterTable(); });
+  window.em = { filterTable, calcStorage, calcCost };
+})();
+</script>
+</body>
+</html>

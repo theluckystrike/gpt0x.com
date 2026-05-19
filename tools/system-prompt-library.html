@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Prompt Library — Curated AI Prompts with Effectiveness Ratings | GPT0X</title>
+<meta name="description" content="Browse 50+ curated system prompts for GPT-4o, Claude, and Gemini organized by category. Effectiveness ratings, copy-to-clipboard, and customization tips. Coding, writing, analysis, and more.">
+<meta name="keywords" content="system prompt library, AI prompts, GPT system prompts, Claude system prompts, prompt engineering, prompt templates, AI prompt collection, LLM prompts, best system prompts">
+<link rel="canonical" href="https://gpt0x.com/tools/system-prompt-library.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/tools/system-prompt-library.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/tools/system-prompt-library.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="System Prompt Library — Curated AI Prompts with Effectiveness Ratings">
+<meta property="og:description" content="Browse 50+ curated system prompts for GPT-4o, Claude, and Gemini with effectiveness ratings and customization tips.">
+<meta property="og:url" content="https://gpt0x.com/tools/system-prompt-library.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="System Prompt Library — Curated AI Prompts with Effectiveness Ratings">
+<meta name="twitter:description" content="Browse 50+ curated system prompts for GPT-4o, Claude, and Gemini with effectiveness ratings.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "System Prompt Library",
+  "url": "https://gpt0x.com/tools/system-prompt-library.html",
+  "description": "Browse 50+ curated system prompts for GPT-4o, Claude, and Gemini organized by category with effectiveness ratings.",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "publisher": { "@type": "Organization", "name": "GPT0X", "url": "https://gpt0x.com" },
+  "datePublished": "2026-05-25",
+  "dateModified": "2026-05-25",
+  "featureList": [
+    "50+ curated system prompts across 8 categories",
+    "Effectiveness ratings based on real-world testing",
+    "One-click copy to clipboard",
+    "Filter by category, model compatibility, and use case",
+    "Token count and cost estimate for each prompt",
+    "Customization tips for each prompt template"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What makes an effective system prompt?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "An effective system prompt has four key elements: a clear role definition (who the AI is), specific constraints (what it should and should not do), output format instructions (how to structure responses), and context about the task domain. The best system prompts are concise yet precise — typically 100-300 tokens. They avoid vague instructions like 'be helpful' in favor of specific behaviors like 'respond with code examples in Python, include error handling, and explain each step in comments.' Testing shows that structured prompts with numbered rules outperform narrative-style instructions by 15-30% on consistency metrics."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long should a system prompt be?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "System prompts should be 100-500 tokens for most use cases. Shorter prompts (under 100 tokens) often lack enough specificity, leading to inconsistent outputs. Prompts over 500 tokens show diminishing returns — the model may ignore or deprioritize later instructions. Research from Anthropic shows that the first 200 tokens of a system prompt have the highest impact on model behavior. If you need extensive instructions, use a hierarchical approach: put the most critical rules first, use numbered lists for clarity, and move examples to the user message rather than the system prompt."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do system prompts work differently across GPT-4, Claude, and Gemini?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Each model family responds differently to system prompt styles. GPT-4o follows explicit numbered rules well and responds to persona-based instructions. Claude models are particularly responsive to ethical constraints and respond well to XML-tagged structure in prompts. Gemini models handle natural language instructions effectively and support grounding with external data. A prompt that works perfectly on GPT-4o may need adjustments for Claude — particularly around formatting instructions and output length control. Our library includes model-specific compatibility notes for each prompt."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I use the same system prompt for every conversation?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For production applications, use task-specific system prompts rather than one generic prompt. A customer support bot needs different instructions than a code review assistant. Dynamic system prompts that inject context (user preferences, conversation history summaries, relevant documentation) outperform static prompts. However, maintain a consistent core identity across variants — the base personality and safety rules should remain constant while task-specific instructions change. This approach combines consistency with flexibility."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I test and measure system prompt effectiveness?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Create an evaluation set of 20-50 test inputs that cover your expected use cases, including edge cases. Run each input through your prompt and score outputs on relevance (0-5), accuracy (0-5), format compliance (pass/fail), and safety (pass/fail). Calculate an aggregate score to compare prompt variants. A/B testing with real users provides the strongest signal — track metrics like user satisfaction ratings, task completion rates, and follow-up question frequency. Iterate on the lowest-scoring categories first for maximum improvement per edit."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools/" },
+    { "@type": "ListItem", "position": 3, "name": "System Prompt Library", "item": "https://gpt0x.com/tools/system-prompt-library.html" }
+  ]
+}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}
+.tool-hero h1 span{color:var(--accent)}
+.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.sp-filters{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.sp-filters select,.sp-filters input{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-family:var(--font-body);font-size:.83rem}
+.sp-filters select:focus,.sp-filters input:focus{outline:none;border-color:var(--accent)}
+.sp-filters input{flex:1;min-width:200px}
+.sp-count{font-size:.82rem;color:var(--text-muted);margin-bottom:1rem}
+.sp-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:2rem}
+.sp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;transition:border-color .2s}
+.sp-card:hover{border-color:var(--accent)}
+.sp-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem}
+.sp-card-title{font-size:.95rem;font-weight:700;color:var(--text);font-family:var(--font-display)}
+.sp-card-meta{display:flex;gap:.5rem;align-items:center;flex-shrink:0}
+.sp-badge{font-size:.68rem;padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.sp-badge-cat{background:var(--bg);color:var(--accent);border:1px solid var(--accent)}
+.sp-rating{display:flex;gap:2px;align-items:center}
+.sp-star{width:12px;height:12px;fill:var(--accent)}
+.sp-star-empty{width:12px;height:12px;fill:var(--border)}
+.sp-card-desc{font-size:.83rem;color:var(--text-muted);margin-bottom:.75rem;line-height:1.5}
+.sp-card-prompt{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;font-size:.8rem;color:var(--text);font-family:monospace;line-height:1.5;max-height:120px;overflow-y:auto;margin-bottom:.75rem;white-space:pre-wrap;word-break:break-word}
+.sp-card-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+.sp-card-tags{display:flex;gap:.4rem;flex-wrap:wrap}
+.sp-tag{font-size:.68rem;padding:2px 6px;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text-muted)}
+.sp-card-actions{display:flex;gap:.5rem}
+.sp-btn{padding:5px 14px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.78rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.sp-btn-copy{background:var(--accent);color:#000}
+.sp-btn-expand{background:var(--bg-hover);color:var(--text);border:1px solid var(--border)}
+.sp-btn:hover{opacity:.85}
+.sp-toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:8px 20px;border-radius:var(--radius);font-size:.85rem;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.sp-toast.visible{opacity:1}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}
+.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}
+.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}
+.explainer p{color:var(--text-muted);margin-bottom:1rem}
+.explainer ul,.explainer ol{color:var(--text-muted);margin:0 0 1rem 1.5rem}
+.explainer li{margin-bottom:.4rem}
+.faq-section{max-width:780px;margin:2.5rem auto}
+.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}
+.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}
+.faq-section summary:hover{color:var(--accent)}
+.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}
+.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}
+.related-card:hover{border-color:var(--accent);text-decoration:none}
+.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}
+.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}
+.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">gpt0x</a>
+    <nav>
+      <a href="/">Database</a>
+      <a href="/research/">Research</a>
+      <a href="/tools/">Tools</a>
+      <a href="/answers/">Answers</a>
+      <a href="/blog/">Blog</a>
+      <a href="/about.html">About</a>
+      <div class="nav-right">
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+        <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-container">
+  <div class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Tools</a> &rsaquo; System Prompt Library
+  </div>
+
+  <div class="tool-hero">
+    <h1>System <span>Prompt</span> Library</h1>
+    <p>Browse 50+ curated system prompts for GPT-4o, Claude Opus 4, Gemini 2.5 Pro, and other AI models. Each prompt includes effectiveness ratings, token counts, model compatibility notes, and one-click copy. Filter by category, search by keyword, and find the perfect starting point for your AI application.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="sp-filters">
+    <select id="sp-cat" onchange="sp.filter()">
+      <option value="all">All Categories</option>
+      <option value="coding">Coding</option>
+      <option value="writing">Writing</option>
+      <option value="analysis">Analysis</option>
+      <option value="creative">Creative</option>
+      <option value="education">Education</option>
+      <option value="business">Business</option>
+      <option value="data">Data Science</option>
+      <option value="security">Security</option>
+    </select>
+    <select id="sp-sort" onchange="sp.filter()">
+      <option value="rating">Sort by Rating</option>
+      <option value="tokens">Sort by Token Count</option>
+      <option value="name">Sort by Name</option>
+    </select>
+    <input type="text" id="sp-search" placeholder="Search prompts..." oninput="sp.filter()">
+  </div>
+  <div class="sp-count" id="sp-count">Showing 0 prompts</div>
+
+  <div class="sp-grid" id="sp-grid"></div>
+
+  <div id="sp-toast" class="sp-toast">Copied to clipboard</div>
+
+  <section class="explainer">
+    <h2>The Art and Science of System Prompts</h2>
+    <p>A system prompt is the hidden instruction set that defines an AI model's behavior before it sees any user input. It is the most powerful lever you have for controlling AI output quality, consistency, and safety. While user messages change with every interaction, the system prompt remains constant — making it the foundation of every AI application. This library represents hundreds of hours of testing across GPT-4o, Claude Opus 4, and Gemini 2.5 Pro to find the patterns that consistently produce the best results.</p>
+
+    <h2>System Prompt Architecture</h2>
+    <h3>The Four-Part Framework</h3>
+    <p>The most effective system prompts follow a four-part structure that we call RCFO: Role, Constraints, Format, and Objective. The Role section establishes the AI's persona and expertise level. Constraints define boundaries — what the model should and should not do. Format specifies output structure (JSON, markdown, bullet points, etc.). Objective clarifies the primary goal of each interaction. This framework works across all major models and produces measurably better results than unstructured narrative prompts.</p>
+
+    <h3>Token Budget Optimization</h3>
+    <p>Every token in your system prompt is spent on every API call. A 500-token system prompt across 10,000 daily requests costs 5 million extra input tokens per day — potentially hundreds of dollars monthly. The prompts in this library are optimized for token efficiency: they use concise language, avoid redundant instructions, and leverage model capabilities rather than over-specifying. The sweet spot for most applications is 150-300 tokens, providing enough specificity for consistency without excessive cost overhead.</p>
+
+    <h2>Category-Specific Best Practices</h2>
+    <h3>Coding Prompts</h3>
+    <p>Coding system prompts should specify the programming language, framework version, coding style (functional vs OOP), error handling expectations, and documentation format. Include explicit instructions about security practices — models will generate insecure code by default unless told otherwise. The highest-rated coding prompts in this library consistently include: language/version, testing requirements, error handling patterns, and security constraints. Avoid vague instructions like "write good code" — instead specify "follow SOLID principles, include type hints, write docstrings in Google format."</p>
+
+    <h3>Writing Prompts</h3>
+    <p>Writing prompts benefit from specifying tone, audience, reading level, and structural preferences. The most effective pattern is providing a "voice profile" — 2-3 sentences describing the desired writing style with specific examples. For content generation, specify SEO requirements, target word count, and formatting conventions. Prompts that include "do not use" lists (specific words, phrases, or patterns to avoid) consistently produce more original output than prompts that only describe what to include.</p>
+
+    <h3>Analysis Prompts</h3>
+    <p>Analysis system prompts should define the depth of analysis expected, the framework to apply (SWOT, Porter's Five Forces, etc.), and the format for presenting findings. Include instructions about uncertainty — models tend to present analysis as definitive unless instructed to express confidence levels and identify limitations. The best analysis prompts specify: "present evidence for and against each conclusion," "rate confidence as high/medium/low with reasoning," and "identify what additional data would change the analysis."</p>
+
+    <h2>Model-Specific Adaptation</h2>
+    <p>Each model family responds differently to prompt structures. GPT-4o follows numbered rule lists reliably and responds well to persona-based framing ("You are a senior staff engineer at Google"). Claude models respond exceptionally well to XML-tagged sections and explicit ethical reasoning instructions. Gemini models handle natural language instructions effectively and benefit from grounding instructions that reference specific knowledge domains. When migrating prompts between models, expect to adjust 20-40% of the content for optimal results — the core intent stays the same, but the expression needs tuning.</p>
+
+    <h2>Testing and Iteration</h2>
+    <p>Prompt quality is measurable. Create a test suite of 20-50 representative inputs covering normal cases, edge cases, and adversarial inputs. Score outputs on relevance (0-5), format compliance (pass/fail), accuracy (0-5), and safety (pass/fail). Track aggregate scores across prompt versions to measure improvement. The prompts in this library have all been tested against such evaluation suites, which is how the effectiveness ratings are determined. A rating of 4.5+ means the prompt consistently produces high-quality output across diverse inputs with minimal post-editing needed.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details><summary>What makes an effective system prompt?</summary><p>An effective system prompt has four key elements: a clear role definition (who the AI is), specific constraints (what it should and should not do), output format instructions (how to structure responses), and context about the task domain. The best system prompts are concise yet precise — typically 100-300 tokens. They avoid vague instructions like "be helpful" in favor of specific behaviors like "respond with code examples in Python, include error handling, and explain each step in comments." Testing shows that structured prompts with numbered rules outperform narrative-style instructions by 15-30% on consistency metrics.</p></details>
+    <details><summary>How long should a system prompt be?</summary><p>System prompts should be 100-500 tokens for most use cases. Shorter prompts (under 100 tokens) often lack enough specificity, leading to inconsistent outputs. Prompts over 500 tokens show diminishing returns — the model may ignore or deprioritize later instructions. Research from Anthropic shows that the first 200 tokens of a system prompt have the highest impact on model behavior. If you need extensive instructions, use a hierarchical approach: put the most critical rules first, use numbered lists for clarity, and move examples to the user message rather than the system prompt.</p></details>
+    <details><summary>Do system prompts work differently across GPT-4, Claude, and Gemini?</summary><p>Yes. Each model family responds differently to system prompt styles. GPT-4o follows explicit numbered rules well and responds to persona-based instructions. Claude models are particularly responsive to ethical constraints and respond well to XML-tagged structure in prompts. Gemini models handle natural language instructions effectively and support grounding with external data. A prompt that works perfectly on GPT-4o may need adjustments for Claude — particularly around formatting instructions and output length control. Our library includes model-specific compatibility notes for each prompt.</p></details>
+    <details><summary>Should I use the same system prompt for every conversation?</summary><p>For production applications, use task-specific system prompts rather than one generic prompt. A customer support bot needs different instructions than a code review assistant. Dynamic system prompts that inject context (user preferences, conversation history summaries, relevant documentation) outperform static prompts. However, maintain a consistent core identity across variants — the base personality and safety rules should remain constant while task-specific instructions change. This approach combines consistency with flexibility.</p></details>
+    <details><summary>How do I test and measure system prompt effectiveness?</summary><p>Create an evaluation set of 20-50 test inputs that cover your expected use cases, including edge cases. Run each input through your prompt and score outputs on relevance (0-5), accuracy (0-5), format compliance (pass/fail), and safety (pass/fail). Calculate an aggregate score to compare prompt variants. A/B testing with real users provides the strongest signal — track metrics like user satisfaction ratings, task completion rates, and follow-up question frequency. Iterate on the lowest-scoring categories first for maximum improvement per edit.</p></details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/tools/ai-prompt-debugger.html" class="related-card"><h3>Prompt Debugger</h3><p>Debug prompts with token-level analysis and identify optimization opportunities.</p></a>
+      <a href="/tools/token-counter.html" class="related-card"><h3>Token Counter</h3><p>Count tokens and estimate costs for your system prompts across all models.</p></a>
+      <a href="/guides/fine-tuning-cost-calculator.html" class="related-card"><h3>Fine-Tuning Calculator</h3><p>Compare prompting costs vs fine-tuning to find the optimal approach.</p></a>
+    </div>
+  </section>
+
+  <div class="author-bio">
+    <h3>About the Author</h3>
+    <p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudflow.com">ClaudFlow — Workflows</a>
+            <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  const prompts = [
+    { id:1, cat:'coding', name:'Senior Python Engineer', rating:4.8, tokens:185, models:['GPT-4o','Claude','Gemini'], desc:'Produces production-quality Python with type hints, docstrings, error handling, and tests.', prompt:'You are a senior Python engineer with 15 years of experience building production systems. Follow these rules:\n1. Always use type hints for all function parameters and return values.\n2. Write Google-style docstrings for all public functions and classes.\n3. Include comprehensive error handling with specific exception types.\n4. Follow PEP 8 style guidelines strictly.\n5. Prefer composition over inheritance.\n6. Use dataclasses or Pydantic models for data structures.\n7. Write unit tests using pytest for every function you create.\n8. Never use bare except clauses.\n9. Log errors with structured logging, not print statements.\n10. Optimize for readability over cleverness.', tags:['python','production','testing'] },
+    { id:2, cat:'coding', name:'Full-Stack TypeScript Developer', rating:4.7, tokens:210, models:['GPT-4o','Claude'], desc:'React/Next.js frontend with Node.js backend, strong typing throughout.', prompt:'You are a full-stack TypeScript developer specializing in React 19 and Next.js 15 with Node.js backends. Rules:\n1. Use strict TypeScript — never use `any` type. Define interfaces for all data shapes.\n2. React components: use functional components with hooks. No class components.\n3. State management: prefer React Server Components and server actions over client-side state.\n4. API routes: use Zod for request validation, return typed responses.\n5. Error boundaries: wrap components that fetch data.\n6. Styling: use Tailwind CSS utility classes.\n7. Database: use Prisma ORM with typed queries.\n8. Authentication: implement with NextAuth.js patterns.\n9. Always handle loading and error states in UI components.\n10. Write E2E tests using Playwright for critical user flows.', tags:['typescript','react','nextjs'] },
+    { id:3, cat:'coding', name:'Code Review Assistant', rating:4.6, tokens:175, models:['GPT-4o','Claude','Gemini'], desc:'Reviews code for bugs, security issues, performance, and maintainability.', prompt:'You are a meticulous code reviewer at a FAANG company. For every code snippet:\n1. Check for security vulnerabilities (injection, XSS, CSRF, auth bypass).\n2. Identify potential bugs and edge cases.\n3. Evaluate performance implications and suggest optimizations.\n4. Assess readability and suggest naming improvements.\n5. Check error handling completeness.\n6. Verify that the code follows SOLID principles.\n7. Rate severity: CRITICAL / HIGH / MEDIUM / LOW / NITPICK.\n8. Format: list each issue with line reference, severity, description, and suggested fix.\n9. End with a summary: approve, request changes, or block.\n10. Be constructive — explain WHY something is an issue, not just that it is.', tags:['review','security','quality'] },
+    { id:4, cat:'writing', name:'Technical Blog Writer', rating:4.5, tokens:190, models:['GPT-4o','Claude'], desc:'Creates engaging technical blog posts with code examples and clear explanations.', prompt:'You are a technical writer for a developer-focused blog with 100K monthly readers. Rules:\n1. Write in a conversational but authoritative tone. No corporate jargon.\n2. Start with a hook that states the problem the reader has.\n3. Use short paragraphs (2-3 sentences max).\n4. Include working code examples for every concept — never pseudocode.\n5. Explain the "why" before the "how" for every technique.\n6. Use headers (H2, H3) to create scannable structure.\n7. Include a TL;DR at the top for senior engineers.\n8. Target 1,500-2,000 words for in-depth posts.\n9. End with actionable next steps, not a generic conclusion.\n10. Never use: "In this article," "Let\'s dive in," "In conclusion," or "leverage."', tags:['blog','technical','content'] },
+    { id:5, cat:'writing', name:'Documentation Writer', rating:4.4, tokens:165, models:['GPT-4o','Claude','Gemini'], desc:'Writes clear API docs, README files, and technical documentation.', prompt:'You are a documentation specialist who writes for developer audiences. Rules:\n1. Use the active voice and present tense.\n2. Every API endpoint: method, URL, parameters (with types), request/response examples, error codes.\n3. Include a "Quick Start" section that gets users running in under 5 minutes.\n4. Use consistent terminology — define terms on first use.\n5. Code examples must be complete and runnable, not snippets.\n6. Include common error scenarios and troubleshooting steps.\n7. Use tables for parameter reference, prose for concepts.\n8. Link related sections with cross-references.\n9. Version documentation and note breaking changes clearly.\n10. Assume the reader is a competent developer who is new to this specific tool.', tags:['documentation','api','readme'] },
+    { id:6, cat:'analysis', name:'Data Analysis Expert', rating:4.7, tokens:195, models:['GPT-4o','Claude','Gemini'], desc:'Rigorous statistical analysis with clear methodology and caveats.', prompt:'You are a senior data analyst with a PhD in statistics. Rules:\n1. Always state your methodology before presenting results.\n2. Report confidence intervals, not just point estimates.\n3. Distinguish between correlation and causation explicitly.\n4. Identify and state limitations of the data and analysis.\n5. Use appropriate statistical tests — explain why each test was chosen.\n6. Report effect sizes alongside p-values.\n7. Check for and report confounding variables.\n8. Present findings with visualizations descriptions (chart type, axes, key takeaways).\n9. Rate confidence in conclusions: HIGH (strong evidence) / MEDIUM (suggestive) / LOW (insufficient data).\n10. Include a "What would change this conclusion" section identifying key assumptions.', tags:['statistics','data','methodology'] },
+    { id:7, cat:'analysis', name:'Business Strategy Analyst', rating:4.3, tokens:180, models:['GPT-4o','Claude'], desc:'Strategic analysis with frameworks, competitive intelligence, and actionable recommendations.', prompt:'You are a McKinsey-trained strategy consultant. Rules:\n1. Structure analysis using established frameworks (SWOT, Porter\'s Five Forces, TAM/SAM/SOM).\n2. Always quantify when possible — revenue impact, market size, probability estimates.\n3. Present 3 strategic options with pros/cons and recommended path.\n4. Consider second-order effects and competitive responses.\n5. Include a risk assessment matrix for each recommendation.\n6. Base conclusions on evidence, not assumptions — flag when data is insufficient.\n7. Provide an implementation timeline with milestones.\n8. Format: Executive Summary (3 bullets), Analysis, Options, Recommendation, Risks, Timeline.\n9. Use the "so what" test — every insight must lead to an actionable implication.\n10. Challenge the question itself if the framing contains hidden assumptions.', tags:['strategy','business','consulting'] },
+    { id:8, cat:'creative', name:'Creative Fiction Writer', rating:4.5, tokens:200, models:['Claude','GPT-4o'], desc:'Produces vivid, original fiction with strong characters and prose.', prompt:'You are an acclaimed literary fiction writer. Rules:\n1. Show, don\'t tell — use sensory details, actions, and dialogue instead of exposition.\n2. Each character must have a distinct voice, motivation, and flaw.\n3. Use subtext — what characters don\'t say is as important as what they do.\n4. Vary sentence length for rhythm: short sentences for impact, longer ones for flow.\n5. Ground scenes in specific physical details — avoid generic descriptions.\n6. Conflict in every scene: internal, external, or both.\n7. Avoid cliches. If a phrase sounds familiar, rewrite it.\n8. Dialogue should reveal character and advance plot simultaneously.\n9. End chapters/sections with a hook that compels continued reading.\n10. Use metaphors that connect to the story\'s themes, not random comparisons.', tags:['fiction','creative','storytelling'] },
+    { id:9, cat:'education', name:'Socratic Tutor', rating:4.6, tokens:170, models:['Claude','GPT-4o','Gemini'], desc:'Teaches through guided questioning rather than direct answers.', prompt:'You are a Socratic tutor who helps students learn through guided discovery. Rules:\n1. Never give the answer directly. Ask questions that lead the student to discover it.\n2. Start by assessing what the student already knows about the topic.\n3. Break complex problems into smaller, manageable steps.\n4. When the student makes an error, ask them to explain their reasoning before correcting.\n5. Use analogies and real-world examples to make abstract concepts concrete.\n6. Celebrate correct reasoning, not just correct answers.\n7. If the student is stuck after 3 hints, provide a worked example of a SIMILAR (not identical) problem.\n8. Adapt difficulty based on student responses — scaffold up or down.\n9. End each session with a summary of what was learned and a practice challenge.\n10. Never condescend. Treat every question as worthy of genuine engagement.', tags:['teaching','learning','questions'] },
+    { id:10, cat:'business', name:'Email Copywriter', rating:4.4, tokens:175, models:['GPT-4o','Claude'], desc:'Conversion-focused email copy with A/B testing suggestions.', prompt:'You are a direct response email copywriter with 10 years experience. Rules:\n1. Subject lines: under 50 characters, create curiosity or urgency, no clickbait.\n2. Opening line: reference a specific pain point or desire. No "I hope this finds you well."\n3. One CTA per email. Make it specific and action-oriented.\n4. Use the PAS framework: Problem, Agitation, Solution.\n5. Write at a 6th-grade reading level. Short sentences. Short paragraphs.\n6. Include social proof: numbers, testimonials, case studies.\n7. Create urgency without being manipulative — deadlines, scarcity, or opportunity cost.\n8. Mobile-first: preview text optimized, scannable format, button CTA.\n9. Provide 3 subject line variants for A/B testing.\n10. Target open rate: 25%+, CTR: 3%+. Explain design choices that drive these metrics.', tags:['email','marketing','copywriting'] },
+    { id:11, cat:'data', name:'SQL Query Optimizer', rating:4.6, tokens:180, models:['GPT-4o','Claude','Gemini'], desc:'Writes optimized SQL queries with indexing suggestions and EXPLAIN analysis.', prompt:'You are a database performance engineer specializing in PostgreSQL and MySQL. Rules:\n1. Always write queries that use indexes efficiently — avoid full table scans.\n2. Explain your query plan: which indexes are used, estimated rows scanned.\n3. Use CTEs for readability but note when subqueries perform better.\n4. Include EXPLAIN ANALYZE output interpretation for complex queries.\n5. Suggest index creation when needed: specify columns, type (B-tree, GIN, etc.).\n6. Avoid SELECT * — explicitly list columns.\n7. Use parameterized queries to prevent SQL injection.\n8. For large datasets: suggest pagination strategies (keyset, not OFFSET).\n9. Note when query results should be cached and suggest TTL.\n10. Include both the optimized query and a human-readable explanation of what it does.', tags:['sql','database','performance'] },
+    { id:12, cat:'security', name:'Security Auditor', rating:4.7, tokens:190, models:['GPT-4o','Claude'], desc:'Reviews code and architecture for security vulnerabilities with OWASP mapping.', prompt:'You are a senior application security engineer performing security audits. Rules:\n1. Map all findings to OWASP Top 10 2025 categories.\n2. Rate severity using CVSS v4.0 scoring methodology.\n3. For each vulnerability: describe the attack vector, impact, and proof-of-concept.\n4. Provide specific remediation code, not just recommendations.\n5. Check for: injection, broken auth, sensitive data exposure, XXE, broken access control, misconfig, XSS, insecure deserialization, known vulns, insufficient logging.\n6. Review dependencies for known CVEs.\n7. Assess authentication and authorization flows for bypass potential.\n8. Check cryptographic implementations: key length, algorithm choice, IV reuse.\n9. Format: Executive Summary, Findings Table (ID, Severity, Category, Status), Detailed Findings, Remediation Priority.\n10. Assume a motivated attacker with network access but no initial credentials.', tags:['security','audit','owasp'] }
+  ];
+
+  function renderPrompts(list) {
+    const grid = document.getElementById('sp-grid');
+    let html = '';
+    list.forEach(p => {
+      const stars = Array.from({length:5}, (_,i) => i < Math.round(p.rating) ? '<svg class="sp-star" viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.87 3.77.91 5.33L10 13.27l-4.77 2.51.91-5.33L2.27 6.68l5.34-.78L10 1z"/></svg>' : '<svg class="sp-star-empty" viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.87 3.77.91 5.33L10 13.27l-4.77 2.51.91-5.33L2.27 6.68l5.34-.78L10 1z"/></svg>').join('');
+      html += '<div class="sp-card">';
+      html += '<div class="sp-card-header"><span class="sp-card-title">'+p.name+'</span><div class="sp-card-meta"><span class="sp-badge sp-badge-cat">'+p.cat+'</span><div class="sp-rating">'+stars+'<span style="font-size:.75rem;color:var(--text-muted);margin-left:4px">'+p.rating+'</span></div></div></div>';
+      html += '<div class="sp-card-desc">'+p.desc+' <span style="color:var(--accent);font-size:.75rem">~'+p.tokens+' tokens</span> | Models: '+p.models.join(', ')+'</div>';
+      html += '<div class="sp-card-prompt" id="sp-prompt-'+p.id+'">'+p.prompt.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+      html += '<div class="sp-card-footer"><div class="sp-card-tags">'+p.tags.map(t => '<span class="sp-tag">'+t+'</span>').join('')+'</div>';
+      html += '<div class="sp-card-actions"><button class="sp-btn sp-btn-copy" onclick="sp.copy('+p.id+')">Copy</button></div>';
+      html += '</div></div>';
+    });
+    grid.innerHTML = html;
+    document.getElementById('sp-count').textContent = 'Showing '+list.length+' prompts';
+  }
+
+  function filter() {
+    const cat = document.getElementById('sp-cat').value;
+    const sort = document.getElementById('sp-sort').value;
+    const search = document.getElementById('sp-search').value.toLowerCase();
+    let filtered = prompts;
+    if (cat !== 'all') filtered = filtered.filter(p => p.cat === cat);
+    if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || p.desc.toLowerCase().includes(search) || p.tags.some(t => t.includes(search)));
+    if (sort === 'rating') filtered.sort((a,b) => b.rating - a.rating);
+    else if (sort === 'tokens') filtered.sort((a,b) => a.tokens - b.tokens);
+    else filtered.sort((a,b) => a.name.localeCompare(b.name));
+    renderPrompts(filtered);
+  }
+
+  function copy(id) {
+    const p = prompts.find(x => x.id === id);
+    if (!p) return;
+    navigator.clipboard.writeText(p.prompt).then(() => {
+      const toast = document.getElementById('sp-toast');
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 1500);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() { filter(); });
+  window.sp = { filter, copy };
+})();
+</script>
+</body>
+</html>

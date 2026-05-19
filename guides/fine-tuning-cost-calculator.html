@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fine-Tuning Cost Calculator for GPT, Claude & Llama — Dataset Size Optimizer | GPT0X</title>
+<meta name="description" content="Calculate fine-tuning costs for GPT-4o, Claude, Llama 3, and Mistral models. Estimate training epochs, dataset size, tokens per row, and compare fine-tuning vs few-shot prompting cost breakeven. Free calculator.">
+<meta name="keywords" content="fine-tuning cost calculator, GPT fine-tuning pricing, LLM fine-tuning, dataset size optimizer, training cost estimator, few-shot vs fine-tuning, model customization, LoRA fine-tuning cost">
+<link rel="canonical" href="https://gpt0x.com/guides/fine-tuning-cost-calculator.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/guides/fine-tuning-cost-calculator.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/guides/fine-tuning-cost-calculator.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fine-Tuning Cost Calculator for GPT, Claude & Llama — Dataset Size Optimizer">
+<meta property="og:description" content="Calculate fine-tuning costs for GPT-4o, Claude, Llama 3, and Mistral models. Estimate training epochs, dataset size, and compare fine-tuning vs few-shot prompting breakeven.">
+<meta property="og:url" content="https://gpt0x.com/guides/fine-tuning-cost-calculator.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Fine-Tuning Cost Calculator for GPT, Claude & Llama — Dataset Size Optimizer">
+<meta name="twitter:description" content="Calculate fine-tuning costs for GPT-4o, Claude, Llama 3, and Mistral models. Estimate training epochs, dataset size, and compare fine-tuning vs few-shot prompting breakeven.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Fine-Tuning Cost Calculator for GPT, Claude & Llama",
+  "url": "https://gpt0x.com/guides/fine-tuning-cost-calculator.html",
+  "description": "Calculate fine-tuning costs for GPT-4o, Claude, Llama 3, and Mistral models with dataset size optimizer and few-shot vs fine-tuning cost breakeven analysis.",
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "publisher": { "@type": "Organization", "name": "GPT0X", "url": "https://gpt0x.com" },
+  "datePublished": "2026-05-25",
+  "dateModified": "2026-05-25",
+  "mainEntityOfPage": "https://gpt0x.com/guides/fine-tuning-cost-calculator.html"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How much does it cost to fine-tune GPT-4o?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Fine-tuning GPT-4o costs $25.00 per 1 million training tokens as of May 2026. A typical dataset of 1,000 rows with 200 tokens per row totals 200,000 training tokens, costing about $5.00 per epoch. With the recommended 3 epochs, total training cost is approximately $15.00. After training, inference uses the fine-tuned model at standard GPT-4o rates ($2.50 input / $10.00 output per 1M tokens). Smaller datasets cost less but may underfit; larger datasets improve quality but increase costs linearly."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I fine-tune instead of using few-shot prompting?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Fine-tuning becomes more cost-effective than few-shot prompting when you make enough API calls to amortize the training cost. If your few-shot prompt adds 500 tokens of examples to every request, and you make 10,000+ requests per month, fine-tuning eliminates those extra tokens from every call, saving significant ongoing costs. The breakeven point depends on your prompt overhead, call volume, and training cost. Fine-tuning also improves latency by removing example tokens from each request and can improve consistency for domain-specific tasks."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many training examples do I need for fine-tuning?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "OpenAI recommends a minimum of 10 examples for fine-tuning, but practical results require 50-100 examples for simple formatting tasks and 500-1,000+ examples for complex behavior changes. Quality matters more than quantity — 200 well-curated, diverse examples typically outperform 2,000 noisy or repetitive ones. The diminishing returns curve flattens around 1,000-5,000 examples for most tasks. Our dataset size optimizer helps you find the sweet spot based on your task complexity and budget."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between full fine-tuning and LoRA?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Full fine-tuning updates all model weights, requiring significant GPU memory and compute — typically $50-500+ for large models. LoRA (Low-Rank Adaptation) freezes the base model and trains small adapter matrices, reducing memory by 10-100x and training cost by 5-20x. LoRA achieves 90-95% of full fine-tuning quality for most tasks. QLoRA further reduces costs by quantizing the base model to 4-bit precision during training. For open-source models like Llama 3, LoRA on consumer GPUs (RTX 4090) costs only electricity; cloud LoRA runs $2-20 per training job."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many epochs should I train for when fine-tuning?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most fine-tuning jobs perform best with 2-4 epochs. OpenAI defaults to 3 epochs for their fine-tuning API. Training for too few epochs (1) may underfit, producing inconsistent results. Too many epochs (10+) causes overfitting where the model memorizes training examples instead of learning patterns, degrading performance on novel inputs. The optimal epoch count depends on dataset size: smaller datasets (under 100 examples) may benefit from 4-6 epochs, while larger datasets (1,000+) often converge in 2-3 epochs. Monitor training loss — if it stops decreasing, additional epochs waste money."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://gpt0x.com/guides/" },
+    { "@type": "ListItem", "position": 3, "name": "Fine-Tuning Cost Calculator", "item": "https://gpt0x.com/guides/fine-tuning-cost-calculator.html" }
+  ]
+}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}
+.tool-hero h1 span{color:var(--accent)}
+.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.ft-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+@media(max-width:768px){.ft-layout{grid-template-columns:1fr}}
+.ft-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.ft-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.ft-field{margin-bottom:1rem}
+.ft-field label{display:block;font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:4px}
+.ft-field select,.ft-field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-family:var(--font-body);font-size:.85rem}
+.ft-field select:focus,.ft-field input:focus{outline:none;border-color:var(--accent)}
+.ft-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.ft-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.ft-btn-primary{background:var(--accent);color:#000}
+.ft-btn-secondary{background:var(--bg-hover);color:var(--text);border:1px solid var(--border)}
+.ft-btn:hover{opacity:.85}
+.ft-result{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:1rem}
+.ft-result h4{font-size:.8rem;color:var(--accent);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.5px}
+.ft-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;font-size:.83rem;border-bottom:1px solid var(--border)}
+.ft-row:last-child{border-bottom:none}
+.ft-row .ft-label{color:var(--text-muted)}
+.ft-row .ft-value{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.ft-stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.25rem}
+.ft-stat{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;text-align:center}
+.ft-stat .ft-stat-value{font-size:1.4rem;font-weight:700;color:var(--accent);font-family:var(--font-display)}
+.ft-stat .ft-stat-label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.ft-breakeven{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.ft-breakeven h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.ft-bar-chart{margin:1rem 0}
+.ft-bar-row{display:flex;align-items:center;margin-bottom:.5rem;font-size:.8rem}
+.ft-bar-row .ft-bar-label{width:120px;color:var(--text-muted);flex-shrink:0}
+.ft-bar-row .ft-bar-track{flex:1;height:24px;background:var(--bg);border-radius:var(--radius);overflow:hidden;position:relative}
+.ft-bar-row .ft-bar-fill{height:100%;border-radius:var(--radius);transition:width .5s}
+.ft-bar-row .ft-bar-val{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.72rem;font-weight:600;color:#000}
+.ft-optimizer{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.ft-optimizer h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.ft-opt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+@media(max-width:768px){.ft-opt-grid{grid-template-columns:1fr}}
+.ft-opt-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center}
+.ft-opt-card h4{font-size:.8rem;color:var(--accent);margin-bottom:.5rem}
+.ft-opt-card .ft-opt-val{font-size:1.2rem;font-weight:700;color:var(--text);font-family:var(--font-display)}
+.ft-opt-card p{font-size:.72rem;color:var(--text-muted);margin-top:.25rem}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}
+.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}
+.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}
+.explainer p{color:var(--text-muted);margin-bottom:1rem}
+.explainer ul,.explainer ol{color:var(--text-muted);margin:0 0 1rem 1.5rem}
+.explainer li{margin-bottom:.4rem}
+.explainer table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}
+.explainer th,.explainer td{padding:.5rem .75rem;border:1px solid var(--border);text-align:left}
+.explainer th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}
+.explainer td{color:var(--text-muted)}
+.faq-section{max-width:780px;margin:2.5rem auto}
+.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}
+.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}
+.faq-section summary:hover{color:var(--accent)}
+.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}
+.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}
+.related-card:hover{border-color:var(--accent);text-decoration:none}
+.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}
+.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}
+.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">gpt0x</a>
+    <nav>
+      <a href="/">Database</a>
+      <a href="/research/">Research</a>
+      <a href="/tools/">Tools</a>
+      <a href="/answers/">Answers</a>
+      <a href="/blog/">Blog</a>
+      <a href="/about.html">About</a>
+      <div class="nav-right">
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+        <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-container">
+  <div class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/guides/">Guides</a> &rsaquo; Fine-Tuning Cost Calculator
+  </div>
+
+  <div class="tool-hero">
+    <h1>Fine-Tuning <span>Cost</span> Calculator</h1>
+    <p>Calculate fine-tuning costs for GPT-4o, Claude, Llama 3.3, and Mistral models. Estimate training epochs, total tokens, training time, and find the breakeven point where fine-tuning beats few-shot prompting. Optimize your dataset size for maximum ROI.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="ft-layout">
+    <div class="ft-panel">
+      <h3>Training Configuration</h3>
+      <div class="ft-field">
+        <label>Model to fine-tune</label>
+        <select id="ft-model">
+          <optgroup label="OpenAI (API Fine-Tuning)">
+            <option value="gpt4o" selected>GPT-4o — $25.00/1M training tokens</option>
+            <option value="gpt4omini">GPT-4o Mini — $3.00/1M training tokens</option>
+            <option value="gpt35">GPT-3.5 Turbo — $8.00/1M training tokens</option>
+          </optgroup>
+          <optgroup label="Open Source (Cloud GPU)">
+            <option value="llama33_70b">Llama 3.3 70B (LoRA) — ~$12/hr A100</option>
+            <option value="llama33_8b">Llama 3.3 8B (LoRA) — ~$2/hr A10G</option>
+            <option value="mistral7b">Mistral 7B (LoRA) — ~$2/hr A10G</option>
+            <option value="mistral_large">Mistral Large (LoRA) — ~$15/hr H100</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="ft-field">
+        <label>Dataset rows (training examples)</label>
+        <input type="number" id="ft-rows" value="500" min="10" max="1000000">
+      </div>
+      <div class="ft-field">
+        <label>Average tokens per row (prompt + completion)</label>
+        <input type="number" id="ft-tpr" value="200" min="10" max="32000">
+      </div>
+      <div class="ft-field">
+        <label>Number of training epochs</label>
+        <input type="number" id="ft-epochs" value="3" min="1" max="25">
+      </div>
+      <div class="ft-actions">
+        <button class="ft-btn ft-btn-primary" onclick="ft.calculate()">Calculate Cost</button>
+        <button class="ft-btn ft-btn-secondary" onclick="ft.reset()">Reset</button>
+      </div>
+      <div class="ft-stats-grid">
+        <div class="ft-stat"><div class="ft-stat-value" id="ft-total-tokens">0</div><div class="ft-stat-label">Total Tokens</div></div>
+        <div class="ft-stat"><div class="ft-stat-value" id="ft-training-cost">$0</div><div class="ft-stat-label">Training Cost</div></div>
+        <div class="ft-stat"><div class="ft-stat-value" id="ft-est-time">—</div><div class="ft-stat-label">Est. Time</div></div>
+        <div class="ft-stat"><div class="ft-stat-value" id="ft-cost-per-row">$0</div><div class="ft-stat-label">Cost / Example</div></div>
+      </div>
+    </div>
+
+    <div class="ft-panel">
+      <h3>Training Cost Breakdown</h3>
+      <div class="ft-result">
+        <h4>Cost Details</h4>
+        <div class="ft-row"><span class="ft-label">Dataset tokens (1 epoch)</span><span class="ft-value" id="ft-epoch-tokens">0</span></div>
+        <div class="ft-row"><span class="ft-label">Total training tokens</span><span class="ft-value" id="ft-train-tokens">0</span></div>
+        <div class="ft-row"><span class="ft-label">Training cost</span><span class="ft-value" id="ft-train-cost">$0.00</span></div>
+        <div class="ft-row"><span class="ft-label">Estimated training time</span><span class="ft-value" id="ft-time">—</span></div>
+      </div>
+      <div class="ft-result">
+        <h4>Post-Training Inference Cost</h4>
+        <div class="ft-row"><span class="ft-label">Input cost (per 1M tokens)</span><span class="ft-value" id="ft-inf-input">—</span></div>
+        <div class="ft-row"><span class="ft-label">Output cost (per 1M tokens)</span><span class="ft-value" id="ft-inf-output">—</span></div>
+        <div class="ft-row"><span class="ft-label">Cost per 1K-token request</span><span class="ft-value" id="ft-inf-request">—</span></div>
+      </div>
+      <div class="ft-result">
+        <h4>Model Comparison</h4>
+        <div id="ft-comparison">Select a model and click "Calculate Cost" to see comparisons across all fine-tuning options.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ft-breakeven">
+    <h3>Fine-Tuning vs Few-Shot Breakeven Analysis</h3>
+    <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Compare the total cost of fine-tuning (one-time training + cheaper inference) versus few-shot prompting (no training cost but extra tokens per request). Enter your usage to find the breakeven point.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1rem">
+      <div class="ft-field">
+        <label>Few-shot example tokens (per request)</label>
+        <input type="number" id="ft-fewshot-tokens" value="500" min="50">
+      </div>
+      <div class="ft-field">
+        <label>Requests per month</label>
+        <input type="number" id="ft-monthly-requests" value="10000" min="100">
+      </div>
+      <div class="ft-field">
+        <label>Avg output tokens per request</label>
+        <input type="number" id="ft-avg-output" value="300" min="10">
+      </div>
+    </div>
+    <button class="ft-btn ft-btn-primary" onclick="ft.breakeven()">Calculate Breakeven</button>
+    <div id="ft-breakeven-result" style="margin-top:1rem">
+      <div class="ft-bar-chart" id="ft-bar-chart"></div>
+      <p style="font-size:.83rem;color:var(--text-muted)" id="ft-breakeven-text">Click "Calculate Breakeven" to compare fine-tuning vs few-shot prompting costs over time.</p>
+    </div>
+  </div>
+
+  <div class="ft-optimizer">
+    <h3>Dataset Size Optimizer</h3>
+    <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Find the optimal dataset size based on your task complexity, quality requirements, and budget. Recommendations are based on published research and OpenAI's fine-tuning guidelines.</p>
+    <div class="ft-field" style="max-width:300px">
+      <label>Task complexity</label>
+      <select id="ft-task-type" onchange="ft.optimize()">
+        <option value="format">Formatting / Style (simple)</option>
+        <option value="classify" selected>Classification / Extraction (medium)</option>
+        <option value="generate">Generation / Reasoning (complex)</option>
+        <option value="domain">Domain Expert (very complex)</option>
+      </select>
+    </div>
+    <div class="ft-opt-grid" id="ft-opt-grid">
+      <div class="ft-opt-card">
+        <h4>Minimum Viable</h4>
+        <div class="ft-opt-val" id="ft-opt-min">50</div>
+        <p>Baseline quality, may be inconsistent</p>
+      </div>
+      <div class="ft-opt-card">
+        <h4>Recommended</h4>
+        <div class="ft-opt-val" id="ft-opt-rec" style="color:var(--accent)">500</div>
+        <p>Good quality for most use cases</p>
+      </div>
+      <div class="ft-opt-card">
+        <h4>High Quality</h4>
+        <div class="ft-opt-val" id="ft-opt-high">2,000</div>
+        <p>Diminishing returns beyond this point</p>
+      </div>
+    </div>
+    <div id="ft-opt-detail" style="font-size:.83rem;color:var(--text-muted);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem"></div>
+  </div>
+
+  <section class="explainer">
+    <h2>The Complete Guide to Fine-Tuning Costs in 2026</h2>
+    <p>Fine-tuning a large language model means training it on your specific dataset to improve performance on your particular tasks. Unlike prompting, which provides instructions at inference time, fine-tuning bakes knowledge and behavior patterns directly into the model weights. This guide covers everything you need to know about fine-tuning costs, from pricing mechanics to optimization strategies that can reduce your spend by 80% or more.</p>
+
+    <h2>How Fine-Tuning Pricing Works</h2>
+    <p>Fine-tuning costs are calculated based on the total number of training tokens processed across all epochs. A training token is every token in your dataset — both the prompt and completion portions of each example — multiplied by the number of epochs. If your dataset has 100,000 tokens and you train for 3 epochs, you process 300,000 training tokens. OpenAI charges a per-token rate for this processing, currently $25.00 per million tokens for GPT-4o and $3.00 per million tokens for GPT-4o Mini.</p>
+    <p>For open-source models like Llama 3.3 and Mistral, the economics are different. Instead of per-token pricing, you pay for GPU time. A 70B parameter model requires at least one A100 80GB GPU for LoRA fine-tuning, costing approximately $1.50-2.00 per hour on cloud providers like Lambda, RunPod, or AWS. An 8B parameter model can train on a single A10G GPU at around $0.50-1.00 per hour. Training time depends on dataset size, model size, and batch configuration, but a typical 500-row dataset trains in 15-60 minutes for small models and 1-4 hours for large models.</p>
+
+    <h2>Fine-Tuning Pricing by Provider (May 2026)</h2>
+    <table>
+      <tr><th>Provider / Model</th><th>Training Cost</th><th>Inference Input</th><th>Inference Output</th></tr>
+      <tr><td>OpenAI GPT-4o</td><td>$25.00/1M tokens</td><td>$3.75/1M</td><td>$15.00/1M</td></tr>
+      <tr><td>OpenAI GPT-4o Mini</td><td>$3.00/1M tokens</td><td>$0.30/1M</td><td>$1.20/1M</td></tr>
+      <tr><td>OpenAI GPT-3.5 Turbo</td><td>$8.00/1M tokens</td><td>$3.00/1M</td><td>$6.00/1M</td></tr>
+      <tr><td>Llama 3.3 70B (LoRA)</td><td>~$12/hr GPU</td><td>Hosting cost</td><td>Hosting cost</td></tr>
+      <tr><td>Llama 3.3 8B (LoRA)</td><td>~$2/hr GPU</td><td>Hosting cost</td><td>Hosting cost</td></tr>
+      <tr><td>Mistral 7B (LoRA)</td><td>~$2/hr GPU</td><td>Hosting cost</td><td>Hosting cost</td></tr>
+    </table>
+
+    <h2>Understanding Training Epochs</h2>
+    <p>An epoch is one complete pass through your entire training dataset. If you have 500 examples and train for 3 epochs, the model sees each example 3 times. More epochs allow the model to learn patterns more thoroughly, but too many epochs cause overfitting — the model memorizes training examples verbatim instead of generalizing. OpenAI defaults to 3 epochs for most fine-tuning jobs, which is optimal for datasets of 200-2,000 examples. Smaller datasets (under 100 examples) may benefit from 4-6 epochs, while very large datasets (10,000+) often converge in 1-2 epochs.</p>
+
+    <h3>Monitoring Training Quality</h3>
+    <p>Track training loss across epochs to determine the optimal stopping point. Training loss should decrease steadily through the first 1-2 epochs and then plateau. If loss continues dropping sharply after epoch 3, your model is likely overfitting. OpenAI provides training metrics in their fine-tuning dashboard; for open-source training, tools like Weights & Biases or TensorBoard visualize loss curves in real time. A good practice is to hold out 10-20% of your dataset for validation — if validation loss starts increasing while training loss keeps dropping, you have overfit.</p>
+
+    <h2>Fine-Tuning vs Few-Shot Prompting: Cost Analysis</h2>
+    <p>The core tradeoff is a one-time training cost versus ongoing per-request overhead. Few-shot prompting adds examples to every API call, increasing token usage by hundreds or thousands of tokens per request. Fine-tuning eliminates this overhead but requires upfront investment. The breakeven calculation is straightforward: divide the training cost by the per-request savings from removing few-shot examples. If training costs $15 and each request saves $0.005 in token costs, breakeven occurs at 3,000 requests — typically just a few days for production applications.</p>
+    <p>Beyond cost, fine-tuning offers three additional advantages. First, latency improves because fewer input tokens means faster time-to-first-token. Second, consistency improves because the behavior is encoded in weights rather than relying on in-context learning. Third, you gain access to behaviors that are difficult to elicit through prompting alone, such as specific output formats, domain terminology, or tone adjustments.</p>
+
+    <h2>Dataset Preparation Best Practices</h2>
+    <h3>Quality Over Quantity</h3>
+    <p>Research consistently shows that 200 high-quality, diverse examples outperform 2,000 noisy or repetitive ones. Each example should represent a realistic input-output pair that demonstrates the exact behavior you want. Remove duplicates, fix errors, and ensure variety across your task distribution. If your production traffic includes 10 types of requests, make sure each type is represented proportionally in your training data.</p>
+
+    <h3>Optimal Example Length</h3>
+    <p>Keep examples concise. Long completions with unnecessary preamble or verbose explanations train the model to be wordy, increasing inference costs. If you want the model to respond in 3 sentences, most training examples should show 3-sentence responses. The average tokens-per-row metric in the calculator above helps you estimate total costs and spot examples that are unusually long (potential outliers to trim).</p>
+
+    <h3>Dataset Formatting</h3>
+    <p>For OpenAI fine-tuning, each example must be a JSONL row with messages in the chat format: system, user, and assistant roles. The system message should be consistent across all examples (it becomes the default behavior). For open-source model fine-tuning with frameworks like Axolotl or Unsloth, datasets are typically formatted as instruction-input-output triples or in the Alpaca format. Consistency in formatting is critical — mixing formats confuses the training process and degrades quality.</p>
+
+    <h2>LoRA vs Full Fine-Tuning</h2>
+    <p>Low-Rank Adaptation (LoRA) has become the standard approach for fine-tuning in 2026. Instead of updating all model parameters, LoRA freezes the base weights and trains small adapter matrices that are added to specific layers. This reduces trainable parameters by 99%+, memory requirements by 10-100x, and training time by 3-10x. The quality tradeoff is minimal — LoRA achieves 90-97% of full fine-tuning performance for most tasks.</p>
+    <p>QLoRA extends this further by quantizing the frozen base model to 4-bit precision during training, enabling fine-tuning of 70B parameter models on a single 48GB GPU. For production deployments, the LoRA adapters can be merged into the base model for inference (no latency overhead) or served separately for easy A/B testing between fine-tuned variants. The cost savings from LoRA are enormous: fine-tuning Llama 3.3 70B with full parameters costs $200-500 in GPU time, while LoRA achieves comparable results for $20-50.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details>
+      <summary>How much does it cost to fine-tune GPT-4o?</summary>
+      <p>Fine-tuning GPT-4o costs $25.00 per 1 million training tokens as of May 2026. A typical dataset of 1,000 rows with 200 tokens per row totals 200,000 training tokens, costing about $5.00 per epoch. With the recommended 3 epochs, total training cost is approximately $15.00. After training, inference uses the fine-tuned model at standard GPT-4o rates ($2.50 input / $10.00 output per 1M tokens). Smaller datasets cost less but may underfit; larger datasets improve quality but increase costs linearly.</p>
+    </details>
+    <details>
+      <summary>When should I fine-tune instead of using few-shot prompting?</summary>
+      <p>Fine-tuning becomes more cost-effective than few-shot prompting when you make enough API calls to amortize the training cost. If your few-shot prompt adds 500 tokens of examples to every request, and you make 10,000+ requests per month, fine-tuning eliminates those extra tokens from every call, saving significant ongoing costs. The breakeven point depends on your prompt overhead, call volume, and training cost. Fine-tuning also improves latency by removing example tokens from each request and can improve consistency for domain-specific tasks.</p>
+    </details>
+    <details>
+      <summary>How many training examples do I need for fine-tuning?</summary>
+      <p>OpenAI recommends a minimum of 10 examples for fine-tuning, but practical results require 50-100 examples for simple formatting tasks and 500-1,000+ examples for complex behavior changes. Quality matters more than quantity — 200 well-curated, diverse examples typically outperform 2,000 noisy or repetitive ones. The diminishing returns curve flattens around 1,000-5,000 examples for most tasks. Our dataset size optimizer helps you find the sweet spot based on your task complexity and budget.</p>
+    </details>
+    <details>
+      <summary>What is the difference between full fine-tuning and LoRA?</summary>
+      <p>Full fine-tuning updates all model weights, requiring significant GPU memory and compute — typically $50-500+ for large models. LoRA (Low-Rank Adaptation) freezes the base model and trains small adapter matrices, reducing memory by 10-100x and training cost by 5-20x. LoRA achieves 90-95% of full fine-tuning quality for most tasks. QLoRA further reduces costs by quantizing the base model to 4-bit precision during training. For open-source models like Llama 3, LoRA on consumer GPUs (RTX 4090) costs only electricity; cloud LoRA runs $2-20 per training job.</p>
+    </details>
+    <details>
+      <summary>How many epochs should I train for when fine-tuning?</summary>
+      <p>Most fine-tuning jobs perform best with 2-4 epochs. OpenAI defaults to 3 epochs for their fine-tuning API. Training for too few epochs (1) may underfit, producing inconsistent results. Too many epochs (10+) causes overfitting where the model memorizes training examples instead of learning patterns, degrading performance on novel inputs. The optimal epoch count depends on dataset size: smaller datasets (under 100 examples) may benefit from 4-6 epochs, while larger datasets (1,000+) often converge in 2-3 epochs. Monitor training loss — if it stops decreasing, additional epochs waste money.</p>
+    </details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/tools/token-counter.html" class="related-card">
+        <h3>Token Counter</h3>
+        <p>Count tokens and estimate costs for GPT-4o, Claude, Gemini, and 15+ AI models.</p>
+      </a>
+      <a href="/tools/ai-cost-estimator.html" class="related-card">
+        <h3>AI Cost Estimator</h3>
+        <p>Project monthly AI API costs based on your usage patterns across all providers.</p>
+      </a>
+      <a href="/answers/ai-api-rate-limits.html" class="related-card">
+        <h3>API Rate Limits</h3>
+        <p>Compare rate limits across OpenAI, Anthropic, Google, and Mistral APIs.</p>
+      </a>
+    </div>
+  </section>
+
+  <div class="author-bio">
+    <h3>About the Author</h3>
+    <p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudflow.com">ClaudFlow — Workflows</a>
+            <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  const models = {
+    gpt4o:         { name:'GPT-4o',       trainPer1M:25.00, infInput:3.75,  infOutput:15.00, type:'api', tokensPerSec:50000 },
+    gpt4omini:     { name:'GPT-4o Mini',  trainPer1M:3.00,  infInput:0.30,  infOutput:1.20,  type:'api', tokensPerSec:80000 },
+    gpt35:         { name:'GPT-3.5 Turbo',trainPer1M:8.00,  infInput:3.00,  infOutput:6.00,  type:'api', tokensPerSec:60000 },
+    llama33_70b:   { name:'Llama 3.3 70B',gpuHr:12.00,      infInput:0,     infOutput:0,     type:'gpu', tokensPerSec:8000 },
+    llama33_8b:    { name:'Llama 3.3 8B', gpuHr:2.00,       infInput:0,     infOutput:0,     type:'gpu', tokensPerSec:25000 },
+    mistral7b:     { name:'Mistral 7B',   gpuHr:2.00,       infInput:0,     infOutput:0,     type:'gpu', tokensPerSec:28000 },
+    mistral_large: { name:'Mistral Large',gpuHr:15.00,      infInput:0,     infOutput:0,     type:'gpu', tokensPerSec:6000 }
+  };
+
+  const taskSizes = {
+    format:   { min:20,   rec:100,  high:500,   desc:'Formatting tasks (JSON output, style changes) need fewer examples because the model already understands language — it just needs to learn the format pattern. Start with 50-100 and validate quality before scaling up.' },
+    classify: { min:50,   rec:500,  high:2000,  desc:'Classification and extraction tasks need enough examples to cover each category or entity type. Aim for 30-50 examples per class. Imbalanced classes should be oversampled to prevent bias toward the majority class.' },
+    generate: { min:200,  rec:1000, high:5000,  desc:'Generation tasks require diverse examples showing the full range of desired outputs. The model needs enough variety to generalize beyond memorization. Quality and diversity matter more than raw count at this level.' },
+    domain:   { min:500,  rec:2000, high:10000, desc:'Domain expert tasks (medical, legal, financial) require extensive coverage of domain terminology, reasoning patterns, and edge cases. Consider supplementing with synthetic examples generated by a larger model and validated by domain experts.' }
+  };
+
+  function calculate() {
+    const key = document.getElementById('ft-model').value;
+    const m = models[key];
+    const rows = parseInt(document.getElementById('ft-rows').value) || 500;
+    const tpr = parseInt(document.getElementById('ft-tpr').value) || 200;
+    const epochs = parseInt(document.getElementById('ft-epochs').value) || 3;
+    const epochTokens = rows * tpr;
+    const totalTokens = epochTokens * epochs;
+    let cost, time;
+    if (m.type === 'api') {
+      cost = (totalTokens / 1000000) * m.trainPer1M;
+      time = Math.ceil(totalTokens / m.tokensPerSec / 60);
+    } else {
+      const hours = totalTokens / m.tokensPerSec / 3600;
+      cost = hours * m.gpuHr;
+      time = Math.ceil(hours * 60);
+    }
+    document.getElementById('ft-total-tokens').textContent = totalTokens.toLocaleString();
+    document.getElementById('ft-training-cost').textContent = '$' + cost.toFixed(2);
+    document.getElementById('ft-est-time').textContent = time < 60 ? time + 'm' : Math.floor(time/60) + 'h ' + (time%60) + 'm';
+    document.getElementById('ft-cost-per-row').textContent = '$' + (cost / rows).toFixed(4);
+    document.getElementById('ft-epoch-tokens').textContent = epochTokens.toLocaleString();
+    document.getElementById('ft-train-tokens').textContent = totalTokens.toLocaleString();
+    document.getElementById('ft-train-cost').textContent = '$' + cost.toFixed(2);
+    document.getElementById('ft-time').textContent = time < 60 ? time + ' min' : Math.floor(time/60) + 'h ' + (time%60) + 'm';
+    if (m.type === 'api') {
+      document.getElementById('ft-inf-input').textContent = '$' + m.infInput.toFixed(2);
+      document.getElementById('ft-inf-output').textContent = '$' + m.infOutput.toFixed(2);
+      const reqCost = (500/1000000)*m.infInput + (500/1000000)*m.infOutput;
+      document.getElementById('ft-inf-request').textContent = '$' + reqCost.toFixed(6);
+    } else {
+      document.getElementById('ft-inf-input').textContent = 'Self-hosted';
+      document.getElementById('ft-inf-output').textContent = 'Self-hosted';
+      document.getElementById('ft-inf-request').textContent = 'GPU cost only';
+    }
+    let cmpHtml = '<table style="width:100%;border-collapse:collapse;font-size:.82rem"><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:.3rem .5rem;color:var(--accent)">Model</th><th style="text-align:right;padding:.3rem .5rem;color:var(--accent)">Cost</th><th style="text-align:right;padding:.3rem .5rem;color:var(--accent)">Time</th></tr>';
+    Object.keys(models).forEach(k => {
+      const mm = models[k];
+      let c, t;
+      if (mm.type === 'api') { c = (totalTokens/1000000)*mm.trainPer1M; t = Math.ceil(totalTokens/mm.tokensPerSec/60); }
+      else { const h = totalTokens/mm.tokensPerSec/3600; c = h*mm.gpuHr; t = Math.ceil(h*60); }
+      const isActive = k === key ? 'color:var(--accent);font-weight:600' : 'color:var(--text-muted)';
+      cmpHtml += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:.3rem .5rem;'+isActive+'">'+mm.name+'</td><td style="text-align:right;padding:.3rem .5rem;'+isActive+'">$'+c.toFixed(2)+'</td><td style="text-align:right;padding:.3rem .5rem;color:var(--text-muted)">'+(t<60?t+'m':Math.floor(t/60)+'h '+(t%60)+'m')+'</td></tr>';
+    });
+    cmpHtml += '</table>';
+    document.getElementById('ft-comparison').innerHTML = cmpHtml;
+  }
+
+  function breakeven() {
+    const key = document.getElementById('ft-model').value;
+    const m = models[key];
+    if (m.type !== 'api') {
+      document.getElementById('ft-breakeven-text').textContent = 'Breakeven analysis is available for API-based models only. Open-source models have different cost structures based on GPU hosting.';
+      document.getElementById('ft-bar-chart').innerHTML = '';
+      return;
+    }
+    const rows = parseInt(document.getElementById('ft-rows').value) || 500;
+    const tpr = parseInt(document.getElementById('ft-tpr').value) || 200;
+    const epochs = parseInt(document.getElementById('ft-epochs').value) || 3;
+    const fewshotTokens = parseInt(document.getElementById('ft-fewshot-tokens').value) || 500;
+    const monthlyReqs = parseInt(document.getElementById('ft-monthly-requests').value) || 10000;
+    const avgOutput = parseInt(document.getElementById('ft-avg-output').value) || 300;
+    const trainingCost = (rows * tpr * epochs / 1000000) * m.trainPer1M;
+    const baseCostPerReq = (500/1000000)*m.infInput + (avgOutput/1000000)*m.infOutput;
+    const fewshotCostPerReq = ((500+fewshotTokens)/1000000)*m.infInput + (avgOutput/1000000)*m.infOutput;
+    const ftCostPerReq = (500/1000000)*m.infInput + (avgOutput/1000000)*m.infOutput;
+    const savingsPerReq = fewshotCostPerReq - ftCostPerReq;
+    const breakevenReqs = savingsPerReq > 0 ? Math.ceil(trainingCost / savingsPerReq) : Infinity;
+    const breakevenMonths = breakevenReqs / monthlyReqs;
+    let months = [1, 3, 6, 12];
+    let maxCost = 0;
+    let data = months.map(mo => {
+      const fsCost = fewshotCostPerReq * monthlyReqs * mo;
+      const ftCost = trainingCost + ftCostPerReq * monthlyReqs * mo;
+      maxCost = Math.max(maxCost, fsCost, ftCost);
+      return { month: mo, fsCost, ftCost };
+    });
+    let barHtml = '';
+    data.forEach(d => {
+      const fsPct = (d.fsCost / maxCost * 100).toFixed(1);
+      const ftPct = (d.ftCost / maxCost * 100).toFixed(1);
+      barHtml += '<div style="margin-bottom:.75rem"><div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.3rem">Month '+d.month+'</div>';
+      barHtml += '<div class="ft-bar-row"><span class="ft-bar-label">Few-shot</span><div class="ft-bar-track"><div class="ft-bar-fill" style="width:'+fsPct+'%;background:#f472b6"><span class="ft-bar-val">$'+d.fsCost.toFixed(2)+'</span></div></div></div>';
+      barHtml += '<div class="ft-bar-row"><span class="ft-bar-label">Fine-tuned</span><div class="ft-bar-track"><div class="ft-bar-fill" style="width:'+ftPct+'%;background:var(--accent)"><span class="ft-bar-val">$'+d.ftCost.toFixed(2)+'</span></div></div></div>';
+      barHtml += '</div>';
+    });
+    document.getElementById('ft-bar-chart').innerHTML = barHtml;
+    if (breakevenReqs === Infinity) {
+      document.getElementById('ft-breakeven-text').textContent = 'Fine-tuning does not break even with the current configuration. The few-shot tokens are not adding enough cost per request to justify the training investment.';
+    } else {
+      document.getElementById('ft-breakeven-text').innerHTML = 'Training cost: <strong style="color:var(--accent)">$'+trainingCost.toFixed(2)+'</strong> | Savings per request: <strong style="color:var(--accent)">$'+savingsPerReq.toFixed(6)+'</strong> | Breakeven at <strong style="color:var(--accent)">'+breakevenReqs.toLocaleString()+' requests</strong> (~'+breakevenMonths.toFixed(1)+' months at your volume). After breakeven, fine-tuning saves $'+(savingsPerReq*monthlyReqs).toFixed(2)+'/month.';
+    }
+  }
+
+  function optimize() {
+    const task = document.getElementById('ft-task-type').value;
+    const t = taskSizes[task];
+    document.getElementById('ft-opt-min').textContent = t.min.toLocaleString();
+    document.getElementById('ft-opt-rec').textContent = t.rec.toLocaleString();
+    document.getElementById('ft-opt-high').textContent = t.high.toLocaleString();
+    const tpr = parseInt(document.getElementById('ft-tpr').value) || 200;
+    const epochs = parseInt(document.getElementById('ft-epochs').value) || 3;
+    const key = document.getElementById('ft-model').value;
+    const m = models[key];
+    let costs = {};
+    ['min','rec','high'].forEach(level => {
+      const r = t[level];
+      const total = r * tpr * epochs;
+      if (m.type === 'api') costs[level] = (total/1000000)*m.trainPer1M;
+      else { const h = total/m.tokensPerSec/3600; costs[level] = h*m.gpuHr; }
+    });
+    document.getElementById('ft-opt-detail').innerHTML = '<strong style="color:var(--accent)">'+t.desc+'</strong><br><br>Estimated costs with '+m.name+': Minimum = $'+costs.min.toFixed(2)+' | Recommended = $'+costs.rec.toFixed(2)+' | High quality = $'+costs.high.toFixed(2);
+  }
+
+  function reset() {
+    document.getElementById('ft-rows').value = 500;
+    document.getElementById('ft-tpr').value = 200;
+    document.getElementById('ft-epochs').value = 3;
+    document.getElementById('ft-model').value = 'gpt4o';
+    ['ft-total-tokens','ft-epoch-tokens','ft-train-tokens'].forEach(id => document.getElementById(id).textContent = '0');
+    ['ft-training-cost','ft-train-cost','ft-cost-per-row'].forEach(id => document.getElementById(id).textContent = '$0');
+    document.getElementById('ft-est-time').textContent = '—';
+    document.getElementById('ft-time').textContent = '—';
+    document.getElementById('ft-inf-input').textContent = '—';
+    document.getElementById('ft-inf-output').textContent = '—';
+    document.getElementById('ft-inf-request').textContent = '—';
+    document.getElementById('ft-comparison').textContent = 'Select a model and click "Calculate Cost" to see comparisons.';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() { optimize(); });
+  window.ft = { calculate, breakeven, optimize, reset };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monthly AI API Cost Estimator — Project Spend for GPT, Claude & Gemini | GPT0X</title>
+<meta name="description" content="Estimate monthly AI API costs based on your usage patterns. Configure requests, models, token sizes, and see projected spend across OpenAI, Anthropic, Google, and Mistral. Compare providers to find the cheapest option.">
+<meta name="keywords" content="AI cost estimator, API cost calculator, GPT-4o pricing, Claude API cost, AI monthly spend, LLM cost projection, API budget planner, AI infrastructure cost">
+<link rel="canonical" href="https://gpt0x.com/tools/ai-cost-estimator.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/tools/ai-cost-estimator.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/tools/ai-cost-estimator.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Monthly AI API Cost Estimator — Project Spend for GPT, Claude & Gemini">
+<meta property="og:description" content="Estimate monthly AI API costs based on your usage patterns across all major providers.">
+<meta property="og:url" content="https://gpt0x.com/tools/ai-cost-estimator.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Monthly AI API Cost Estimator — Project Spend for GPT, Claude & Gemini">
+<meta name="twitter:description" content="Estimate monthly AI API costs based on your usage patterns.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Monthly AI API Cost Estimator","url":"https://gpt0x.com/tools/ai-cost-estimator.html","description":"Estimate monthly AI API costs based on usage patterns across OpenAI, Anthropic, Google, and Mistral.","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"},"publisher":{"@type":"Organization","name":"GPT0X","url":"https://gpt0x.com"},"datePublished":"2026-05-25","dateModified":"2026-05-25","featureList":["Monthly cost projection across 15+ AI models","Multi-model usage splitting for model routing scenarios","Embedding and fine-tuning cost inclusion","Growth projection with usage scaling","Provider comparison to find the cheapest alternative"]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"How much does it cost to run GPT-4o at 100K requests per month?","acceptedAnswer":{"@type":"Answer","text":"At 100K requests/month with an average of 500 input tokens and 300 output tokens per request, GPT-4o costs approximately $425/month ($125 input + $300 output). GPT-4o Mini handles the same volume for about $33/month. Claude Sonnet 4 costs about $600/month. Gemini 2.5 Flash is the cheapest at roughly $26/month. The right model depends on your quality requirements — for many tasks, routing 80% of requests to a cheaper model and 20% to a premium model can cut costs by 60-70% while maintaining quality."}},
+{"@type":"Question","name":"What is the cheapest AI API for production use?","acceptedAnswer":{"@type":"Answer","text":"As of May 2026, the cheapest production-grade AI APIs are: Gemini 2.5 Flash ($0.15/$0.60 per 1M tokens), GPT-4o Mini ($0.15/$0.60), and DeepSeek V3 ($0.27/$1.10). For open-source deployment, hosting Llama 3.3 8B on a single A10G GPU costs ~$0.50/hr and can serve 500+ requests per minute with zero per-token costs. The cheapest option depends on your scale: below 10K requests/month, API models are cheaper than self-hosting; above 100K requests/month, self-hosted models become significantly cheaper."}},
+{"@type":"Question","name":"How do AI API costs scale with usage?","acceptedAnswer":{"@type":"Answer","text":"AI API costs scale linearly with token volume — double the requests, double the cost. However, most providers offer volume discounts or batch APIs. OpenAI's Batch API provides 50% cost reduction for async processing. Anthropic and Google offer committed-use discounts for enterprise customers. Prompt caching (available from OpenAI and Anthropic) can reduce input token costs by 50-90% for requests sharing common prefixes. At scale, optimizing prompt length has the highest ROI: reducing average prompt size by 200 tokens saves $50-500/month per 100K requests depending on the model."}},
+{"@type":"Question","name":"Should I use one AI provider or multiple?","acceptedAnswer":{"@type":"Answer","text":"Multi-provider strategies are recommended for production. Benefits: cost optimization (route to the cheapest capable model), reliability (failover between providers), and rate limit headroom (separate quotas per provider). The implementation cost is moderate — normalize your prompt format and handle provider-specific response parsing. Many teams use a primary provider for 80% of traffic and a secondary for failover and specific use cases. The cost estimator lets you model multi-provider splits to find the optimal allocation."}},
+{"@type":"Question","name":"How can I reduce my AI API costs by 50% or more?","acceptedAnswer":{"@type":"Answer","text":"Five proven cost reduction strategies: 1) Model routing — send simple tasks to cheap models, complex tasks to premium models (saves 40-60%). 2) Prompt compression — remove redundant instructions and examples (saves 20-40%). 3) Caching — cache responses for identical or similar prompts (saves 30-90% depending on repetition). 4) Output length control — set max_tokens and request concise formats (saves 20-50% on output costs). 5) Batch processing — use async batch APIs for non-real-time workloads (saves 50% on OpenAI). Combined, these strategies can reduce costs by 70-90%."}}
+]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://gpt0x.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://gpt0x.com/tools/"},{"@type":"ListItem","position":3,"name":"AI Cost Estimator","item":"https://gpt0x.com/tools/ai-cost-estimator.html"}]}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}.tool-hero h1 span{color:var(--accent)}.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.ce-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}@media(max-width:768px){.ce-grid{grid-template-columns:1fr}}
+.ce-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.ce-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.ce-field{margin-bottom:.75rem}.ce-field label{display:block;font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px}
+.ce-field select,.ce-field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-family:var(--font-body);font-size:.83rem}
+.ce-field select:focus,.ce-field input:focus{outline:none;border-color:var(--accent)}
+.ce-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;background:var(--accent);color:#000}.ce-btn:hover{opacity:.85}
+.ce-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:1rem 0}@media(max-width:768px){.ce-stats{grid-template-columns:1fr}}
+.ce-stat{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;text-align:center}
+.ce-stat-value{font-size:1.4rem;font-weight:700;color:var(--accent);font-family:var(--font-display)}
+.ce-stat-label{font-size:.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.ce-result{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:.85rem;color:var(--text-muted);margin-top:1rem}.ce-result strong{color:var(--accent)}
+.ce-breakdown{margin-top:1rem}
+.ce-row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.83rem}
+.ce-row:last-child{border-bottom:none}
+.ce-row .ce-rl{color:var(--text-muted)}.ce-row .ce-rv{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}.explainer p{color:var(--text-muted);margin-bottom:1rem}.explainer ul{color:var(--text-muted);margin:0 0 1rem 1.5rem}.explainer li{margin-bottom:.4rem}
+.explainer table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}.explainer th,.explainer td{padding:.5rem .75rem;border:1px solid var(--border);text-align:left}.explainer th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}.explainer td{color:var(--text-muted)}
+.faq-section{max-width:780px;margin:2.5rem auto}.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}.faq-section summary:hover{color:var(--accent)}.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}.related-card:hover{border-color:var(--accent);text-decoration:none}.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header><div class="container"><a href="/" class="logo">gpt0x</a><nav><a href="/">Database</a><a href="/research/">Research</a><a href="/tools/">Tools</a><a href="/answers/">Answers</a><a href="/blog/">Blog</a><a href="/about.html">About</a><div class="nav-right"><a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a><a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a></div></nav></div></header>
+
+<main class="tool-container">
+  <div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/tools/">Tools</a> &rsaquo; AI Cost Estimator</div>
+  <div class="tool-hero">
+    <h1>Monthly AI <span>Cost</span> Estimator</h1>
+    <p>Project your monthly AI API spend based on usage patterns. Configure request volumes, average token sizes, and model selection to see projected costs. Compare providers side by side to find the most cost-effective option. Includes embedding and fine-tuning cost projections.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="ce-grid">
+    <div class="ce-panel">
+      <h3>Usage Configuration</h3>
+      <div class="ce-field"><label>Primary Model</label><select id="ce-model"><option value="gpt4o">GPT-4o ($2.50/$10.00)</option><option value="gpt4omini">GPT-4o Mini ($0.15/$0.60)</option><option value="o3">o3 ($10.00/$40.00)</option><option value="o4mini">o4-mini ($1.10/$4.40)</option><option value="opus4">Claude Opus 4 ($15/$75)</option><option value="sonnet4">Claude Sonnet 4 ($3/$15)</option><option value="haiku35">Claude Haiku 3.5 ($0.80/$4)</option><option value="gemini25pro">Gemini 2.5 Pro ($1.25/$10)</option><option value="gemini25flash">Gemini 2.5 Flash ($0.15/$0.60)</option></select></div>
+      <div class="ce-field"><label>Monthly Requests</label><input type="number" id="ce-requests" value="50000" min="100"></div>
+      <div class="ce-field"><label>Avg Input Tokens per Request</label><input type="number" id="ce-input-tokens" value="500" min="10"></div>
+      <div class="ce-field"><label>Avg Output Tokens per Request</label><input type="number" id="ce-output-tokens" value="300" min="10"></div>
+      <div class="ce-field"><label>Prompt Caching (% of requests cached)</label><input type="number" id="ce-cache-pct" value="0" min="0" max="100"></div>
+      <div class="ce-field"><label>Batch API Usage (% async)</label><input type="number" id="ce-batch-pct" value="0" min="0" max="100"></div>
+      <div class="ce-field"><label>Monthly Growth Rate (%)</label><input type="number" id="ce-growth" value="10" min="0" max="200"></div>
+      <button class="ce-btn" onclick="ce.estimate()" style="margin-top:.5rem">Estimate Costs</button>
+    </div>
+    <div class="ce-panel">
+      <h3>Cost Projection</h3>
+      <div class="ce-stats">
+        <div class="ce-stat"><div class="ce-stat-value" id="ce-monthly">$0</div><div class="ce-stat-label">Monthly Cost</div></div>
+        <div class="ce-stat"><div class="ce-stat-value" id="ce-per-req">$0</div><div class="ce-stat-label">Cost / Request</div></div>
+        <div class="ce-stat"><div class="ce-stat-value" id="ce-annual">$0</div><div class="ce-stat-label">Annual (w/ growth)</div></div>
+      </div>
+      <div class="ce-breakdown" id="ce-breakdown"></div>
+      <h3 style="margin-top:1.5rem">Provider Comparison</h3>
+      <div id="ce-comparison">Click "Estimate Costs" to compare prices across all providers.</div>
+    </div>
+  </div>
+
+  <div class="ce-panel">
+    <h3>6-Month Cost Forecast</h3>
+    <div id="ce-forecast" style="font-size:.85rem;color:var(--text-muted)">Configure usage and click "Estimate Costs" to see a 6-month forecast with growth projections.</div>
+  </div>
+
+  <section class="explainer">
+    <h2>Understanding AI API Costs in 2026</h2>
+    <p>AI API costs are the fastest-growing line item in many engineering budgets. A single GPT-4o-powered feature handling 100,000 requests per month can cost $400-1,000+ depending on prompt design. Understanding the cost structure and optimization levers is essential for building sustainable AI products. This guide covers pricing models, cost drivers, and proven strategies for reducing AI spend without sacrificing quality.</p>
+
+    <h2>Pricing Model Breakdown</h2>
+    <p>All major LLM providers use per-token pricing with separate rates for input (prompt) and output (completion) tokens. Output tokens are 2-5x more expensive than input tokens because generation requires more compute. The two key factors that determine your cost are: total token volume (requests x tokens per request) and model choice. Switching from GPT-4o to GPT-4o Mini reduces costs by 94% — if the cheaper model can handle your task, this is the single highest-impact optimization.</p>
+
+    <h2>AI Model Pricing (May 2026)</h2>
+    <table>
+      <tr><th>Model</th><th>Input $/1M</th><th>Output $/1M</th><th>50K Reqs/Mo*</th></tr>
+      <tr><td>GPT-4o</td><td>$2.50</td><td>$10.00</td><td>$212.50</td></tr>
+      <tr><td>GPT-4o Mini</td><td>$0.15</td><td>$0.60</td><td>$12.75</td></tr>
+      <tr><td>Claude Opus 4</td><td>$15.00</td><td>$75.00</td><td>$1,500.00</td></tr>
+      <tr><td>Claude Sonnet 4</td><td>$3.00</td><td>$15.00</td><td>$300.00</td></tr>
+      <tr><td>Gemini 2.5 Pro</td><td>$1.25</td><td>$10.00</td><td>$181.25</td></tr>
+      <tr><td>Gemini 2.5 Flash</td><td>$0.15</td><td>$0.60</td><td>$12.75</td></tr>
+    </table>
+    <p style="font-size:.78rem;color:var(--text-muted)">*Estimated at 500 input + 300 output tokens per request</p>
+
+    <h2>Cost Reduction Strategies</h2>
+    <h3>1. Model Routing (40-60% savings)</h3>
+    <p>Not every request needs your most expensive model. Build a router that classifies request complexity and directs simple tasks to cheap models (GPT-4o Mini, Gemini Flash) while routing complex reasoning to premium models (GPT-4o, Claude Opus 4). A common pattern: use a cheap model to classify the request, then route accordingly. This adds a small fixed cost per request but reduces average model cost dramatically.</p>
+
+    <h3>2. Prompt Caching (50-90% savings on repeated prefixes)</h3>
+    <p>OpenAI and Anthropic offer automatic prompt caching that discounts repeated prefixes. If your system prompt is 500 tokens and every request shares it, caching saves 50% of those input token costs. For applications where many requests share common context (customer support with knowledge base snippets, RAG with frequently retrieved passages), caching can reduce input costs by up to 90%.</p>
+
+    <h3>3. Batch APIs (50% savings)</h3>
+    <p>OpenAI's Batch API processes requests asynchronously within 24 hours at 50% cost. For non-real-time workloads — content generation, data analysis, bulk classification — this is free money. Anthropic offers Message Batches with similar economics. The tradeoff is latency: you submit a batch and get results hours later instead of seconds.</p>
+
+    <h3>4. Output Length Control (20-50% savings)</h3>
+    <p>Output tokens cost 2-5x more than input tokens, so controlling response length has outsized impact. Set max_tokens in your API calls. Use structured output formats (JSON with specific fields) instead of allowing verbose prose. Include explicit length instructions: "Respond in exactly 3 sentences." This discipline alone can cut output costs by 30-50% for most applications.</p>
+
+    <h2>Embedding and Infrastructure Costs</h2>
+    <p>Beyond LLM inference, AI applications incur costs for embeddings (one-time per document, $0.02-0.18 per 1M tokens), vector database storage ($0.025-0.33/GB/month), and reranking ($1-2 per 1,000 queries). For a production RAG application with 1 million documents and 100K monthly queries, embedding costs are a one-time $10-100, storage is $5-20/month, and reranking is $100-200/month. The LLM generation cost typically dominates — often 70-90% of total AI infrastructure spend.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details><summary>How much does it cost to run GPT-4o at 100K requests per month?</summary><p>At 100K requests/month with 500 input and 300 output tokens average, GPT-4o costs approximately $425/month. GPT-4o Mini handles the same for ~$33/month. Routing 80% to the cheap model saves 60-70%.</p></details>
+    <details><summary>What is the cheapest AI API for production use?</summary><p>Gemini 2.5 Flash and GPT-4o Mini tie at $0.15/$0.60 per 1M tokens. For self-hosted, Llama 3.3 8B on A10G costs ~$0.50/hr with zero per-token costs.</p></details>
+    <details><summary>How do AI API costs scale with usage?</summary><p>Costs scale linearly with tokens. Volume discounts, batch APIs (50% off), and prompt caching (50-90% on repeated prefixes) help at scale. Reducing prompt length by 200 tokens saves $50-500/month per 100K requests.</p></details>
+    <details><summary>Should I use one AI provider or multiple?</summary><p>Multi-provider is recommended for cost optimization, reliability, and rate limit headroom. Use a primary (80%) and secondary (20%) provider.</p></details>
+    <details><summary>How can I reduce my AI API costs by 50% or more?</summary><p>Combine: model routing (40-60%), prompt compression (20-40%), caching (30-90%), output control (20-50%), and batch APIs (50%). Together these save 70-90%.</p></details>
+  </section>
+
+  <section class="related-tools"><h2>Related Tools</h2><div class="related-grid"><a href="/tools/token-counter.html" class="related-card"><h3>Token Counter</h3><p>Count tokens for GPT-4o, Claude, and 15+ models with cost estimation.</p></a><a href="/answers/ai-api-rate-limits.html" class="related-card"><h3>API Rate Limits</h3><p>Compare rate limits across all AI providers by tier.</p></a><a href="/guides/fine-tuning-cost-calculator.html" class="related-card"><h3>Fine-Tuning Calculator</h3><p>Compare fine-tuning vs prompting costs.</p></a></div></section>
+  <div class="author-bio"><h3>About the Author</h3><p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p></div>
+</main>
+<footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Zovo Tools</div><div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div><a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a><div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div></div></footer>
+<nav class="zovo-network" aria-label="Zovo Tools Network"><div class="zovo-network-inner"><h3 class="zovo-network-title">Explore More Tools</h3><div class="zovo-network-links"><a href="https://abwex.com">ABWex — A/B Testing</a><a href="https://claudflow.com">ClaudFlow — Workflows</a><a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a><a href="https://claudkit.com">ClaudKit — API</a><a href="https://enhio.com">Enhio — Text Tools</a><a href="https://epochpilot.com">EpochPilot — Timestamps</a><a href="https://gen8x.com">Gen8X — Color Tools</a><a href="https://heytensor.com">HeyTensor — ML Tools</a><a href="https://invokebot.com">InvokeBot — Webhooks</a><a href="https://kappafy.com">Kappafy — JSON</a><a href="https://kappakit.com">KappaKit — Dev Toolkit</a><a href="https://kickllm.com">KickLLM — LLM Costs</a><a href="https://krzen.com">Krzen — Image Tools</a><a href="https://lochbot.com">LochBot — Security</a><a href="https://lockml.com">LockML — ML Compare</a><a href="https://ml3x.com">ML3X — Matrix Math</a></div></div></nav>
+
+<script>
+(function(){
+  const models = {
+    gpt4o:        { name:'GPT-4o',           input:2.50,  output:10.00 },
+    gpt4omini:    { name:'GPT-4o Mini',      input:0.15,  output:0.60 },
+    o3:           { name:'o3',               input:10.00, output:40.00 },
+    o4mini:       { name:'o4-mini',          input:1.10,  output:4.40 },
+    opus4:        { name:'Claude Opus 4',    input:15.00, output:75.00 },
+    sonnet4:      { name:'Claude Sonnet 4',  input:3.00,  output:15.00 },
+    haiku35:      { name:'Claude Haiku 3.5', input:0.80,  output:4.00 },
+    gemini25pro:  { name:'Gemini 2.5 Pro',   input:1.25,  output:10.00 },
+    gemini25flash:{ name:'Gemini 2.5 Flash', input:0.15,  output:0.60 }
+  };
+
+  function estimate() {
+    const key = document.getElementById('ce-model').value;
+    const m = models[key];
+    const reqs = parseInt(document.getElementById('ce-requests').value) || 50000;
+    const inTk = parseInt(document.getElementById('ce-input-tokens').value) || 500;
+    const outTk = parseInt(document.getElementById('ce-output-tokens').value) || 300;
+    const cachePct = parseInt(document.getElementById('ce-cache-pct').value) || 0;
+    const batchPct = parseInt(document.getElementById('ce-batch-pct').value) || 0;
+    const growth = parseInt(document.getElementById('ce-growth').value) || 0;
+
+    const totalInTokens = reqs * inTk;
+    const totalOutTokens = reqs * outTk;
+    const cacheDiscount = cachePct / 100 * 0.5;
+    const batchDiscount = batchPct / 100 * 0.5;
+    const effectiveInRate = m.input * (1 - cacheDiscount) * (1 - batchDiscount);
+    const effectiveOutRate = m.output * (1 - batchDiscount);
+    const inCost = (totalInTokens / 1000000) * effectiveInRate;
+    const outCost = (totalOutTokens / 1000000) * effectiveOutRate;
+    const monthly = inCost + outCost;
+    const perReq = monthly / reqs;
+
+    let annual = 0;
+    let forecastHtml = '<table style="width:100%;border-collapse:collapse;font-size:.82rem"><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:.4rem;color:var(--accent)">Month</th><th style="text-align:right;padding:.4rem;color:var(--accent)">Requests</th><th style="text-align:right;padding:.4rem;color:var(--accent)">Cost</th><th style="text-align:right;padding:.4rem;color:var(--accent)">Cumulative</th></tr>';
+    let cumulative = 0;
+    for (let i = 1; i <= 6; i++) {
+      const moReqs = Math.round(reqs * Math.pow(1 + growth/100, i-1));
+      const moCost = moReqs / reqs * monthly;
+      cumulative += moCost;
+      if (i <= 12) annual += moCost;
+      forecastHtml += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:.35rem;color:var(--text)">Month '+i+'</td><td style="text-align:right;padding:.35rem;color:var(--text-muted)">'+moReqs.toLocaleString()+'</td><td style="text-align:right;padding:.35rem;color:var(--text-muted)">$'+moCost.toFixed(2)+'</td><td style="text-align:right;padding:.35rem;color:var(--accent);font-weight:600">$'+cumulative.toFixed(2)+'</td></tr>';
+    }
+    for (let i = 7; i <= 12; i++) {
+      const moCost = Math.round(reqs * Math.pow(1 + growth/100, i-1)) / reqs * monthly;
+      annual += moCost;
+    }
+    forecastHtml += '</table>';
+
+    document.getElementById('ce-monthly').textContent = '$' + monthly.toFixed(2);
+    document.getElementById('ce-per-req').textContent = '$' + perReq.toFixed(5);
+    document.getElementById('ce-annual').textContent = '$' + annual.toFixed(0);
+
+    let bdHtml = '<div class="ce-row"><span class="ce-rl">Input tokens ('+totalInTokens.toLocaleString()+')</span><span class="ce-rv">$'+inCost.toFixed(2)+'</span></div>';
+    bdHtml += '<div class="ce-row"><span class="ce-rl">Output tokens ('+totalOutTokens.toLocaleString()+')</span><span class="ce-rv">$'+outCost.toFixed(2)+'</span></div>';
+    if (cachePct > 0) bdHtml += '<div class="ce-row"><span class="ce-rl">Cache savings ('+cachePct+'%)</span><span class="ce-rv" style="color:#34d399">-$'+((totalInTokens/1000000)*m.input*cachePct/100*0.5).toFixed(2)+'</span></div>';
+    if (batchPct > 0) bdHtml += '<div class="ce-row"><span class="ce-rl">Batch savings ('+batchPct+'%)</span><span class="ce-rv" style="color:#34d399">-$'+((totalInTokens/1000000*m.input + totalOutTokens/1000000*m.output)*batchPct/100*0.5).toFixed(2)+'</span></div>';
+    bdHtml += '<div class="ce-row" style="border-top:2px solid var(--accent);padding-top:.5rem;margin-top:.3rem"><span class="ce-rl" style="font-weight:600;color:var(--text)">Total Monthly</span><span class="ce-rv">$'+monthly.toFixed(2)+'</span></div>';
+    document.getElementById('ce-breakdown').innerHTML = bdHtml;
+
+    let cmpHtml = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;margin-top:.5rem"><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:.3rem;color:var(--accent)">Model</th><th style="text-align:right;padding:.3rem;color:var(--accent)">Monthly</th><th style="text-align:right;padding:.3rem;color:var(--accent)">vs Selected</th></tr>';
+    const sortedModels = Object.entries(models).map(([k,v]) => {
+      const ic = (totalInTokens/1000000)*v.input*(1-cacheDiscount)*(1-batchDiscount);
+      const oc = (totalOutTokens/1000000)*v.output*(1-batchDiscount);
+      return { key:k, name:v.name, cost:ic+oc };
+    }).sort((a,b) => a.cost - b.cost);
+    sortedModels.forEach(s => {
+      const diff = ((s.cost - monthly) / monthly * 100).toFixed(0);
+      const diffStr = s.key === key ? 'Selected' : (s.cost < monthly ? diff+'%' : '+'+diff+'%');
+      const diffColor = s.key === key ? 'var(--accent)' : (s.cost < monthly ? '#34d399' : '#f472b6');
+      cmpHtml += '<tr style="border-bottom:1px solid var(--border)'+(s.key===key?';background:var(--bg)':'')+'">';
+      cmpHtml += '<td style="padding:.3rem;'+(s.key===key?'color:var(--accent);font-weight:600':'color:var(--text)')+'">'+s.name+'</td>';
+      cmpHtml += '<td style="text-align:right;padding:.3rem;color:var(--text-muted)">$'+s.cost.toFixed(2)+'</td>';
+      cmpHtml += '<td style="text-align:right;padding:.3rem;color:'+diffColor+';font-weight:600">'+diffStr+'</td></tr>';
+    });
+    cmpHtml += '</table>';
+    document.getElementById('ce-comparison').innerHTML = cmpHtml;
+    document.getElementById('ce-forecast').innerHTML = forecastHtml;
+  }
+
+  window.ce = { estimate };
+})();
+</script>
+</body>
+</html>

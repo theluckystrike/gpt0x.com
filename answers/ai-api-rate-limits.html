@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI API Rate Limit Comparison — OpenAI, Anthropic, Google & Mistral (2026) | GPT0X</title>
+<meta name="description" content="Compare AI API rate limits across OpenAI, Anthropic, Google, and Mistral. Interactive queue management calculator, burst vs sustained throughput analyzer, and rate limit header decoder. Updated May 2026.">
+<meta name="keywords" content="AI API rate limits, OpenAI rate limits, Anthropic rate limits, Google AI rate limits, Mistral rate limits, API throttling, rate limit comparison, queue management, API throughput">
+<link rel="canonical" href="https://gpt0x.com/answers/ai-api-rate-limits.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/answers/ai-api-rate-limits.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/answers/ai-api-rate-limits.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI API Rate Limit Comparison — OpenAI, Anthropic, Google & Mistral (2026)">
+<meta property="og:description" content="Compare AI API rate limits across OpenAI, Anthropic, Google, and Mistral. Interactive queue calculator and throughput analyzer.">
+<meta property="og:url" content="https://gpt0x.com/answers/ai-api-rate-limits.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI API Rate Limit Comparison — OpenAI, Anthropic, Google & Mistral (2026)">
+<meta name="twitter:description" content="Compare AI API rate limits across OpenAI, Anthropic, Google, and Mistral. Interactive queue calculator and throughput analyzer.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "AI API Rate Limit Comparison — OpenAI, Anthropic, Google & Mistral",
+  "url": "https://gpt0x.com/answers/ai-api-rate-limits.html",
+  "description": "Compare AI API rate limits across OpenAI, Anthropic, Google, and Mistral with interactive queue management calculator and throughput analyzer.",
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "publisher": { "@type": "Organization", "name": "GPT0X", "url": "https://gpt0x.com" },
+  "datePublished": "2026-05-25",
+  "dateModified": "2026-05-25",
+  "mainEntityOfPage": "https://gpt0x.com/answers/ai-api-rate-limits.html"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What are the rate limits for OpenAI's GPT-4o API?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "OpenAI's GPT-4o rate limits depend on your usage tier. Tier 1 (after first $5 payment) allows 500 RPM (requests per minute) and 30,000 TPM (tokens per minute). Tier 2 ($50+ spent) increases to 5,000 RPM and 450,000 TPM. Tier 3 ($100+ spent) allows 5,000 RPM and 800,000 TPM. Tier 4 and 5 offer up to 10,000 RPM and 10,000,000+ TPM. Rate limits are applied per-organization and per-model, meaning GPT-4o and GPT-4o Mini have separate limits."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do Anthropic's Claude API rate limits compare to OpenAI?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Anthropic's Claude API uses a tier system based on monthly spend. The Build tier (default) allows 50 RPM and 40,000 input TPM for Claude Opus 4, and 50 RPM with 40,000 TPM for Sonnet 4. The Scale tier (after spending thresholds) increases to 4,000 RPM and 400,000 TPM. Anthropic generally has lower default limits than OpenAI but scales comparably at higher tiers. A key difference: Anthropic counts input and output tokens separately for rate limiting, while OpenAI combines them."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What HTTP headers indicate rate limit status?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most AI APIs return rate limit headers with every response. OpenAI returns x-ratelimit-limit-requests, x-ratelimit-limit-tokens, x-ratelimit-remaining-requests, x-ratelimit-remaining-tokens, and x-ratelimit-reset-requests/tokens. Anthropic returns anthropic-ratelimit-requests-limit, anthropic-ratelimit-requests-remaining, anthropic-ratelimit-tokens-limit, and anthropic-ratelimit-tokens-remaining. When you hit a limit, you receive a 429 Too Many Requests status code. Always parse these headers to implement proactive throttling rather than waiting for 429 errors."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How should I implement retry logic for rate-limited API calls?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use exponential backoff with jitter for rate limit retries. Start with a 1-second delay, double it on each retry (2s, 4s, 8s), and add random jitter (0-1s) to prevent thundering herd problems. Cap the maximum delay at 60 seconds and limit total retries to 5-7 attempts. Most AI SDKs (openai-python, anthropic-python) have built-in retry logic. For production systems, implement a token bucket or sliding window rate limiter on your side to proactively stay under limits rather than relying on retry-after-error patterns."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I increase my AI API rate limits?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. All major providers offer rate limit increases. OpenAI automatically upgrades your tier as you accumulate spend — after $100+ in API usage, limits increase significantly. You can also request a manual increase through their support portal for enterprise needs. Anthropic offers custom rate limits for Scale tier customers. Google Cloud AI rate limits can be increased by requesting quota adjustments in the Google Cloud Console. For urgent production needs, contacting the provider's sales team is the fastest path to higher limits."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Answers", "item": "https://gpt0x.com/answers/" },
+    { "@type": "ListItem", "position": 3, "name": "AI API Rate Limits", "item": "https://gpt0x.com/answers/ai-api-rate-limits.html" }
+  ]
+}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}
+.tool-hero h1 span{color:var(--accent)}
+.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.rl-table-wrap{overflow-x:auto;margin-bottom:2rem}
+.rl-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.rl-table th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.3px;padding:.6rem .5rem;text-align:left;border:1px solid var(--border);position:sticky;top:0}
+.rl-table td{padding:.5rem;border:1px solid var(--border);color:var(--text-muted)}
+.rl-table tr:hover td{background:var(--bg-card)}
+.rl-table .rl-provider{font-weight:600;color:var(--text)}
+.rl-table .rl-highlight{color:var(--accent);font-weight:600}
+.rl-filter{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.rl-filter select,.rl-filter input{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 12px;font-family:var(--font-body);font-size:.83rem}
+.rl-filter select:focus,.rl-filter input:focus{outline:none;border-color:var(--accent)}
+.rl-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.rl-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.rl-field{margin-bottom:1rem}
+.rl-field label{display:block;font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:4px}
+.rl-field select,.rl-field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-family:var(--font-body);font-size:.85rem}
+.rl-field select:focus,.rl-field input:focus{outline:none;border-color:var(--accent)}
+.rl-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;background:var(--accent);color:#000}
+.rl-btn:hover{opacity:.85}
+.rl-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+@media(max-width:768px){.rl-grid{grid-template-columns:1fr}}
+.rl-result{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-top:1rem;font-size:.85rem;color:var(--text-muted)}
+.rl-result strong{color:var(--accent)}
+.rl-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+@media(max-width:768px){.rl-stats-grid{grid-template-columns:1fr}}
+.rl-stat{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;text-align:center}
+.rl-stat .rl-stat-value{font-size:1.3rem;font-weight:700;color:var(--accent);font-family:var(--font-display)}
+.rl-stat .rl-stat-label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.rl-header-decode{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.rl-header-decode h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.rl-header-decode textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-family:monospace;font-size:.82rem;min-height:120px;resize:vertical}
+.rl-header-decode textarea:focus{outline:none;border-color:var(--accent)}
+.rl-decoded{margin-top:1rem}
+.rl-decoded-row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.83rem}
+.rl-decoded-row:last-child{border-bottom:none}
+.rl-decoded-row .rl-dk{color:var(--text-muted);font-family:monospace;font-size:.78rem}
+.rl-decoded-row .rl-dv{color:var(--accent);font-weight:600}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}
+.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}
+.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}
+.explainer p{color:var(--text-muted);margin-bottom:1rem}
+.explainer ul,.explainer ol{color:var(--text-muted);margin:0 0 1rem 1.5rem}
+.explainer li{margin-bottom:.4rem}
+.explainer table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}
+.explainer th,.explainer td{padding:.5rem .75rem;border:1px solid var(--border);text-align:left}
+.explainer th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}
+.explainer td{color:var(--text-muted)}
+.explainer code{background:var(--bg-card);padding:2px 6px;border-radius:3px;font-size:.82rem;color:var(--accent)}
+.faq-section{max-width:780px;margin:2.5rem auto}
+.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}
+.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}
+.faq-section summary:hover{color:var(--accent)}
+.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}
+.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}
+.related-card:hover{border-color:var(--accent);text-decoration:none}
+.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}
+.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}
+.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">gpt0x</a>
+    <nav>
+      <a href="/">Database</a>
+      <a href="/research/">Research</a>
+      <a href="/tools/">Tools</a>
+      <a href="/answers/">Answers</a>
+      <a href="/blog/">Blog</a>
+      <a href="/about.html">About</a>
+      <div class="nav-right">
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+        <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-container">
+  <div class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/answers/">Answers</a> &rsaquo; AI API Rate Limits
+  </div>
+
+  <div class="tool-hero">
+    <h1>AI API <span>Rate Limit</span> Comparison</h1>
+    <p>Compare rate limits across OpenAI, Anthropic, Google, and Mistral APIs by tier. Calculate queue throughput, analyze burst vs sustained capacity, and decode rate limit headers from API responses. Updated for May 2026 pricing tiers.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="rl-filter">
+    <select id="rl-provider-filter" onchange="rl.filterTable()">
+      <option value="all">All Providers</option>
+      <option value="openai">OpenAI</option>
+      <option value="anthropic">Anthropic</option>
+      <option value="google">Google</option>
+      <option value="mistral">Mistral</option>
+    </select>
+    <select id="rl-tier-filter" onchange="rl.filterTable()">
+      <option value="all">All Tiers</option>
+      <option value="1">Tier 1 (Entry)</option>
+      <option value="2">Tier 2 (Growth)</option>
+      <option value="3">Tier 3 (Scale)</option>
+      <option value="4">Tier 4+ (Enterprise)</option>
+    </select>
+  </div>
+
+  <div class="rl-table-wrap">
+    <table class="rl-table" id="rl-main-table">
+      <thead>
+        <tr>
+          <th>Provider</th>
+          <th>Model</th>
+          <th>Tier</th>
+          <th>RPM</th>
+          <th>TPM (Input)</th>
+          <th>TPM (Output)</th>
+          <th>RPD</th>
+          <th>Batch</th>
+        </tr>
+      </thead>
+      <tbody id="rl-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="rl-grid">
+    <div class="rl-panel">
+      <h3>Queue Management Calculator</h3>
+      <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Estimate how long it takes to process a queue of requests given your rate limits.</p>
+      <div class="rl-field">
+        <label>Total requests in queue</label>
+        <input type="number" id="rl-queue-total" value="10000" min="1">
+      </div>
+      <div class="rl-field">
+        <label>Avg tokens per request (input + output)</label>
+        <input type="number" id="rl-queue-tokens" value="1000" min="100">
+      </div>
+      <div class="rl-field">
+        <label>Your RPM limit</label>
+        <input type="number" id="rl-queue-rpm" value="500" min="1">
+      </div>
+      <div class="rl-field">
+        <label>Your TPM limit</label>
+        <input type="number" id="rl-queue-tpm" value="30000" min="1000">
+      </div>
+      <button class="rl-btn" onclick="rl.calcQueue()">Calculate Queue Time</button>
+      <div class="rl-result" id="rl-queue-result">Enter your queue details and rate limits to estimate processing time.</div>
+    </div>
+
+    <div class="rl-panel">
+      <h3>Burst vs Sustained Throughput</h3>
+      <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Analyze whether your workload is RPM-limited or TPM-limited, and find the effective throughput.</p>
+      <div class="rl-field">
+        <label>Provider & Model</label>
+        <select id="rl-burst-model" onchange="rl.updateBurst()">
+          <option value="openai-gpt4o-t2">OpenAI GPT-4o (Tier 2)</option>
+          <option value="openai-gpt4omini-t2">OpenAI GPT-4o Mini (Tier 2)</option>
+          <option value="anthropic-opus4-build">Anthropic Opus 4 (Build)</option>
+          <option value="anthropic-sonnet4-build">Anthropic Sonnet 4 (Build)</option>
+          <option value="google-gemini25pro">Google Gemini 2.5 Pro</option>
+          <option value="mistral-large">Mistral Large</option>
+        </select>
+      </div>
+      <div class="rl-field">
+        <label>Avg tokens per request</label>
+        <input type="number" id="rl-burst-tokens" value="800" min="100" onchange="rl.updateBurst()">
+      </div>
+      <div class="rl-stats-grid">
+        <div class="rl-stat"><div class="rl-stat-value" id="rl-burst-rpm">—</div><div class="rl-stat-label">RPM Limit</div></div>
+        <div class="rl-stat"><div class="rl-stat-value" id="rl-burst-tpm">—</div><div class="rl-stat-label">TPM Limit</div></div>
+        <div class="rl-stat"><div class="rl-stat-value" id="rl-burst-effective">—</div><div class="rl-stat-label">Effective RPM</div></div>
+      </div>
+      <div class="rl-result" id="rl-burst-result">Select a model to see burst vs sustained throughput analysis.</div>
+    </div>
+  </div>
+
+  <div class="rl-header-decode">
+    <h3>Rate Limit Header Decoder</h3>
+    <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Paste your API response headers to decode rate limit status. Works with OpenAI, Anthropic, and Google response headers.</p>
+    <textarea id="rl-headers" placeholder="Paste API response headers here, e.g.:
+x-ratelimit-limit-requests: 500
+x-ratelimit-remaining-requests: 487
+x-ratelimit-limit-tokens: 30000
+x-ratelimit-remaining-tokens: 28500
+x-ratelimit-reset-requests: 120ms
+x-ratelimit-reset-tokens: 6s"></textarea>
+    <button class="rl-btn" onclick="rl.decodeHeaders()" style="margin-top:.75rem">Decode Headers</button>
+    <div class="rl-decoded" id="rl-decoded"></div>
+  </div>
+
+  <section class="explainer">
+    <h2>Understanding AI API Rate Limits: The Complete Reference</h2>
+    <p>Rate limits are the guardrails that API providers set to ensure fair resource allocation, prevent abuse, and maintain system stability. Every AI API call you make is counted against multiple rate limit dimensions — requests per minute (RPM), tokens per minute (TPM), requests per day (RPD), and sometimes concurrent connections. Understanding these limits is critical for building production AI applications that handle load reliably without hitting 429 errors and dropping user requests.</p>
+
+    <h2>How Rate Limits Work Across Providers</h2>
+    <h3>OpenAI Rate Limit Tiers</h3>
+    <p>OpenAI uses a 5-tier system that automatically upgrades based on cumulative API spend. Tier 1 starts after your first $5 payment and provides 500 RPM / 30,000 TPM for GPT-4o. Each subsequent tier unlocks higher limits — Tier 5 (the highest) offers 10,000 RPM and 30,000,000 TPM. Importantly, rate limits are per-model and per-organization, so GPT-4o and GPT-4o Mini have separate buckets. OpenAI also applies daily limits (RPD) at lower tiers, which can be more restrictive than per-minute limits for batch workloads. The Batch API offers 50% cost savings but processes requests asynchronously within a 24-hour window rather than real-time.</p>
+
+    <h3>Anthropic Rate Limit Structure</h3>
+    <p>Anthropic separates rate limits into Build and Scale tiers based on monthly spend and approval. The Build tier provides 50 RPM and 40,000 input TPM for Claude Opus 4 — significantly lower than OpenAI's entry tier for premium models. Scale tier customers get 4,000 RPM and 400,000 TPM after reaching spend thresholds. A unique aspect of Anthropic's system: input tokens and output tokens are rate-limited separately, and concurrent request limits apply in addition to RPM caps. This means even if you have RPM headroom, sending too many simultaneous long-running requests can trigger throttling.</p>
+
+    <h3>Google Gemini Rate Limits</h3>
+    <p>Google Gemini API rate limits vary by billing plan. The free tier allows 15 RPM and 32,000 TPM for Gemini 2.5 Pro, sufficient for development and testing. The paid tier increases to 2,000 RPM and 4,000,000 TPM — among the most generous default limits of any provider. Google rate limits are applied per-project (not per-key), so all API keys within a Google Cloud project share the same limit pool. Rate limit increases can be requested through the Google Cloud Console quota management interface.</p>
+
+    <h3>Mistral Rate Limits</h3>
+    <p>Mistral offers competitive rate limits starting at 1 RPM for free tier users and scaling to 500+ RPM for enterprise customers. Mistral Large has default limits of 200 RPM and 500,000 TPM on the standard paid plan. Mistral's La Plateforme provides a simpler tier structure than OpenAI or Anthropic, with limits primarily based on your subscription plan rather than cumulative spend. For open-source Mistral models self-hosted through vLLM or TGI, there are no rate limits — only GPU capacity constraints.</p>
+
+    <h2>Rate Limit Strategies for Production</h2>
+    <h3>Token Bucket Algorithm</h3>
+    <p>The most effective client-side rate limiting approach is the token bucket algorithm. Maintain a bucket that fills at your allowed rate (e.g., 500 tokens per minute = ~8.33 tokens per second). Each request consumes tokens from the bucket based on its estimated size. If the bucket is empty, the request waits. This smooths traffic into a steady stream rather than bursting and getting throttled. Most production AI SDKs implement this pattern internally, but you should also add it at the application level for coordinating across multiple service instances.</p>
+
+    <h3>Multi-Provider Failover</h3>
+    <p>Production applications should route requests across multiple providers. If OpenAI rate limits are hit, automatically failover to Anthropic or Google. This requires normalizing your prompt format across providers and maintaining separate rate limit tracking for each. The effective throughput multiplies: 500 RPM on OpenAI + 50 RPM on Anthropic + 2,000 RPM on Google gives you 2,550 RPM total capacity. Cost-aware routing can also direct cheaper requests to the most affordable provider that has available capacity.</p>
+
+    <h3>Batch Processing Optimization</h3>
+    <p>For non-real-time workloads, leverage batch APIs when available. OpenAI's Batch API processes requests at 50% cost with 24-hour turnaround, with separate (higher) rate limits. Structure batch jobs to maximize throughput: group requests by model, pre-validate all inputs before submission, and implement checkpointing so failed batches can resume from the last successful request. A 100,000-request batch at Tier 2 limits would take ~200 minutes in real-time but completes within 24 hours via the Batch API at half the cost.</p>
+
+    <h2>Rate Limit Headers Reference</h2>
+    <table>
+      <tr><th>Header (OpenAI)</th><th>Description</th></tr>
+      <tr><td><code>x-ratelimit-limit-requests</code></td><td>Maximum RPM for this model</td></tr>
+      <tr><td><code>x-ratelimit-remaining-requests</code></td><td>Requests remaining in current window</td></tr>
+      <tr><td><code>x-ratelimit-limit-tokens</code></td><td>Maximum TPM for this model</td></tr>
+      <tr><td><code>x-ratelimit-remaining-tokens</code></td><td>Tokens remaining in current window</td></tr>
+      <tr><td><code>x-ratelimit-reset-requests</code></td><td>Time until request limit resets</td></tr>
+      <tr><td><code>x-ratelimit-reset-tokens</code></td><td>Time until token limit resets</td></tr>
+    </table>
+
+    <table>
+      <tr><th>Header (Anthropic)</th><th>Description</th></tr>
+      <tr><td><code>anthropic-ratelimit-requests-limit</code></td><td>Maximum RPM</td></tr>
+      <tr><td><code>anthropic-ratelimit-requests-remaining</code></td><td>Remaining requests in window</td></tr>
+      <tr><td><code>anthropic-ratelimit-tokens-limit</code></td><td>Maximum input TPM</td></tr>
+      <tr><td><code>anthropic-ratelimit-tokens-remaining</code></td><td>Remaining tokens in window</td></tr>
+      <tr><td><code>retry-after</code></td><td>Seconds to wait before retrying (on 429)</td></tr>
+    </table>
+
+    <h2>Exponential Backoff Implementation</h2>
+    <p>When you receive a 429 status code, do not retry immediately. Implement exponential backoff: wait 1 second, then 2, then 4, then 8, capping at 60 seconds. Add random jitter (0 to 1 second) to each wait to prevent synchronized retries from multiple clients — this is called the "thundering herd" problem. In Python, the standard pattern is:</p>
+    <p>Set <code>max_retries=5</code> with <code>base_delay=1.0</code>. For each retry, calculate <code>delay = min(base_delay * (2 ** attempt) + random(), 60)</code>. The OpenAI and Anthropic Python SDKs have this built in, but always verify the configuration matches your requirements. For high-throughput systems, proactive rate limiting using the response headers is far more efficient than reactive retry-after patterns.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details>
+      <summary>What are the rate limits for OpenAI's GPT-4o API?</summary>
+      <p>OpenAI's GPT-4o rate limits depend on your usage tier. Tier 1 (after first $5 payment) allows 500 RPM (requests per minute) and 30,000 TPM (tokens per minute). Tier 2 ($50+ spent) increases to 5,000 RPM and 450,000 TPM. Tier 3 ($100+ spent) allows 5,000 RPM and 800,000 TPM. Tier 4 and 5 offer up to 10,000 RPM and 10,000,000+ TPM. Rate limits are applied per-organization and per-model, meaning GPT-4o and GPT-4o Mini have separate limits.</p>
+    </details>
+    <details>
+      <summary>How do Anthropic's Claude API rate limits compare to OpenAI?</summary>
+      <p>Anthropic's Claude API uses a tier system based on monthly spend. The Build tier (default) allows 50 RPM and 40,000 input TPM for Claude Opus 4, and 50 RPM with 40,000 TPM for Sonnet 4. The Scale tier (after spending thresholds) increases to 4,000 RPM and 400,000 TPM. Anthropic generally has lower default limits than OpenAI but scales comparably at higher tiers. A key difference: Anthropic counts input and output tokens separately for rate limiting, while OpenAI combines them.</p>
+    </details>
+    <details>
+      <summary>What HTTP headers indicate rate limit status?</summary>
+      <p>Most AI APIs return rate limit headers with every response. OpenAI returns x-ratelimit-limit-requests, x-ratelimit-limit-tokens, x-ratelimit-remaining-requests, x-ratelimit-remaining-tokens, and x-ratelimit-reset-requests/tokens. Anthropic returns anthropic-ratelimit-requests-limit, anthropic-ratelimit-requests-remaining, anthropic-ratelimit-tokens-limit, and anthropic-ratelimit-tokens-remaining. When you hit a limit, you receive a 429 Too Many Requests status code. Always parse these headers to implement proactive throttling rather than waiting for 429 errors.</p>
+    </details>
+    <details>
+      <summary>How should I implement retry logic for rate-limited API calls?</summary>
+      <p>Use exponential backoff with jitter for rate limit retries. Start with a 1-second delay, double it on each retry (2s, 4s, 8s), and add random jitter (0-1s) to prevent thundering herd problems. Cap the maximum delay at 60 seconds and limit total retries to 5-7 attempts. Most AI SDKs (openai-python, anthropic-python) have built-in retry logic. For production systems, implement a token bucket or sliding window rate limiter on your side to proactively stay under limits rather than relying on retry-after-error patterns.</p>
+    </details>
+    <details>
+      <summary>Can I increase my AI API rate limits?</summary>
+      <p>Yes. All major providers offer rate limit increases. OpenAI automatically upgrades your tier as you accumulate spend — after $100+ in API usage, limits increase significantly. You can also request a manual increase through their support portal for enterprise needs. Anthropic offers custom rate limits for Scale tier customers. Google Cloud AI rate limits can be increased by requesting quota adjustments in the Google Cloud Console. For urgent production needs, contacting the provider's sales team is the fastest path to higher limits.</p>
+    </details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/tools/token-counter.html" class="related-card">
+        <h3>Token Counter</h3>
+        <p>Count tokens for GPT-4o, Claude, Gemini, and 15+ models with cost estimation.</p>
+      </a>
+      <a href="/tools/ai-cost-estimator.html" class="related-card">
+        <h3>AI Cost Estimator</h3>
+        <p>Project monthly API costs based on usage patterns across all major providers.</p>
+      </a>
+      <a href="/guides/fine-tuning-cost-calculator.html" class="related-card">
+        <h3>Fine-Tuning Calculator</h3>
+        <p>Calculate training costs and compare fine-tuning vs few-shot prompting ROI.</p>
+      </a>
+    </div>
+  </section>
+
+  <div class="author-bio">
+    <h3>About the Author</h3>
+    <p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudflow.com">ClaudFlow — Workflows</a>
+            <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  const rateLimits = [
+    { provider:'openai', model:'GPT-4o', tier:'1', rpm:500, tpmIn:30000, tpmOut:30000, rpd:10000, batch:'Yes (50% off)' },
+    { provider:'openai', model:'GPT-4o', tier:'2', rpm:5000, tpmIn:450000, tpmOut:450000, rpd:null, batch:'Yes (50% off)' },
+    { provider:'openai', model:'GPT-4o', tier:'3', rpm:5000, tpmIn:800000, tpmOut:800000, rpd:null, batch:'Yes (50% off)' },
+    { provider:'openai', model:'GPT-4o', tier:'4', rpm:10000, tpmIn:10000000, tpmOut:10000000, rpd:null, batch:'Yes (50% off)' },
+    { provider:'openai', model:'GPT-4o Mini', tier:'1', rpm:500, tpmIn:200000, tpmOut:200000, rpd:10000, batch:'Yes (50% off)' },
+    { provider:'openai', model:'GPT-4o Mini', tier:'2', rpm:5000, tpmIn:2000000, tpmOut:2000000, rpd:null, batch:'Yes (50% off)' },
+    { provider:'openai', model:'GPT-4o Mini', tier:'3', rpm:5000, tpmIn:4000000, tpmOut:4000000, rpd:null, batch:'Yes (50% off)' },
+    { provider:'openai', model:'o3', tier:'1', rpm:500, tpmIn:30000, tpmOut:30000, rpd:10000, batch:'No' },
+    { provider:'openai', model:'o3', tier:'2', rpm:5000, tpmIn:450000, tpmOut:150000, rpd:null, batch:'No' },
+    { provider:'openai', model:'o3-mini', tier:'1', rpm:500, tpmIn:200000, tpmOut:200000, rpd:10000, batch:'Yes (50% off)' },
+    { provider:'openai', model:'o3-mini', tier:'2', rpm:5000, tpmIn:2000000, tpmOut:2000000, rpd:null, batch:'Yes (50% off)' },
+    { provider:'anthropic', model:'Claude Opus 4', tier:'1', rpm:50, tpmIn:40000, tpmOut:8000, rpd:1000, batch:'Yes (Message Batches)' },
+    { provider:'anthropic', model:'Claude Opus 4', tier:'2', rpm:1000, tpmIn:80000, tpmOut:16000, rpd:10000, batch:'Yes (Message Batches)' },
+    { provider:'anthropic', model:'Claude Opus 4', tier:'3', rpm:4000, tpmIn:400000, tpmOut:80000, rpd:null, batch:'Yes (Message Batches)' },
+    { provider:'anthropic', model:'Claude Sonnet 4', tier:'1', rpm:50, tpmIn:40000, tpmOut:8000, rpd:1000, batch:'Yes (Message Batches)' },
+    { provider:'anthropic', model:'Claude Sonnet 4', tier:'2', rpm:1000, tpmIn:80000, tpmOut:16000, rpd:10000, batch:'Yes (Message Batches)' },
+    { provider:'anthropic', model:'Claude Sonnet 4', tier:'3', rpm:4000, tpmIn:400000, tpmOut:80000, rpd:null, batch:'Yes (Message Batches)' },
+    { provider:'anthropic', model:'Claude Haiku 3.5', tier:'1', rpm:50, tpmIn:50000, tpmOut:10000, rpd:1000, batch:'Yes (Message Batches)' },
+    { provider:'anthropic', model:'Claude Haiku 3.5', tier:'2', rpm:1000, tpmIn:100000, tpmOut:20000, rpd:10000, batch:'Yes (Message Batches)' },
+    { provider:'google', model:'Gemini 2.5 Pro', tier:'1', rpm:15, tpmIn:32000, tpmOut:32000, rpd:1500, batch:'No' },
+    { provider:'google', model:'Gemini 2.5 Pro', tier:'2', rpm:2000, tpmIn:4000000, tpmOut:4000000, rpd:null, batch:'No' },
+    { provider:'google', model:'Gemini 2.5 Flash', tier:'1', rpm:15, tpmIn:1000000, tpmOut:1000000, rpd:1500, batch:'No' },
+    { provider:'google', model:'Gemini 2.5 Flash', tier:'2', rpm:2000, tpmIn:4000000, tpmOut:4000000, rpd:null, batch:'No' },
+    { provider:'mistral', model:'Mistral Large', tier:'1', rpm:1, tpmIn:500000, tpmOut:500000, rpd:null, batch:'No' },
+    { provider:'mistral', model:'Mistral Large', tier:'2', rpm:200, tpmIn:500000, tpmOut:500000, rpd:null, batch:'No' },
+    { provider:'mistral', model:'Mistral Small', tier:'1', rpm:1, tpmIn:500000, tpmOut:500000, rpd:null, batch:'No' },
+    { provider:'mistral', model:'Mistral Small', tier:'2', rpm:200, tpmIn:500000, tpmOut:500000, rpd:null, batch:'No' }
+  ];
+
+  const burstModels = {
+    'openai-gpt4o-t2':          { rpm:5000, tpm:450000 },
+    'openai-gpt4omini-t2':      { rpm:5000, tpm:2000000 },
+    'anthropic-opus4-build':    { rpm:50,   tpm:40000 },
+    'anthropic-sonnet4-build':  { rpm:50,   tpm:40000 },
+    'google-gemini25pro':       { rpm:2000, tpm:4000000 },
+    'mistral-large':            { rpm:200,  tpm:500000 }
+  };
+
+  function renderTable(data) {
+    const tbody = document.getElementById('rl-tbody');
+    let html = '';
+    data.forEach(r => {
+      const provLabel = r.provider.charAt(0).toUpperCase() + r.provider.slice(1);
+      html += '<tr data-provider="'+r.provider+'" data-tier="'+r.tier+'">';
+      html += '<td class="rl-provider">'+provLabel+'</td>';
+      html += '<td>'+r.model+'</td>';
+      html += '<td>Tier '+r.tier+'</td>';
+      html += '<td class="rl-highlight">'+r.rpm.toLocaleString()+'</td>';
+      html += '<td>'+r.tpmIn.toLocaleString()+'</td>';
+      html += '<td>'+r.tpmOut.toLocaleString()+'</td>';
+      html += '<td>'+(r.rpd ? r.rpd.toLocaleString() : 'Unlimited')+'</td>';
+      html += '<td>'+r.batch+'</td>';
+      html += '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  function filterTable() {
+    const provider = document.getElementById('rl-provider-filter').value;
+    const tier = document.getElementById('rl-tier-filter').value;
+    let filtered = rateLimits;
+    if (provider !== 'all') filtered = filtered.filter(r => r.provider === provider);
+    if (tier !== 'all') filtered = filtered.filter(r => r.tier === tier);
+    renderTable(filtered);
+  }
+
+  function calcQueue() {
+    const total = parseInt(document.getElementById('rl-queue-total').value) || 10000;
+    const tokens = parseInt(document.getElementById('rl-queue-tokens').value) || 1000;
+    const rpm = parseInt(document.getElementById('rl-queue-rpm').value) || 500;
+    const tpm = parseInt(document.getElementById('rl-queue-tpm').value) || 30000;
+    const rpmLimitedMins = total / rpm;
+    const tpmLimitedReqsPerMin = tpm / tokens;
+    const tpmLimitedMins = total / tpmLimitedReqsPerMin;
+    const effectiveMin = Math.max(rpmLimitedMins, tpmLimitedMins);
+    const bottleneck = rpmLimitedMins >= tpmLimitedMins ? 'RPM' : 'TPM';
+    const effectiveRpm = Math.min(rpm, tpmLimitedReqsPerMin);
+    const hours = Math.floor(effectiveMin / 60);
+    const mins = Math.ceil(effectiveMin % 60);
+    let timeStr = hours > 0 ? hours + 'h ' + mins + 'm' : mins + 'm';
+    document.getElementById('rl-queue-result').innerHTML =
+      'Processing <strong>'+total.toLocaleString()+'</strong> requests at <strong>'+Math.floor(effectiveRpm)+' effective RPM</strong> (bottleneck: '+bottleneck+')<br>'+
+      'Estimated time: <strong>'+timeStr+'</strong><br>'+
+      'RPM-limited: '+Math.ceil(rpmLimitedMins)+' min | TPM-limited: '+Math.ceil(tpmLimitedMins)+' min<br>'+
+      'Total tokens processed: <strong>'+(total*tokens).toLocaleString()+'</strong>';
+  }
+
+  function updateBurst() {
+    const key = document.getElementById('rl-burst-model').value;
+    const bm = burstModels[key];
+    const tokens = parseInt(document.getElementById('rl-burst-tokens').value) || 800;
+    const tpmRpm = Math.floor(bm.tpm / tokens);
+    const effective = Math.min(bm.rpm, tpmRpm);
+    const bottleneck = bm.rpm <= tpmRpm ? 'RPM' : 'TPM';
+    document.getElementById('rl-burst-rpm').textContent = bm.rpm.toLocaleString();
+    document.getElementById('rl-burst-tpm').textContent = bm.tpm.toLocaleString();
+    document.getElementById('rl-burst-effective').textContent = effective.toLocaleString();
+    const pctRpm = ((effective / bm.rpm) * 100).toFixed(0);
+    document.getElementById('rl-burst-result').innerHTML =
+      'Bottleneck: <strong>'+bottleneck+'</strong> | Effective throughput: <strong>'+effective+' RPM</strong> ('+pctRpm+'% of RPM limit)<br>'+
+      'At '+tokens+' tokens/req, TPM allows <strong>'+tpmRpm+' RPM</strong> vs limit of <strong>'+bm.rpm+' RPM</strong>.<br>'+
+      (bottleneck === 'TPM' ? 'Reduce average request size or request a TPM increase to reach full RPM capacity.' : 'You have token headroom. Can increase request size to ~'+Math.floor(bm.tpm/bm.rpm)+' tokens/req before hitting TPM limit.');
+  }
+
+  function decodeHeaders() {
+    const raw = document.getElementById('rl-headers').value.trim();
+    if (!raw) { document.getElementById('rl-decoded').innerHTML = ''; return; }
+    const lines = raw.split('\n').filter(l => l.trim());
+    const parsed = {};
+    lines.forEach(line => {
+      const idx = line.indexOf(':');
+      if (idx === -1) return;
+      const key = line.substring(0, idx).trim().toLowerCase();
+      const val = line.substring(idx + 1).trim();
+      parsed[key] = val;
+    });
+    let html = '';
+    const rlKeys = Object.keys(parsed).filter(k => k.includes('ratelimit') || k.includes('rate-limit') || k === 'retry-after');
+    if (rlKeys.length === 0) {
+      html = '<p style="color:var(--text-muted);font-size:.85rem;margin-top:.75rem">No rate limit headers detected. Paste headers containing "ratelimit" or "retry-after" keys.</p>';
+    } else {
+      const limitReqs = parsed['x-ratelimit-limit-requests'] || parsed['anthropic-ratelimit-requests-limit'];
+      const remainReqs = parsed['x-ratelimit-remaining-requests'] || parsed['anthropic-ratelimit-requests-remaining'];
+      const limitTokens = parsed['x-ratelimit-limit-tokens'] || parsed['anthropic-ratelimit-tokens-limit'];
+      const remainTokens = parsed['x-ratelimit-remaining-tokens'] || parsed['anthropic-ratelimit-tokens-remaining'];
+      if (limitReqs && remainReqs) {
+        const pct = ((parseInt(remainReqs) / parseInt(limitReqs)) * 100).toFixed(1);
+        html += '<div style="margin-top:.75rem;margin-bottom:.5rem"><div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.3rem">Request Limit Usage ('+remainReqs+' / '+limitReqs+' remaining = '+pct+'% available)</div>';
+        html += '<div style="height:20px;background:var(--bg);border-radius:var(--radius);overflow:hidden"><div style="height:100%;width:'+(100-parseFloat(pct))+'%;background:var(--accent);border-radius:var(--radius)"></div></div></div>';
+      }
+      if (limitTokens && remainTokens) {
+        const pct = ((parseInt(remainTokens) / parseInt(limitTokens)) * 100).toFixed(1);
+        html += '<div style="margin-bottom:.75rem"><div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.3rem">Token Limit Usage ('+remainTokens+' / '+limitTokens+' remaining = '+pct+'% available)</div>';
+        html += '<div style="height:20px;background:var(--bg);border-radius:var(--radius);overflow:hidden"><div style="height:100%;width:'+(100-parseFloat(pct))+'%;background:#60a5fa;border-radius:var(--radius)"></div></div></div>';
+      }
+      rlKeys.forEach(k => {
+        html += '<div class="rl-decoded-row"><span class="rl-dk">'+k+'</span><span class="rl-dv">'+parsed[k]+'</span></div>';
+      });
+    }
+    document.getElementById('rl-decoded').innerHTML = html;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    renderTable(rateLimits);
+    updateBurst();
+  });
+
+  window.rl = { filterTable, calcQueue, updateBurst, decodeHeaders };
+})();
+</script>
+</body>
+</html>

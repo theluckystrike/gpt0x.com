@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Prompt Builder — Structured Prompt Engineering Tool | GPT0X</title>
+<meta name="description" content="Build structured prompts for GPT-4, Claude, Gemini, and other AI models. Template-based prompt engineering with role, context, task, format, constraints, and examples. Free, no sign-up.">
+<meta name="keywords" content="prompt engineering tool, AI prompt builder, structured prompts, ChatGPT prompts, Claude prompts, prompt templates, few-shot learning, chain-of-thought">
+<link rel="canonical" href="https://gpt0x.com/tools/prompt-builder.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/tools/prompt-builder.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/tools/prompt-builder.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Prompt Builder — Structured Prompt Engineering Tool">
+<meta property="og:description" content="Build structured prompts for GPT-4, Claude, Gemini, and other AI models. Template-based prompt engineering with role, context, task, format, and constraints.">
+<meta property="og:url" content="https://gpt0x.com/tools/prompt-builder.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Prompt Builder — Structured Prompt Engineering Tool">
+<meta name="twitter:description" content="Build structured prompts for GPT-4, Claude, Gemini, and other AI models. Template-based prompt engineering with role, context, task, format, and constraints.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AI Prompt Builder",
+  "url": "https://gpt0x.com/tools/prompt-builder.html",
+  "description": "Build structured prompts for GPT-4, Claude, Gemini, and other AI models with template-based prompt engineering.",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "datePublished": "2026-05-25",
+  "dateModified": "2026-05-25",
+  "featureList": [
+    "6 prompt template categories: Code, Data Analysis, Creative Writing, Summarization, Translation, Q&A",
+    "Structured fields: Role, Context, Task, Format, Constraints, Examples",
+    "Real-time prompt assembly and preview",
+    "Token count estimation",
+    "One-click copy to clipboard",
+    "Client-side only — no data leaves your browser"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is structured prompt engineering?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Structured prompt engineering is the practice of organizing AI prompts into distinct components — role, context, task, format, constraints, and examples — rather than writing free-form instructions. This approach produces more consistent and higher-quality outputs from language models like GPT-4, Claude, and Gemini because it removes ambiguity and gives the model clear boundaries for its response."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does chain-of-thought prompting improve AI output?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chain-of-thought prompting instructs the AI model to show its reasoning step by step before providing a final answer. Research from Google Brain (Wei et al., 2022) showed this technique dramatically improves performance on math, logic, and multi-step reasoning tasks. By adding phrases like 'Think step by step' or 'Show your reasoning' to your prompts, you can increase accuracy on complex tasks by 20-40%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between zero-shot and few-shot prompting?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Zero-shot prompting gives the model a task with no examples, relying entirely on its training knowledge. Few-shot prompting includes 1-5 example input-output pairs before the actual task, which helps the model understand the exact format, style, and logic you expect. Few-shot prompting is especially valuable for classification, formatting, and domain-specific tasks where the model needs to match a particular pattern."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which AI model works best with structured prompts?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "All major AI models benefit from structured prompts, but Claude Opus 4 and GPT-4o tend to follow complex multi-section prompts most reliably. Claude models are particularly strong at following formatting constraints and maintaining consistency across long outputs. For code generation tasks, both Claude Sonnet 4 and GPT-4o excel with structured role + task + constraints prompts."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How accurate is the token count estimation?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The token estimation uses a multiplier of approximately 1.3 tokens per word, which is the standard approximation for English text with most tokenizers (GPT, Claude, etc.). Actual token counts vary by model and content — code and technical text tend to use more tokens per word, while simple prose uses fewer. For precise counts, use the tokenizer specific to your target model."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools/" },
+    { "@type": "ListItem", "position": 3, "name": "Prompt Builder", "item": "https://gpt0x.com/tools/prompt-builder.html" }
+  ]
+}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}
+.tool-hero h1 span{color:var(--accent)}
+.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.pb-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+@media(max-width:768px){.pb-layout{grid-template-columns:1fr}}
+.pb-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.pb-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.pb-field{margin-bottom:1rem}
+.pb-field label{display:block;font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:4px}
+.pb-field select,.pb-field input,.pb-field textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-family:var(--font-body);font-size:.85rem;resize:vertical}
+.pb-field select:focus,.pb-field input:focus,.pb-field textarea:focus{outline:none;border-color:var(--accent)}
+.pb-field textarea{min-height:70px}
+.pb-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.pb-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.pb-btn-primary{background:var(--accent);color:#000}
+.pb-btn-secondary{background:var(--bg-hover);color:var(--text);border:1px solid var(--border)}
+.pb-btn:hover{opacity:.85}
+.pb-preview{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:.85rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;min-height:200px;max-height:500px;overflow-y:auto;color:var(--text-muted)}
+.pb-stats{display:flex;gap:1.5rem;margin-top:.75rem;font-size:.78rem;color:var(--text-muted)}
+.pb-stats span{color:var(--accent);font-weight:600}
+.pb-template-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.pb-chip{padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:.8rem;color:var(--text-muted);cursor:pointer;transition:all .2s;background:var(--bg)}
+.pb-chip:hover,.pb-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(52,211,153,.06)}
+.pb-copy-toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:8px 20px;border-radius:var(--radius);font-size:.85rem;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.pb-copy-toast.visible{opacity:1}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}
+.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}
+.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}
+.explainer p{color:var(--text-muted);margin-bottom:1rem}
+.explainer ul,.explainer ol{color:var(--text-muted);margin:0 0 1rem 1.5rem}
+.explainer li{margin-bottom:.4rem}
+.faq-section{max-width:780px;margin:2.5rem auto}
+.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}
+.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}
+.faq-section summary:hover{color:var(--accent)}
+.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}
+.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}
+.related-card:hover{border-color:var(--accent);text-decoration:none}
+.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}
+.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}
+.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">gpt0x</a>
+    <nav>
+      <a href="/">Database</a>
+      <a href="/research/">Research</a>
+      <a href="/tools/">Tools</a>
+      <a href="/answers/">Answers</a>
+      <a href="/blog/">Blog</a>
+      <a href="/about.html">About</a>
+      <div class="nav-right">
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+        <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-container">
+  <div class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Tools</a> &rsaquo; Prompt Builder
+  </div>
+
+  <div class="tool-hero">
+    <h1>AI <span>Prompt</span> Builder</h1>
+    <p>Build structured, high-quality prompts for any AI model. Choose a template, fill in the fields, and generate a prompt engineered for maximum clarity and performance.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <h3 style="font-size:.85rem;color:var(--text-muted);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.5px">Choose a Template</h3>
+  <div class="pb-template-chips">
+    <button class="pb-chip active" onclick="pb.selectTemplate('code')">Code Generation</button>
+    <button class="pb-chip" onclick="pb.selectTemplate('data')">Data Analysis</button>
+    <button class="pb-chip" onclick="pb.selectTemplate('creative')">Creative Writing</button>
+    <button class="pb-chip" onclick="pb.selectTemplate('summarize')">Summarization</button>
+    <button class="pb-chip" onclick="pb.selectTemplate('translate')">Translation</button>
+    <button class="pb-chip" onclick="pb.selectTemplate('qa')">Q&amp;A</button>
+  </div>
+
+  <div class="pb-layout">
+    <div class="pb-panel">
+      <h3>Prompt Fields</h3>
+      <div class="pb-field">
+        <label>Role / Persona</label>
+        <input type="text" id="pb-role" placeholder="e.g., You are a senior Python developer with 10 years of experience">
+      </div>
+      <div class="pb-field">
+        <label>Context</label>
+        <textarea id="pb-context" placeholder="e.g., I am building a REST API with Flask for a task management application. The database uses PostgreSQL."></textarea>
+      </div>
+      <div class="pb-field">
+        <label>Task</label>
+        <textarea id="pb-task" placeholder="e.g., Write an endpoint that creates a new task with title, description, due date, and priority fields."></textarea>
+      </div>
+      <div class="pb-field">
+        <label>Output Format</label>
+        <input type="text" id="pb-format" placeholder="e.g., Python code with docstrings, type hints, and inline comments">
+      </div>
+      <div class="pb-field">
+        <label>Constraints</label>
+        <textarea id="pb-constraints" placeholder="e.g., Use SQLAlchemy ORM. Include input validation. Handle errors with proper HTTP status codes. No external libraries beyond Flask and SQLAlchemy."></textarea>
+      </div>
+      <div class="pb-field">
+        <label>Examples (optional)</label>
+        <textarea id="pb-examples" placeholder="e.g., Input: POST /tasks {title: 'Review PR', priority: 'high'} Output: {id: 1, title: 'Review PR', priority: 'high', status: 'pending', created_at: '2026-05-25'}"></textarea>
+      </div>
+    </div>
+
+    <div class="pb-panel">
+      <h3>Generated Prompt</h3>
+      <div class="pb-actions">
+        <button class="pb-btn pb-btn-primary" onclick="pb.generate()">Generate Prompt</button>
+        <button class="pb-btn pb-btn-secondary" onclick="pb.copy()">Copy to Clipboard</button>
+        <button class="pb-btn pb-btn-secondary" onclick="pb.clear()">Clear All</button>
+      </div>
+      <div class="pb-preview" id="pb-preview">Your assembled prompt will appear here. Fill in the fields on the left and click "Generate Prompt" to build a structured prompt ready for any AI model.</div>
+      <div class="pb-stats">
+        <div>Words: <span id="pb-words">0</span></div>
+        <div>Est. Tokens: <span id="pb-tokens">0</span></div>
+        <div>Characters: <span id="pb-chars">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pb-toast" class="pb-copy-toast">Copied to clipboard</div>
+
+  <section class="explainer">
+    <h2>Prompt Engineering: The Complete Guide</h2>
+    <p>Prompt engineering is the discipline of crafting inputs to AI language models that produce reliable, high-quality outputs. As large language models have become central to software development, content creation, data analysis, and research, the ability to write effective prompts has become one of the most practical skills in the AI era. This guide covers the core techniques, model-specific strategies, and common pitfalls that separate mediocre prompts from exceptional ones.</p>
+
+    <h2>Why Structured Prompts Outperform Free-Form Instructions</h2>
+    <p>A structured prompt breaks your instruction into discrete components: who the model should be (role), what it already knows (context), what it should do (task), how the output should look (format), what boundaries to respect (constraints), and what good output looks like (examples). This structure works because it mirrors how language models process instructions internally. The model attention mechanism can latch onto each section and weight it appropriately, rather than parsing a wall of text for implicit requirements.</p>
+    <p>Research from Anthropic and OpenAI consistently shows that prompts with explicit structure produce outputs that are 30-50% more likely to match the user's intent compared to single-paragraph instructions. The improvement is especially dramatic for complex tasks that involve multiple requirements, domain expertise, or specific formatting needs. The AI Prompt Builder on this page automates this structuring process so you can focus on what you need rather than how to ask for it.</p>
+
+    <h2>The Six Components of an Effective Prompt</h2>
+    <h3>1. Role / Persona</h3>
+    <p>The role field tells the model who it should be. This is not a gimmick — it activates relevant knowledge and adjusts the model's tone, vocabulary, and depth of reasoning. "You are a senior database administrator" produces fundamentally different SQL advice than "You are a junior developer learning databases." The role primes the model to draw from the right part of its training distribution. For best results, be specific about experience level, domain expertise, and communication style.</p>
+
+    <h3>2. Context</h3>
+    <p>Context provides the background information the model needs to give a relevant answer. Include your tech stack, project constraints, target audience, or any domain-specific details that would matter to a human expert working on the same problem. The context field is where most prompt failures originate — either too little context (forcing the model to guess) or too much irrelevant detail (diluting the signal). Aim for the information a competent colleague would need to give you useful advice.</p>
+
+    <h3>3. Task</h3>
+    <p>The task is the specific action you want the model to perform. Write this as a clear imperative: "Write a function that..." or "Analyze the following data and..." Avoid vague requests like "Help me with my code" in favor of specific ones like "Refactor this function to reduce cyclomatic complexity below 5 while maintaining all existing test cases." Specificity in the task field directly correlates with output quality.</p>
+
+    <h3>4. Output Format</h3>
+    <p>Specifying the format eliminates one of the most common sources of frustration with AI outputs. If you want a JSON object, say "Return a valid JSON object with keys: name, type, description." If you want Markdown, say "Use Markdown with h2 headers for sections and bullet points for lists." The format field turns implicit expectations into explicit requirements, which models follow reliably.</p>
+
+    <h3>5. Constraints</h3>
+    <p>Constraints define what the model should not do and what boundaries it must respect. "Do not use any external libraries beyond the standard library." "Keep the response under 500 words." "Do not include placeholder comments — write real implementation code." Constraints are critical for production use cases where the output must fit within specific technical or stylistic requirements. Without constraints, models tend toward verbose, generic responses.</p>
+
+    <h3>6. Examples (Few-Shot Learning)</h3>
+    <p>Providing 1-3 examples of the desired input-output pattern is the single most powerful technique for controlling model behavior. Few-shot learning, as demonstrated in the GPT-3 paper (Brown et al., 2020), allows models to infer patterns from examples without any fine-tuning. For classification tasks, formatting tasks, or any situation where "I'll know it when I see it," examples are more effective than paragraphs of description. Each example should be representative and cover an edge case if possible.</p>
+
+    <h2>Advanced Prompting Techniques</h2>
+    <h3>Chain-of-Thought (CoT) Prompting</h3>
+    <p>Chain-of-thought prompting instructs the model to reason step by step before producing a final answer. The original research from Wei et al. (2022) at Google Brain showed that simply adding "Let's think step by step" to a math prompt increased accuracy from 17.7% to 78.7% on the GSM8K benchmark. For coding, analysis, and logic tasks, CoT prompting reduces errors by forcing the model to decompose the problem before jumping to a solution. Add phrases like "Think through this step by step" or "First, analyze the requirements. Then, design the approach. Finally, write the implementation" to your task field.</p>
+
+    <h3>System Prompts vs User Prompts</h3>
+    <p>Most modern AI APIs distinguish between system prompts (persistent instructions that set behavior for the entire conversation) and user prompts (individual messages). System prompts are ideal for role definitions, constraints, and output format requirements that should persist across multiple exchanges. User prompts contain the specific task or question. When using the Prompt Builder, the role and constraints fields map naturally to system prompt content, while context, task, and examples map to user prompt content.</p>
+
+    <h3>Prompt Chaining</h3>
+    <p>For complex tasks that exceed what a single prompt can handle, prompt chaining breaks the work into sequential steps where each prompt's output feeds into the next. For example: Prompt 1 extracts key requirements from a specification document. Prompt 2 generates an architecture design based on those requirements. Prompt 3 writes implementation code following the architecture. Each prompt is simpler and more focused, producing higher quality at each stage than a single monolithic prompt attempting everything at once.</p>
+
+    <h3>Self-Consistency and Verification</h3>
+    <p>For critical tasks, ask the model to generate multiple approaches and then evaluate which is best. "Generate three different solutions to this problem, then analyze the tradeoffs of each and recommend the best approach with justification." This technique exploits the model's ability to critique and compare, often catching errors that a single-pass generation would miss. It is particularly effective for code generation, where the model can reason about edge cases and performance tradeoffs.</p>
+
+    <h2>Model-Specific Prompt Tips</h2>
+    <h3>GPT-4o and GPT-4o-mini</h3>
+    <p>OpenAI models respond well to explicit structure with clear section headers. Use numbered lists for multi-step tasks. GPT-4o excels when given a specific persona and handles long, detailed prompts without losing coherence. For code tasks, specify the language, framework version, and testing approach explicitly. GPT-4o-mini is cost-effective for simpler tasks but benefits from shorter, more focused prompts.</p>
+
+    <h3>Claude Opus 4 and Claude Sonnet 4</h3>
+    <p>Claude models excel at following complex constraints and producing well-structured outputs. They handle XML-tagged prompts exceptionally well — wrapping sections in tags like &lt;context&gt; and &lt;task&gt; can improve adherence to instructions. Claude Opus 4 is strongest for nuanced reasoning, long-form analysis, and tasks requiring careful attention to detail. Claude Sonnet 4 offers the best balance of speed, cost, and quality for most production use cases.</p>
+
+    <h3>Gemini 2.5 Pro and Gemini 2.5 Flash</h3>
+    <p>Google's Gemini models have the advantage of massive context windows (up to 1M tokens). For tasks involving large documents, codebases, or datasets, you can include the full source material rather than summarizing. Gemini 2.5 Pro excels at multimodal tasks combining text, images, and code. Structure your prompts with clear delimiters between sections.</p>
+
+    <h3>Open-Source Models (Llama, DeepSeek, Qwen, Mistral)</h3>
+    <p>Open-source models generally benefit from more explicit instructions and simpler prompt structures. Avoid overly complex nested prompts. Few-shot examples are especially important for open-source models since they have less instruction-tuning data. Llama 3.3 70B and DeepSeek V3 handle code generation well with clear, direct prompts. Qwen 2.5 72B performs strongly on multilingual tasks.</p>
+
+    <h2>Common Prompt Engineering Mistakes</h2>
+    <ul>
+      <li><strong>Being vague about the output format.</strong> "Write some code" vs "Write a Python function with type hints, docstring, and unit tests" — the second prompt will always produce better results.</li>
+      <li><strong>Overloading a single prompt.</strong> If your prompt tries to do 5 things at once, the model will do all 5 poorly. Break complex tasks into a chain of focused prompts.</li>
+      <li><strong>Not providing examples.</strong> If you have a specific format in mind, show the model an example. One good example is worth a paragraph of description.</li>
+      <li><strong>Ignoring the model's strengths.</strong> Using GPT-4o for a simple classification task wastes money. Using GPT-4o-mini for complex reasoning wastes time. Match the model to the task.</li>
+      <li><strong>Prompt injection vulnerability.</strong> If your prompt includes user-supplied input, sanitize it. Malicious input can override your system prompt if not properly delimited and escaped.</li>
+      <li><strong>Not iterating.</strong> The first prompt is rarely optimal. Test your prompt with edge cases, analyze failures, and refine. Prompt engineering is an iterative process, not a one-shot exercise.</li>
+    </ul>
+
+    <h2>When to Use This Prompt Builder</h2>
+    <p>The AI Prompt Builder is designed for developers, content creators, analysts, and researchers who work with language models regularly and want to consistently produce high-quality prompts without starting from a blank page. Use it when you need to write a prompt for a new task type, when your free-form prompts are producing inconsistent results, or when you want to systematically improve your prompt engineering process. The templates cover the six most common use cases — code generation, data analysis, creative writing, summarization, translation, and question answering — and the structured fields ensure you never forget a critical component.</p>
+    <p>Every feature runs entirely in your browser. No data is sent to any server, no analytics are collected, and no account is required. The prompt you build stays on your machine until you copy it to the AI model of your choice.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details>
+      <summary>What is structured prompt engineering?</summary>
+      <p>Structured prompt engineering is the practice of organizing AI prompts into distinct components — role, context, task, format, constraints, and examples — rather than writing free-form instructions. This approach produces more consistent and higher-quality outputs from language models like GPT-4, Claude, and Gemini because it removes ambiguity and gives the model clear boundaries for its response.</p>
+    </details>
+    <details>
+      <summary>How does chain-of-thought prompting improve AI output?</summary>
+      <p>Chain-of-thought prompting instructs the AI model to show its reasoning step by step before providing a final answer. Research from Google Brain (Wei et al., 2022) showed this technique dramatically improves performance on math, logic, and multi-step reasoning tasks. By adding phrases like "Think step by step" or "Show your reasoning" to your prompts, you can increase accuracy on complex tasks by 20-40%.</p>
+    </details>
+    <details>
+      <summary>What is the difference between zero-shot and few-shot prompting?</summary>
+      <p>Zero-shot prompting gives the model a task with no examples, relying entirely on its training knowledge. Few-shot prompting includes 1-5 example input-output pairs before the actual task, which helps the model understand the exact format, style, and logic you expect. Few-shot prompting is especially valuable for classification, formatting, and domain-specific tasks where the model needs to match a particular pattern.</p>
+    </details>
+    <details>
+      <summary>Which AI model works best with structured prompts?</summary>
+      <p>All major AI models benefit from structured prompts, but Claude Opus 4 and GPT-4o tend to follow complex multi-section prompts most reliably. Claude models are particularly strong at following formatting constraints and maintaining consistency across long outputs. For code generation tasks, both Claude Sonnet 4 and GPT-4o excel with structured role + task + constraints prompts.</p>
+    </details>
+    <details>
+      <summary>How accurate is the token count estimation?</summary>
+      <p>The token estimation uses a multiplier of approximately 1.3 tokens per word, which is the standard approximation for English text with most tokenizers (GPT, Claude, etc.). Actual token counts vary by model and content — code and technical text tend to use more tokens per word, while simple prose uses fewer. For precise counts, use the tokenizer specific to your target model.</p>
+    </details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/answers/ai-model-comparison-2026.html" class="related-card">
+        <h3>AI Model Comparison 2026</h3>
+        <p>Compare pricing, speed, and capabilities of 12+ AI models side by side.</p>
+      </a>
+      <a href="/research/ai-benchmark-tracker.html" class="related-card">
+        <h3>Benchmark Tracker</h3>
+        <p>MMLU, HumanEval, GSM8K, and MATH scores for all major models with visualizations.</p>
+      </a>
+      <a href="/" class="related-card">
+        <h3>AI Model Database</h3>
+        <p>Search and filter 40+ AI models by provider, type, parameters, and capabilities.</p>
+      </a>
+    </div>
+  </section>
+
+  <div class="author-bio">
+    <h3>About the Author</h3>
+    <p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudflow.com">ClaudFlow — Workflows</a>
+            <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  const templates = {
+    code: {
+      role: 'You are a senior software engineer with deep expertise in writing clean, production-ready code',
+      context: 'I am building a web application and need help implementing a specific feature. The tech stack includes modern frameworks and follows industry best practices.',
+      task: 'Write a complete implementation for the requested feature, including error handling, input validation, and edge case coverage.',
+      format: 'Well-commented code with type annotations, docstrings, and a brief explanation of the approach',
+      constraints: 'Follow SOLID principles. No placeholder code — write real implementations. Include error handling for all failure modes. Use descriptive variable names.',
+      examples: ''
+    },
+    data: {
+      role: 'You are a senior data analyst with expertise in statistical analysis, data visualization, and deriving actionable insights from datasets',
+      context: 'I have a dataset that needs analysis. The goal is to extract meaningful patterns, identify trends, and present findings clearly.',
+      task: 'Analyze the provided data, identify key patterns and anomalies, calculate relevant statistics, and present your findings with clear explanations.',
+      format: 'Structured analysis with sections: Summary, Key Findings, Statistical Details, Visualizations (described), and Recommendations',
+      constraints: 'Use appropriate statistical methods. Distinguish between correlation and causation. Note confidence levels and potential biases. Avoid overfitting conclusions to small samples.',
+      examples: ''
+    },
+    creative: {
+      role: 'You are an experienced creative writer with a versatile style, capable of adapting tone, voice, and structure to match any genre or audience',
+      context: 'I need creative content that engages readers, maintains consistent tone throughout, and serves a specific purpose or audience.',
+      task: 'Write the requested creative content with attention to narrative structure, character development (if applicable), and audience engagement.',
+      format: 'Polished prose ready for publication, with appropriate paragraph breaks, dialogue formatting, and section structure',
+      constraints: 'Maintain consistent voice throughout. Avoid cliches and generic phrasing. Show, don\'t tell. Every sentence should serve a purpose — cut anything that doesn\'t advance the narrative or argument.',
+      examples: ''
+    },
+    summarize: {
+      role: 'You are an expert at distilling complex information into clear, accurate summaries that preserve the essential meaning and nuance of the original content',
+      context: 'I have a document, article, or body of text that needs to be condensed while retaining the most important information, arguments, and conclusions.',
+      task: 'Summarize the provided content, preserving key arguments, data points, and conclusions. Maintain the original author\'s intent and distinguish between facts and opinions.',
+      format: 'A structured summary with: one-paragraph executive summary, key points as bullet list, important details, and notable quotes or data points',
+      constraints: 'Do not add information not present in the original. Do not editorialize. Preserve numerical data exactly. Flag any ambiguities in the source material.',
+      examples: ''
+    },
+    translate: {
+      role: 'You are a professional translator with expertise in maintaining meaning, tone, and cultural context across languages',
+      context: 'I need text translated between languages while preserving the original meaning, style, and cultural nuances. The translation should read naturally in the target language.',
+      task: 'Translate the provided text into the target language. Maintain the original tone, style, and intent. Adapt idioms and cultural references appropriately rather than translating literally.',
+      format: 'The translated text, followed by notes on any significant translation choices (idioms adapted, cultural references, ambiguities resolved)',
+      constraints: 'Prioritize natural-sounding target language over word-for-word accuracy. Preserve formatting structure. Flag any terms with multiple valid translations and explain your choice.',
+      examples: ''
+    },
+    qa: {
+      role: 'You are a knowledgeable expert who provides accurate, well-sourced answers with appropriate nuance and context',
+      context: 'I need a thorough answer to a question that covers the key aspects, provides relevant context, and distinguishes between established facts and areas of uncertainty.',
+      task: 'Answer the question comprehensively. Provide context, explain reasoning, cite relevant facts, and address common misconceptions if applicable.',
+      format: 'A direct answer first, followed by detailed explanation, supporting evidence, and related considerations. Use headers for complex answers.',
+      constraints: 'Distinguish between well-established facts and areas of debate. Acknowledge uncertainty where it exists. Do not present speculation as fact. Cite specific sources or studies when possible.',
+      examples: ''
+    }
+  };
+
+  let currentTemplate = 'code';
+
+  function selectTemplate(key) {
+    currentTemplate = key;
+    const t = templates[key];
+    document.getElementById('pb-role').value = t.role;
+    document.getElementById('pb-context').value = t.context;
+    document.getElementById('pb-task').value = t.task;
+    document.getElementById('pb-format').value = t.format;
+    document.getElementById('pb-constraints').value = t.constraints;
+    document.getElementById('pb-examples').value = t.examples;
+    document.querySelectorAll('.pb-chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.pb-chip').forEach(c => {
+      if (c.textContent.toLowerCase().includes(key === 'qa' ? 'q&a' : key === 'summarize' ? 'summar' : key)) c.classList.add('active');
+    });
+    generate();
+  }
+
+  function generate() {
+    const role = document.getElementById('pb-role').value.trim();
+    const context = document.getElementById('pb-context').value.trim();
+    const task = document.getElementById('pb-task').value.trim();
+    const format = document.getElementById('pb-format').value.trim();
+    const constraints = document.getElementById('pb-constraints').value.trim();
+    const examples = document.getElementById('pb-examples').value.trim();
+
+    let prompt = '';
+    if (role) prompt += '## Role\n' + role + '\n\n';
+    if (context) prompt += '## Context\n' + context + '\n\n';
+    if (task) prompt += '## Task\n' + task + '\n\n';
+    if (format) prompt += '## Output Format\n' + format + '\n\n';
+    if (constraints) prompt += '## Constraints\n' + constraints + '\n\n';
+    if (examples) prompt += '## Examples\n' + examples + '\n\n';
+
+    if (!prompt) {
+      prompt = 'Fill in at least one field to generate a prompt.';
+    }
+
+    const preview = document.getElementById('pb-preview');
+    preview.textContent = prompt.trim();
+
+    const words = prompt.trim().split(/\s+/).filter(w => w.length > 0).length;
+    const tokens = Math.round(words * 1.3);
+    const chars = prompt.trim().length;
+    document.getElementById('pb-words').textContent = words.toLocaleString();
+    document.getElementById('pb-tokens').textContent = tokens.toLocaleString();
+    document.getElementById('pb-chars').textContent = chars.toLocaleString();
+  }
+
+  function copy() {
+    const text = document.getElementById('pb-preview').textContent;
+    if (!text || text === 'Fill in at least one field to generate a prompt.') return;
+    navigator.clipboard.writeText(text).then(() => {
+      const toast = document.getElementById('pb-toast');
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 2000);
+    });
+  }
+
+  function clear() {
+    document.getElementById('pb-role').value = '';
+    document.getElementById('pb-context').value = '';
+    document.getElementById('pb-task').value = '';
+    document.getElementById('pb-format').value = '';
+    document.getElementById('pb-constraints').value = '';
+    document.getElementById('pb-examples').value = '';
+    document.getElementById('pb-preview').textContent = 'Your assembled prompt will appear here. Fill in the fields on the left and click "Generate Prompt" to build a structured prompt ready for any AI model.';
+    document.getElementById('pb-words').textContent = '0';
+    document.getElementById('pb-tokens').textContent = '0';
+    document.getElementById('pb-chars').textContent = '0';
+    document.querySelectorAll('.pb-chip').forEach(c => c.classList.remove('active'));
+  }
+
+  window.pb = { selectTemplate, generate, copy, clear };
+
+  // Initialize with code template
+  selectTemplate('code');
+})();
+</script>
+</body>
+</html>

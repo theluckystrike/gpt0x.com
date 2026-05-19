@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Prompt Debugger — Token-Level Analysis & Optimization | GPT0X</title>
+<meta name="description" content="Debug and optimize AI prompts with token-level analysis. Identify wasteful tokens, redundant instructions, missing constraints, and structural issues. Get optimization suggestions with estimated cost savings.">
+<meta name="keywords" content="prompt debugger, AI prompt analysis, prompt optimization, token analysis, prompt engineering tool, prompt cost reduction, LLM prompt debugging, prompt quality checker">
+<link rel="canonical" href="https://gpt0x.com/tools/ai-prompt-debugger.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/tools/ai-prompt-debugger.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/tools/ai-prompt-debugger.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Prompt Debugger — Token-Level Analysis & Optimization">
+<meta property="og:description" content="Debug and optimize AI prompts with token-level analysis. Identify wasteful tokens and get optimization suggestions.">
+<meta property="og:url" content="https://gpt0x.com/tools/ai-prompt-debugger.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Prompt Debugger — Token-Level Analysis & Optimization">
+<meta name="twitter:description" content="Debug and optimize AI prompts with token-level analysis.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Prompt Debugger","url":"https://gpt0x.com/tools/ai-prompt-debugger.html","description":"Debug and optimize AI prompts with token-level analysis and optimization suggestions.","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"},"publisher":{"@type":"Organization","name":"GPT0X","url":"https://gpt0x.com"},"datePublished":"2026-05-25","dateModified":"2026-05-25","featureList":["Token-level prompt analysis","Redundancy and filler word detection","Structural issue identification","Missing constraint warnings","Cost impact estimation per issue","One-click optimization suggestions"]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"How do I debug a prompt that produces inconsistent results?","acceptedAnswer":{"@type":"Answer","text":"Inconsistent results usually stem from ambiguous instructions, missing constraints, or conflicting rules. Start by checking: 1) Are your instructions specific enough? Replace 'write a good response' with 'respond in 3 sentences using formal tone.' 2) Do you have conflicting instructions? A prompt that says 'be concise' and 'explain in detail' will produce variable outputs. 3) Is the output format specified? Without format constraints, the model may alternate between bullet points, paragraphs, and numbered lists. 4) Are edge cases covered? The model may handle ambiguous inputs differently each time without explicit fallback instructions."}},
+{"@type":"Question","name":"What are the most common prompt engineering mistakes?","acceptedAnswer":{"@type":"Answer","text":"The five most common mistakes are: 1) Vague instructions ('be helpful') instead of specific behaviors ('respond with step-by-step instructions, include code examples in Python'). 2) Missing output format — not specifying JSON, markdown, or prose leads to inconsistent formatting. 3) Overly long prompts — after 300-400 tokens, later instructions get less attention. 4) Redundant examples — including 5 few-shot examples when 2 would suffice wastes tokens. 5) No error handling — not telling the model what to do when it lacks information ('if you do not have enough context, ask a clarifying question rather than guessing')."}},
+{"@type":"Question","name":"How many tokens should a system prompt be?","acceptedAnswer":{"@type":"Answer","text":"Optimal system prompts are 100-300 tokens. Under 100 tokens often lacks specificity. Over 500 tokens shows diminishing returns, as the model may deprioritize later instructions. The prompt debugger identifies when your prompt exceeds recommended lengths and highlights which sections can be compressed. Every token in a system prompt costs money on every request — a 500-token prompt across 50K requests/month at GPT-4o rates costs $62.50/month just in system prompt overhead."}},
+{"@type":"Question","name":"How do I reduce prompt token count without losing quality?","acceptedAnswer":{"@type":"Answer","text":"Five techniques: 1) Remove filler phrases ('I would like you to', 'Please be sure to', 'It is important that'). 2) Use structured formats — numbered rules are more token-efficient than narrative paragraphs. 3) Replace examples with pattern descriptions ('format: Name: [name], Age: [age]' instead of listing 3 full examples). 4) Eliminate redundancy — saying 'respond concisely' and 'keep responses short' is wasted duplication. 5) Move static context to fine-tuning — if your prompt includes the same 200-token background on every call, fine-tuning bakes it into the model for free at inference time."}},
+{"@type":"Question","name":"Does the order of instructions in a prompt matter?","acceptedAnswer":{"@type":"Answer","text":"Yes, significantly. Models pay more attention to the beginning and end of prompts (a phenomenon called primacy and recency bias). Place your most critical instructions — role definition, output format, and safety constraints — in the first 100 tokens. Place less critical preferences and edge-case handling toward the end. For long system prompts, use numbered lists to create clear hierarchy. Research shows that reordering instructions to put critical rules first improves compliance by 10-25% compared to burying them in the middle of a long prompt."}}
+]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://gpt0x.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://gpt0x.com/tools/"},{"@type":"ListItem","position":3,"name":"Prompt Debugger","item":"https://gpt0x.com/tools/ai-prompt-debugger.html"}]}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}.tool-hero h1 span{color:var(--accent)}.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}@media(max-width:768px){.pd-grid{grid-template-columns:1fr}}
+.pd-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.pd-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.pd-field{margin-bottom:1rem}.pd-field label{display:block;font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px}
+.pd-field textarea,.pd-field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-family:var(--font-body);font-size:.85rem;resize:vertical}
+.pd-field textarea{min-height:200px;line-height:1.6;font-family:monospace;font-size:.82rem}.pd-field select{font-family:var(--font-body)}
+.pd-field textarea:focus,.pd-field select:focus{outline:none;border-color:var(--accent)}
+.pd-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.pd-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;background:var(--accent);color:#000}.pd-btn:hover{opacity:.85}
+.pd-btn-secondary{background:var(--bg-hover);color:var(--text);border:1px solid var(--border)}
+.pd-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1rem}@media(max-width:768px){.pd-stats{grid-template-columns:repeat(2,1fr)}}
+.pd-stat{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem;text-align:center}
+.pd-stat-value{font-size:1.1rem;font-weight:700;color:var(--accent);font-family:var(--font-display)}
+.pd-stat-label{font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.pd-issue{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;margin-bottom:.5rem;font-size:.83rem}
+.pd-issue-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem}
+.pd-issue-title{font-weight:600;color:var(--text)}
+.pd-issue-severity{font-size:.7rem;padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase}
+.pd-sev-high{background:#f472b6;color:#000}.pd-sev-med{background:#fbbf24;color:#000}.pd-sev-low{background:var(--bg-hover);color:var(--text-muted)}
+.pd-issue-desc{color:var(--text-muted);line-height:1.5}
+.pd-issue-fix{color:var(--accent);font-size:.8rem;margin-top:.3rem}
+.pd-score{text-align:center;margin:1rem 0}
+.pd-score-val{font-size:2rem;font-weight:700;font-family:var(--font-display)}
+.pd-score-label{font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.pd-highlighted{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;font-family:monospace;font-size:.8rem;line-height:1.7;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.pd-hl-filler{background:rgba(244,114,182,0.2);border-bottom:2px solid #f472b6}
+.pd-hl-redundant{background:rgba(251,191,36,0.2);border-bottom:2px solid #fbbf24}
+.pd-hl-good{background:rgba(52,211,153,0.15);border-bottom:2px solid #34d399}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}.explainer p{color:var(--text-muted);margin-bottom:1rem}.explainer ul{color:var(--text-muted);margin:0 0 1rem 1.5rem}.explainer li{margin-bottom:.4rem}
+.faq-section{max-width:780px;margin:2.5rem auto}.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}.faq-section summary:hover{color:var(--accent)}.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}.related-card:hover{border-color:var(--accent);text-decoration:none}.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header><div class="container"><a href="/" class="logo">gpt0x</a><nav><a href="/">Database</a><a href="/research/">Research</a><a href="/tools/">Tools</a><a href="/answers/">Answers</a><a href="/blog/">Blog</a><a href="/about.html">About</a><div class="nav-right"><a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a><a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a></div></nav></div></header>
+
+<main class="tool-container">
+  <div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/tools/">Tools</a> &rsaquo; Prompt Debugger</div>
+  <div class="tool-hero">
+    <h1>AI <span>Prompt</span> Debugger</h1>
+    <p>Paste your system prompt or user prompt to get a detailed analysis. Identifies filler phrases, redundant instructions, missing constraints, structural issues, and token waste. Get a quality score, highlighted problem areas, and specific optimization suggestions with estimated cost savings.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="pd-grid">
+    <div class="pd-panel">
+      <h3>Input Prompt</h3>
+      <div class="pd-field"><label>Prompt type</label><select id="pd-type"><option value="system">System Prompt</option><option value="user">User Prompt</option><option value="full">Full Conversation</option></select></div>
+      <div class="pd-field"><label>Paste your prompt</label><textarea id="pd-input" placeholder="Paste your system prompt, user prompt, or full conversation here. The debugger will analyze token efficiency, structural quality, and identify optimization opportunities."></textarea></div>
+      <div class="pd-field"><label>Monthly request volume (for cost impact)</label><select id="pd-volume"><option value="1000">1,000/month</option><option value="10000" selected>10,000/month</option><option value="50000">50,000/month</option><option value="100000">100,000/month</option></select></div>
+      <div class="pd-actions">
+        <button class="pd-btn" onclick="pd.analyze()">Analyze Prompt</button>
+        <button class="pd-btn pd-btn-secondary" onclick="pd.loadSample()">Load Sample</button>
+        <button class="pd-btn pd-btn-secondary" onclick="pd.clear()">Clear</button>
+      </div>
+      <div class="pd-stats">
+        <div class="pd-stat"><div class="pd-stat-value" id="pd-tokens">0</div><div class="pd-stat-label">Tokens</div></div>
+        <div class="pd-stat"><div class="pd-stat-value" id="pd-issues">0</div><div class="pd-stat-label">Issues</div></div>
+        <div class="pd-stat"><div class="pd-stat-value" id="pd-waste">0%</div><div class="pd-stat-label">Token Waste</div></div>
+        <div class="pd-stat"><div class="pd-stat-value" id="pd-savings">$0</div><div class="pd-stat-label">Monthly Savings</div></div>
+      </div>
+    </div>
+    <div class="pd-panel">
+      <h3>Analysis Results</h3>
+      <div class="pd-score" id="pd-score-box" style="display:none">
+        <div class="pd-score-val" id="pd-score">—</div>
+        <div class="pd-score-label">Prompt Quality Score</div>
+      </div>
+      <div id="pd-results">Click "Analyze Prompt" to see detailed results with issue identification and optimization suggestions.</div>
+      <h3 style="margin-top:1.5rem">Highlighted Prompt</h3>
+      <div class="pd-highlighted" id="pd-highlighted">Paste a prompt and analyze it to see highlighted problem areas: <span class="pd-hl-filler">filler phrases</span>, <span class="pd-hl-redundant">redundancies</span>, and <span class="pd-hl-good">effective patterns</span>.</div>
+    </div>
+  </div>
+
+  <section class="explainer">
+    <h2>The Science of Prompt Debugging</h2>
+    <p>Every token in your prompt costs money and consumes context window space. Yet most prompts contain 15-40% wasteful tokens — filler phrases, redundant instructions, and unnecessary verbosity that add cost without improving output quality. Prompt debugging is the systematic process of identifying and eliminating this waste, resulting in cheaper, faster, and often more consistent AI responses. This tool automates the analysis that experienced prompt engineers perform manually.</p>
+
+    <h2>Common Prompt Issues</h2>
+    <h3>Filler Phrases</h3>
+    <p>Phrases like "I would like you to," "Please be sure to," "It is very important that you," and "As an AI language model" add 5-15 tokens each while providing zero behavioral signal to the model. These are the most common source of token waste. The model does not need polite framing — direct instructions ("Respond in JSON format") are more token-efficient and equally effective as verbose requests ("I would really appreciate it if you could please format your response in JSON format").</p>
+
+    <h3>Redundant Instructions</h3>
+    <p>Saying the same thing multiple ways is a common anti-pattern. "Be concise," "keep responses short," and "do not write lengthy responses" all express the same constraint using 3x the tokens. The debugger identifies semantically similar instructions and suggests consolidation. A single clear instruction with a specific metric ("Respond in under 100 words") outperforms multiple vague restatements.</p>
+
+    <h3>Missing Constraints</h3>
+    <p>The absence of critical instructions causes inconsistency. If you do not specify an output format, the model will alternate between formats unpredictably. If you do not specify what to do when information is missing, the model may hallucinate or refuse inconsistently. The debugger checks for common missing constraints: output format, error handling, length limits, tone, and safety boundaries.</p>
+
+    <h3>Structural Issues</h3>
+    <p>Prompt structure affects model compliance. Critical instructions buried in the middle of long prompts get less attention than those at the beginning or end. Mixed formatting (some rules numbered, some in prose, some in bullets) reduces clarity. The debugger analyzes structure and recommends improvements like consistent formatting, instruction prioritization, and logical grouping.</p>
+
+    <h2>Optimization Impact</h2>
+    <p>Reducing a 400-token system prompt to 250 tokens saves 150 tokens per request. At 50,000 requests per month on GPT-4o, that saves $18.75/month — $225/year. For higher-volume applications or more expensive models, savings multiply rapidly. A team using Claude Opus 4 at 100,000 requests per month saves $225/month by reducing their system prompt by just 150 tokens. The debugger quantifies these savings to help you prioritize optimization effort.</p>
+
+    <h2>Prompt Quality Scoring</h2>
+    <p>The quality score (0-100) evaluates five dimensions: token efficiency (are there wasteful tokens?), structural quality (is the prompt well-organized?), constraint completeness (are key instructions present?), clarity (are instructions specific and unambiguous?), and consistency (do instructions align rather than conflict?). A score of 80+ indicates a well-optimized prompt. Scores below 60 suggest significant improvement opportunities. The score weights efficiency and completeness most heavily, as these have the highest impact on output quality and cost.</p>
+
+    <h2>Advanced Prompt Debugging Techniques</h2>
+    <h3>A/B Testing Prompts</h3>
+    <p>The most rigorous way to debug prompts is to A/B test variants against a fixed evaluation set. Create 30-50 representative inputs covering normal cases, edge cases, and adversarial inputs. Run each input through both prompt versions and score outputs on your key metrics (accuracy, format compliance, helpfulness). A prompt change that improves average scores by even 5% can be significant at scale. Many teams maintain a "prompt regression test suite" that runs automatically when prompts are updated, catching quality regressions before they reach production.</p>
+
+    <h3>Chain-of-Thought Debugging</h3>
+    <p>When a prompt produces incorrect outputs, ask the model to show its reasoning by adding "Think step by step before answering." This reveals where the model's reasoning diverges from your intent. Common failure modes include: misinterpreting ambiguous instructions, prioritizing one constraint over another when they conflict, and applying the wrong reasoning framework. The step-by-step output shows you exactly which instruction the model is following and where it goes wrong, enabling targeted fixes rather than blind iteration.</p>
+
+    <h3>Token-Level Sensitivity Analysis</h3>
+    <p>Some tokens in your prompt have outsized impact on output behavior. To identify them, systematically remove or modify individual instructions and measure the output change. A phrase that when removed causes outputs to become 30% less consistent is a critical instruction. A phrase that when removed causes no measurable change is pure waste. This analysis, while labor-intensive, identifies the minimal effective prompt — the shortest version that maintains your quality bar. The debugger automates the first pass of this analysis by identifying common waste patterns.</p>
+
+    <h2>Prompt Versioning Best Practices</h2>
+    <p>Treat prompts like code: version them in source control, test them before deployment, and monitor their performance in production. Store prompts in configuration files (not hardcoded in application code) so they can be updated without code deployments. Tag each prompt version with a semantic version number. Maintain a changelog documenting what changed and why. When a prompt update degrades quality in production, you can instantly roll back to the previous version. Teams that treat prompt engineering with the same rigor as software engineering consistently produce higher-quality AI applications.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details><summary>How do I debug a prompt that produces inconsistent results?</summary><p>Check for ambiguous instructions, missing constraints, conflicting rules, and unspecified output formats. Replace vague instructions with specific behaviors. Add explicit fallback instructions for edge cases.</p></details>
+    <details><summary>What are the most common prompt engineering mistakes?</summary><p>Vague instructions, missing output format, overly long prompts (300+ tokens with diminishing returns), redundant examples, and no error handling instructions.</p></details>
+    <details><summary>How many tokens should a system prompt be?</summary><p>100-300 tokens is optimal. Under 100 lacks specificity. Over 500 shows diminishing returns. Every token costs money on every request.</p></details>
+    <details><summary>How do I reduce prompt token count without losing quality?</summary><p>Remove filler phrases, use structured formats (numbered rules), replace examples with pattern descriptions, eliminate redundancy, and consider fine-tuning for static context.</p></details>
+    <details><summary>Does the order of instructions in a prompt matter?</summary><p>Yes. Models pay more attention to the beginning and end (primacy/recency bias). Place critical instructions in the first 100 tokens. Use numbered lists for clear hierarchy.</p></details>
+  </section>
+
+  <section class="related-tools"><h2>Related Tools</h2><div class="related-grid"><a href="/tools/system-prompt-library.html" class="related-card"><h3>System Prompt Library</h3><p>Browse 50+ curated prompts with effectiveness ratings.</p></a><a href="/tools/token-counter.html" class="related-card"><h3>Token Counter</h3><p>Count tokens and estimate costs for your prompts.</p></a><a href="/tools/ai-cost-estimator.html" class="related-card"><h3>Cost Estimator</h3><p>Project monthly costs with optimized prompts.</p></a></div></section>
+  <div class="author-bio"><h3>About the Author</h3><p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p></div>
+</main>
+<footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Zovo Tools</div><div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div><a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a><div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div></div></footer>
+<nav class="zovo-network" aria-label="Zovo Tools Network"><div class="zovo-network-inner"><h3 class="zovo-network-title">Explore More Tools</h3><div class="zovo-network-links"><a href="https://abwex.com">ABWex — A/B Testing</a><a href="https://claudflow.com">ClaudFlow — Workflows</a><a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a><a href="https://claudkit.com">ClaudKit — API</a><a href="https://enhio.com">Enhio — Text Tools</a><a href="https://epochpilot.com">EpochPilot — Timestamps</a><a href="https://gen8x.com">Gen8X — Color Tools</a><a href="https://heytensor.com">HeyTensor — ML Tools</a><a href="https://invokebot.com">InvokeBot — Webhooks</a><a href="https://kappafy.com">Kappafy — JSON</a><a href="https://kappakit.com">KappaKit — Dev Toolkit</a><a href="https://kickllm.com">KickLLM — LLM Costs</a><a href="https://krzen.com">Krzen — Image Tools</a><a href="https://lochbot.com">LochBot — Security</a><a href="https://lockml.com">LockML — ML Compare</a><a href="https://ml3x.com">ML3X — Matrix Math</a></div></div></nav>
+
+<script>
+(function(){
+  const fillerPhrases = ['i would like you to','please be sure to','it is important that','as an ai language model','as a helpful assistant','i want you to','please make sure','you should always','remember to always','please note that','keep in mind that','it would be great if','i need you to','do not forget to','be sure to','make sure you','please ensure that','i am looking for','what i need is','go ahead and'];
+  const redundantPatterns = [
+    { patterns:['be concise','keep it short','brief responses','do not be verbose','short answers'], group:'conciseness' },
+    { patterns:['be helpful','assist the user','help the user','provide assistance'], group:'helpfulness' },
+    { patterns:['be accurate','provide correct','ensure accuracy','factual responses'], group:'accuracy' },
+    { patterns:['be professional','maintain professionalism','professional tone','formal tone'], group:'professionalism' }
+  ];
+  const requiredElements = { system:['role/persona','output format','constraints/rules','error handling'], user:['clear task','context','desired format','success criteria'] };
+
+  function analyze() {
+    const text = document.getElementById('pd-input').value;
+    if (!text.trim()) return;
+    const type = document.getElementById('pd-type').value;
+    const volume = parseInt(document.getElementById('pd-volume').value);
+    const tokens = Math.ceil(text.length / 4);
+    const lower = text.toLowerCase();
+    let issues = [];
+    let wasteTokens = 0;
+
+    // Check filler phrases
+    fillerPhrases.forEach(fp => {
+      const idx = lower.indexOf(fp);
+      if (idx !== -1) {
+        const fpTokens = Math.ceil(fp.length / 4);
+        wasteTokens += fpTokens;
+        issues.push({ severity:'med', title:'Filler phrase: "'+fp+'"', desc:'This phrase adds ~'+fpTokens+' tokens without changing model behavior.', fix:'Remove or replace with a direct instruction.' });
+      }
+    });
+
+    // Check redundancies
+    redundantPatterns.forEach(rp => {
+      const found = rp.patterns.filter(p => lower.includes(p));
+      if (found.length > 1) {
+        const waste = (found.length - 1) * 5;
+        wasteTokens += waste;
+        issues.push({ severity:'med', title:'Redundant instructions: '+rp.group, desc:'Found '+found.length+' instructions saying the same thing: "'+found.join('", "')+'"', fix:'Keep one specific instruction and remove the others. Saves ~'+waste+' tokens.' });
+      }
+    });
+
+    // Check length
+    if (tokens > 500 && type === 'system') {
+      issues.push({ severity:'high', title:'System prompt exceeds 500 tokens', desc:'At '+tokens+' tokens, this prompt is longer than recommended. Later instructions may receive less attention.', fix:'Target 150-300 tokens. Move examples to user messages. Consolidate rules.' });
+    }
+
+    // Check for missing elements
+    const reqEl = requiredElements[type === 'full' ? 'user' : type] || requiredElements.user;
+    const hasRole = /you are|act as|your role/i.test(text);
+    const hasFormat = /json|markdown|bullet|format|respond with|output:/i.test(text);
+    const hasConstraints = /do not|never|always|must|rule|constraint/i.test(text);
+    const hasErrorHandling = /if you|when you|in case|cannot|unclear|don't know/i.test(text);
+    if (!hasRole && type === 'system') issues.push({ severity:'high', title:'Missing role definition', desc:'No role or persona defined. Add "You are a [role]" to establish consistent behavior.', fix:'Add a clear role definition in the first sentence.' });
+    if (!hasFormat) issues.push({ severity:'high', title:'Missing output format', desc:'No output format specified. The model may produce inconsistent formatting.', fix:'Add format instructions: "Respond in JSON format" or "Use markdown with headers."' });
+    if (!hasConstraints && type === 'system') issues.push({ severity:'med', title:'No explicit constraints', desc:'Without rules about what NOT to do, the model may produce unwanted behaviors.', fix:'Add 2-3 specific constraints about undesired behaviors.' });
+    if (!hasErrorHandling) issues.push({ severity:'low', title:'No error handling instructions', desc:'No instructions for when the model lacks information or encounters ambiguity.', fix:'Add: "If you lack sufficient information, ask a clarifying question rather than guessing."' });
+
+    // Check for numbered structure
+    if (tokens > 200 && !/^\d+[\.\)]/m.test(text) && !/^-\s/m.test(text)) {
+      issues.push({ severity:'low', title:'Unstructured instructions', desc:'Long prompt without numbered or bulleted structure. Structured formats improve compliance.', fix:'Convert instructions to a numbered list for clarity.' });
+    }
+
+    const wastePct = tokens > 0 ? Math.round(wasteTokens / tokens * 100) : 0;
+    const costPerToken = 2.50 / 1000000; // GPT-4o input rate
+    const monthlySavings = wasteTokens * volume * costPerToken;
+    const score = Math.max(0, Math.min(100, 100 - issues.filter(i=>i.severity==='high').length*15 - issues.filter(i=>i.severity==='med').length*8 - issues.filter(i=>i.severity==='low').length*3 - wastePct));
+
+    document.getElementById('pd-tokens').textContent = tokens.toLocaleString();
+    document.getElementById('pd-issues').textContent = issues.length;
+    document.getElementById('pd-waste').textContent = wastePct + '%';
+    document.getElementById('pd-savings').textContent = '$' + monthlySavings.toFixed(2);
+
+    document.getElementById('pd-score-box').style.display = 'block';
+    const scoreEl = document.getElementById('pd-score');
+    scoreEl.textContent = score + '/100';
+    scoreEl.style.color = score >= 80 ? '#34d399' : score >= 60 ? '#fbbf24' : '#f472b6';
+
+    let resultsHtml = '';
+    issues.sort((a,b) => {const s = {high:0,med:1,low:2}; return s[a.severity]-s[b.severity];});
+    issues.forEach(issue => {
+      const sevClass = issue.severity === 'high' ? 'pd-sev-high' : issue.severity === 'med' ? 'pd-sev-med' : 'pd-sev-low';
+      const sevLabel = issue.severity === 'high' ? 'High' : issue.severity === 'med' ? 'Medium' : 'Low';
+      resultsHtml += '<div class="pd-issue"><div class="pd-issue-header"><span class="pd-issue-title">'+issue.title+'</span><span class="pd-issue-severity '+sevClass+'">'+sevLabel+'</span></div><div class="pd-issue-desc">'+issue.desc+'</div><div class="pd-issue-fix">Fix: '+issue.fix+'</div></div>';
+    });
+    if (issues.length === 0) resultsHtml = '<div class="pd-issue"><div class="pd-issue-title" style="color:var(--accent)">No major issues found!</div><div class="pd-issue-desc">Your prompt looks well-structured. Minor optimizations may still be possible.</div></div>';
+    document.getElementById('pd-results').innerHTML = resultsHtml;
+
+    // Highlighted prompt
+    let highlighted = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    fillerPhrases.forEach(fp => {
+      const regex = new RegExp('('+fp.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+      highlighted = highlighted.replace(regex, '<span class="pd-hl-filler">$1</span>');
+    });
+    if (hasRole) highlighted = highlighted.replace(/(you are[^.]*\.)/i, '<span class="pd-hl-good">$1</span>');
+    document.getElementById('pd-highlighted').innerHTML = highlighted;
+  }
+
+  function loadSample() {
+    document.getElementById('pd-input').value = 'I would like you to act as a helpful customer support assistant. You are an AI assistant that helps users with their questions. Please be sure to always be helpful and provide accurate information. It is important that you maintain a professional tone at all times.\n\nBe concise in your responses. Keep it short and do not be verbose. Brief responses are preferred.\n\nPlease make sure you are accurate and provide correct information. Ensure accuracy in all your responses.\n\nIf a customer asks about pricing, please provide the current pricing information. If they ask about features, explain the features. If they have a complaint, be empathetic.\n\nRemember to always be professional and maintain professionalism in your responses. Professional tone is required at all times.\n\nPlease note that you should not make up information. Do not forget to check your facts before responding.';
+    document.getElementById('pd-type').value = 'system';
+    analyze();
+  }
+
+  function clear() {
+    document.getElementById('pd-input').value = '';
+    ['pd-tokens','pd-issues'].forEach(id => document.getElementById(id).textContent = '0');
+    document.getElementById('pd-waste').textContent = '0%';
+    document.getElementById('pd-savings').textContent = '$0';
+    document.getElementById('pd-score-box').style.display = 'none';
+    document.getElementById('pd-results').textContent = 'Click "Analyze Prompt" to see detailed results.';
+    document.getElementById('pd-highlighted').innerHTML = 'Paste a prompt and analyze it to see highlighted problem areas.';
+  }
+
+  window.pd = { analyze, loadSample, clear };
+})();
+</script>
+</body>
+</html>

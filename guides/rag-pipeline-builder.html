@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG Pipeline Builder — Architecture Designer with Chunking Optimizer | GPT0X</title>
+<meta name="description" content="Design retrieval-augmented generation pipelines with interactive architecture builder. Optimize chunking strategies, embedding models, vector databases, and retrieval parameters. Compare fixed, semantic, and recursive chunking.">
+<meta name="keywords" content="RAG pipeline builder, retrieval augmented generation, chunking strategy, RAG architecture, vector database, embedding pipeline, document chunking, semantic search pipeline, RAG optimization">
+<link rel="canonical" href="https://gpt0x.com/guides/rag-pipeline-builder.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/guides/rag-pipeline-builder.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/guides/rag-pipeline-builder.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RAG Pipeline Builder — Architecture Designer with Chunking Optimizer">
+<meta property="og:description" content="Design RAG pipelines with interactive architecture builder and chunking strategy optimizer.">
+<meta property="og:url" content="https://gpt0x.com/guides/rag-pipeline-builder.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RAG Pipeline Builder — Architecture Designer with Chunking Optimizer">
+<meta name="twitter:description" content="Design RAG pipelines with interactive architecture builder and chunking strategy optimizer.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"RAG Pipeline Builder — Architecture Designer with Chunking Optimizer","url":"https://gpt0x.com/guides/rag-pipeline-builder.html","description":"Design RAG pipelines with interactive architecture builder and chunking strategy optimizer.","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"},"publisher":{"@type":"Organization","name":"GPT0X","url":"https://gpt0x.com"},"datePublished":"2026-05-25","dateModified":"2026-05-25","mainEntityOfPage":"https://gpt0x.com/guides/rag-pipeline-builder.html"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"What is the best chunk size for RAG?","acceptedAnswer":{"@type":"Answer","text":"The optimal chunk size depends on your document type and retrieval model. For general-purpose RAG with text-embedding-3-small, 512-1024 tokens with 50-100 token overlap works well for most use cases. Smaller chunks (256 tokens) improve retrieval precision but may lose context. Larger chunks (2048+) preserve more context but reduce precision and increase LLM input costs. The best practice is to benchmark 3-4 chunk sizes on your specific data using a test set of 50+ queries, measuring both retrieval recall and final answer quality."}},
+{"@type":"Question","name":"Should I use fixed-size or semantic chunking?","acceptedAnswer":{"@type":"Answer","text":"Fixed-size chunking (splitting at token boundaries with overlap) is simpler, faster, and works well for homogeneous content like articles and documentation. Semantic chunking (splitting at natural boundaries like paragraphs, sections, or topic changes) preserves meaning better and produces higher retrieval quality for structured documents with clear sections. Recursive character splitting is a good middle ground — it tries to split at paragraph boundaries first, falling back to sentence and word boundaries. For most production systems, recursive splitting with 512-token target chunks outperforms both pure fixed-size and complex semantic approaches."}},
+{"@type":"Question","name":"How many chunks should I retrieve for RAG context?","acceptedAnswer":{"@type":"Answer","text":"Retrieve 3-5 chunks (top-k) for most applications. Too few chunks risk missing relevant information; too many dilute the signal with irrelevant content and increase LLM costs. A reranking step (using Cohere Rerank or a cross-encoder) dramatically improves quality: retrieve 20-50 chunks, rerank them, then pass the top 3-5 to the LLM. This retrieve-then-rerank pattern is the current best practice, improving answer quality by 10-20% compared to using raw vector similarity alone."}},
+{"@type":"Question","name":"What vector database should I use for RAG?","acceptedAnswer":{"@type":"Answer","text":"For prototyping: use pgvector with your existing PostgreSQL database — it handles up to 5 million vectors with decent performance. For production at scale: Pinecone offers the best managed experience with automatic scaling. Qdrant provides the best open-source option with advanced filtering. Weaviate excels at hybrid search combining vector and keyword matching. Chroma is popular for local development. The key factors are: query latency (under 50ms for real-time), filtering capabilities (metadata filters are essential), and operational complexity (managed vs self-hosted)."}},
+{"@type":"Question","name":"How do I evaluate RAG pipeline quality?","acceptedAnswer":{"@type":"Answer","text":"Evaluate RAG at three levels: retrieval quality (are the right chunks retrieved?), generation quality (is the answer correct and well-formed?), and end-to-end quality (does the user get a satisfactory answer?). For retrieval: measure recall@k — what percentage of relevant chunks appear in the top-k results. For generation: use LLM-as-judge to score faithfulness (does the answer stay grounded in retrieved context?) and relevance (does it answer the question?). Tools like RAGAS, TruLens, and Phoenix provide automated RAG evaluation frameworks. Aim for >85% retrieval recall@5 and >90% faithfulness."}}
+]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://gpt0x.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://gpt0x.com/guides/"},{"@type":"ListItem","position":3,"name":"RAG Pipeline Builder","item":"https://gpt0x.com/guides/rag-pipeline-builder.html"}]}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}.tool-hero h1 span{color:var(--accent)}.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.rg-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem}
+.rg-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.rg-field{margin-bottom:1rem}.rg-field label{display:block;font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:4px}
+.rg-field select,.rg-field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-family:var(--font-body);font-size:.85rem}
+.rg-field select:focus,.rg-field input:focus{outline:none;border-color:var(--accent)}
+.rg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+@media(max-width:768px){.rg-grid{grid-template-columns:1fr}}
+.rg-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;background:var(--accent);color:#000}.rg-btn:hover{opacity:.85}
+.rg-btn-secondary{background:var(--bg-hover);color:var(--text);border:1px solid var(--border)}
+.rg-arch{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin:1rem 0;font-family:monospace;font-size:.8rem;line-height:1.8;white-space:pre-wrap;color:var(--text-muted);overflow-x:auto}
+.rg-arch .rg-node{color:var(--accent);font-weight:600}
+.rg-arch .rg-arrow{color:var(--text-muted)}
+.rg-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin:1rem 0}
+@media(max-width:768px){.rg-stats{grid-template-columns:repeat(2,1fr)}}
+.rg-stat{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;text-align:center}
+.rg-stat-value{font-size:1.2rem;font-weight:700;color:var(--accent);font-family:var(--font-display)}
+.rg-stat-label{font-size:.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.rg-result{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:.85rem;color:var(--text-muted);margin-top:1rem}
+.rg-result strong{color:var(--accent)}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}.explainer p{color:var(--text-muted);margin-bottom:1rem}.explainer ul,.explainer ol{color:var(--text-muted);margin:0 0 1rem 1.5rem}.explainer li{margin-bottom:.4rem}
+.explainer table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}.explainer th,.explainer td{padding:.5rem .75rem;border:1px solid var(--border);text-align:left}.explainer th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}.explainer td{color:var(--text-muted)}
+.faq-section{max-width:780px;margin:2.5rem auto}.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}.faq-section summary:hover{color:var(--accent)}.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}.related-card:hover{border-color:var(--accent);text-decoration:none}.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header><div class="container"><a href="/" class="logo">gpt0x</a><nav><a href="/">Database</a><a href="/research/">Research</a><a href="/tools/">Tools</a><a href="/answers/">Answers</a><a href="/blog/">Blog</a><a href="/about.html">About</a><div class="nav-right"><a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a><a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a></div></nav></div></header>
+
+<main class="tool-container">
+  <div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/guides/">Guides</a> &rsaquo; RAG Pipeline Builder</div>
+
+  <div class="tool-hero">
+    <h1>RAG <span>Pipeline</span> Builder</h1>
+    <p>Design your retrieval-augmented generation architecture interactively. Select chunking strategies, embedding models, vector databases, retrieval parameters, and LLMs. Get cost estimates, latency projections, and architecture diagrams. Optimize chunk size for your specific document types.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="rg-grid">
+    <div class="rg-panel">
+      <h3>Pipeline Configuration</h3>
+      <div class="rg-field"><label>Document Type</label><select id="rg-doctype"><option value="articles">Articles / Blog Posts</option><option value="docs">Technical Documentation</option><option value="legal">Legal / Compliance</option><option value="code">Source Code</option><option value="support">Support Tickets / Q&A</option><option value="research">Research Papers</option></select></div>
+      <div class="rg-field"><label>Chunking Strategy</label><select id="rg-chunking"><option value="recursive" selected>Recursive Character Splitting</option><option value="fixed">Fixed Token Size</option><option value="semantic">Semantic (Paragraph/Section)</option><option value="sentence">Sentence-Level</option><option value="markdown">Markdown Header Splitting</option></select></div>
+      <div class="rg-field"><label>Target Chunk Size (tokens)</label><input type="number" id="rg-chunksize" value="512" min="64" max="8192"></div>
+      <div class="rg-field"><label>Overlap (tokens)</label><input type="number" id="rg-overlap" value="64" min="0" max="512"></div>
+      <div class="rg-field"><label>Embedding Model</label><select id="rg-embedding"><option value="te3small">text-embedding-3-small ($0.02/1M)</option><option value="te3large">text-embedding-3-large ($0.13/1M)</option><option value="cohere">Cohere Embed v4 ($0.10/1M)</option><option value="voyage3">Voyage AI voyage-3 ($0.06/1M)</option><option value="gte">GTE-Qwen2 (self-hosted)</option></select></div>
+      <div class="rg-field"><label>Vector Database</label><select id="rg-vectordb"><option value="pinecone">Pinecone (managed)</option><option value="qdrant">Qdrant (cloud/self-hosted)</option><option value="pgvector">pgvector (PostgreSQL)</option><option value="weaviate">Weaviate (hybrid search)</option><option value="chroma">Chroma (local dev)</option></select></div>
+      <div class="rg-field"><label>Retrieval Top-K</label><input type="number" id="rg-topk" value="5" min="1" max="50"></div>
+      <div class="rg-field"><label>Reranking</label><select id="rg-reranking"><option value="none">None</option><option value="cohere">Cohere Rerank ($1/1K searches)</option><option value="crossencoder">Cross-Encoder (self-hosted)</option></select></div>
+      <div class="rg-field"><label>LLM for Generation</label><select id="rg-llm"><option value="gpt4o">GPT-4o ($2.50/$10.00 per 1M)</option><option value="gpt4omini">GPT-4o Mini ($0.15/$0.60)</option><option value="sonnet4">Claude Sonnet 4 ($3/$15)</option><option value="gemini25flash">Gemini 2.5 Flash ($0.15/$0.60)</option></select></div>
+      <div style="display:flex;gap:.75rem;margin-top:1rem"><button class="rg-btn" onclick="rg.build()">Build Pipeline</button><button class="rg-btn rg-btn-secondary" onclick="rg.optimize()">Auto-Optimize</button></div>
+    </div>
+
+    <div class="rg-panel">
+      <h3>Pipeline Architecture</h3>
+      <div class="rg-arch" id="rg-arch">Configure your pipeline and click "Build Pipeline" to generate the architecture diagram and cost estimates.</div>
+      <div class="rg-stats" id="rg-stats" style="display:none">
+        <div class="rg-stat"><div class="rg-stat-value" id="rg-latency">—</div><div class="rg-stat-label">Est. Latency</div></div>
+        <div class="rg-stat"><div class="rg-stat-value" id="rg-cost-query">—</div><div class="rg-stat-label">Cost / Query</div></div>
+        <div class="rg-stat"><div class="rg-stat-value" id="rg-chunks">—</div><div class="rg-stat-label">Chunks / Doc</div></div>
+        <div class="rg-stat"><div class="rg-stat-value" id="rg-context">—</div><div class="rg-stat-label">Context Tokens</div></div>
+      </div>
+      <div class="rg-result" id="rg-result"></div>
+    </div>
+  </div>
+
+  <div class="rg-panel">
+    <h3>Chunking Strategy Comparison</h3>
+    <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Enter a corpus size to compare chunking strategies on cost, chunk count, and estimated retrieval quality.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1rem">
+      <div class="rg-field"><label>Total documents</label><input type="number" id="rg-corpus-docs" value="10000" min="100"></div>
+      <div class="rg-field"><label>Avg tokens per document</label><input type="number" id="rg-corpus-tokens" value="2000" min="100"></div>
+      <div class="rg-field"><label>Monthly queries</label><input type="number" id="rg-corpus-queries" value="50000" min="100"></div>
+    </div>
+    <button class="rg-btn" onclick="rg.compareChunking()">Compare Strategies</button>
+    <div class="rg-result" id="rg-chunk-compare" style="margin-top:1rem">Click "Compare Strategies" to see cost and quality tradeoffs.</div>
+  </div>
+
+  <section class="explainer">
+    <h2>The Complete Guide to RAG Pipeline Architecture</h2>
+    <p>Retrieval-Augmented Generation (RAG) is the dominant pattern for building AI applications that need access to private or current data. Instead of fine-tuning an LLM on your documents, RAG retrieves relevant passages at query time and includes them in the prompt as context. This approach combines the reasoning ability of LLMs with the accuracy of information retrieval, producing answers that are grounded in your actual data rather than the model's potentially outdated training knowledge.</p>
+
+    <h2>RAG Pipeline Components</h2>
+    <h3>1. Document Ingestion</h3>
+    <p>The ingestion pipeline transforms raw documents (PDFs, HTML, Word files, Markdown, etc.) into structured text. This step includes extraction (parsing format-specific content), cleaning (removing headers, footers, navigation elements, and boilerplate), and metadata extraction (dates, authors, document type, section headers). The quality of ingestion directly impacts retrieval quality — garbage in, garbage out. Libraries like Unstructured, LlamaIndex, and LangChain provide parsers for 50+ document formats.</p>
+
+    <h3>2. Chunking</h3>
+    <p>Chunking splits documents into passages small enough for the embedding model to process and specific enough for accurate retrieval. The chunk size is the single most impactful parameter in RAG quality. Chunks that are too small lose context and produce fragmented retrieval. Chunks that are too large dilute the relevant information with irrelevant text, reducing both retrieval precision and increasing LLM costs. Our builder lets you experiment with chunk sizes from 64 to 8192 tokens to find the optimal balance for your data.</p>
+
+    <h3>3. Embedding</h3>
+    <p>Each chunk is converted into a dense vector using an embedding model. The choice of embedding model affects retrieval quality, cost, and storage requirements. For most applications, text-embedding-3-small offers the best cost-to-quality ratio. For maximum retrieval accuracy, Voyage AI voyage-3-large leads current benchmarks. Open-source models like GTE-Qwen2 eliminate per-token costs for high-volume ingestion. The embedding model must match between ingestion and query time — you cannot mix embeddings from different models.</p>
+
+    <h3>4. Vector Storage</h3>
+    <p>Vectors are stored in a vector database optimized for similarity search. The database must support fast approximate nearest neighbor (ANN) search at your scale, metadata filtering (to restrict search by date, source, user, etc.), and ideally hybrid search combining vector similarity with keyword matching. For production workloads processing more than 100 queries per second, managed databases like Pinecone provide the best operational experience. For development and smaller-scale applications, pgvector adds vector search to your existing PostgreSQL without additional infrastructure.</p>
+
+    <h3>5. Retrieval and Reranking</h3>
+    <p>At query time, the user's question is embedded using the same model and used to search the vector database for the most similar chunks. The top-k results are returned. A reranking step dramatically improves quality: instead of relying solely on embedding similarity (which can be noisy), a cross-encoder model scores each candidate passage against the query more carefully. This retrieve-then-rerank pattern typically improves answer quality by 10-20% at minimal additional cost.</p>
+
+    <h3>6. Generation</h3>
+    <p>The retrieved (and optionally reranked) chunks are formatted into the LLM prompt along with the user's question. The LLM generates an answer grounded in the provided context. The prompt template matters: explicitly instruct the model to base its answer only on the provided context and to acknowledge when the context does not contain enough information to answer. This reduces hallucination significantly compared to allowing the model to supplement context with its training knowledge.</p>
+
+    <h2>Chunking Strategies Compared</h2>
+    <table>
+      <tr><th>Strategy</th><th>Best For</th><th>Chunk Quality</th><th>Implementation</th></tr>
+      <tr><td>Fixed Token Size</td><td>Homogeneous text</td><td>Medium</td><td>Simple</td></tr>
+      <tr><td>Recursive Character</td><td>General purpose</td><td>Good</td><td>Moderate</td></tr>
+      <tr><td>Sentence-Level</td><td>Q&A, support</td><td>Good</td><td>Moderate</td></tr>
+      <tr><td>Semantic (Section)</td><td>Structured docs</td><td>Excellent</td><td>Complex</td></tr>
+      <tr><td>Markdown Header</td><td>Documentation</td><td>Excellent</td><td>Simple</td></tr>
+    </table>
+
+    <h2>Cost Optimization Strategies</h2>
+    <p>RAG costs come from three sources: embedding (one-time per document), storage (ongoing monthly), and generation (per query). Generation dominates ongoing costs — each query uses both retrieval and LLM inference. To optimize: use smaller, cheaper LLMs for simple queries and route complex queries to premium models. Cache frequent queries and their answers. Use metadata filters to narrow the search space before vector similarity (reducing false positives). Implement prompt compression to reduce the context window size — techniques like LLMLingua can compress retrieved passages by 50% while preserving answer quality.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details><summary>What is the best chunk size for RAG?</summary><p>The optimal chunk size depends on your document type. For general-purpose RAG, 512-1024 tokens with 50-100 token overlap works well. Smaller chunks (256) improve precision but lose context. Larger chunks (2048+) preserve context but reduce precision. Benchmark on your data to find the optimum.</p></details>
+    <details><summary>Should I use fixed-size or semantic chunking?</summary><p>Fixed-size is simpler and works for homogeneous content. Semantic chunking preserves meaning better for structured documents. Recursive character splitting is the best middle ground for most production systems.</p></details>
+    <details><summary>How many chunks should I retrieve for RAG context?</summary><p>Retrieve 3-5 chunks (top-k) for most applications. Use a retrieve-then-rerank pattern: fetch 20-50 chunks, rerank, then pass top 3-5 to the LLM for 10-20% quality improvement.</p></details>
+    <details><summary>What vector database should I use for RAG?</summary><p>For prototyping: pgvector. For production: Pinecone (managed), Qdrant (open-source), or Weaviate (hybrid search). Key factors: query latency, filtering capabilities, and operational complexity.</p></details>
+    <details><summary>How do I evaluate RAG pipeline quality?</summary><p>Evaluate at three levels: retrieval quality (recall@k), generation quality (faithfulness and relevance), and end-to-end quality. Use frameworks like RAGAS or TruLens. Aim for >85% retrieval recall@5 and >90% faithfulness.</p></details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/answers/embedding-model-comparison.html" class="related-card"><h3>Embedding Comparison</h3><p>Compare embedding models by dimensions, cost, and MTEB scores.</p></a>
+      <a href="/tools/token-counter.html" class="related-card"><h3>Token Counter</h3><p>Count tokens to optimize chunk sizes and estimate costs.</p></a>
+      <a href="/tools/ai-cost-estimator.html" class="related-card"><h3>Cost Estimator</h3><p>Project monthly AI costs for your RAG pipeline.</p></a>
+    </div>
+  </section>
+
+  <div class="author-bio"><h3>About the Author</h3><p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p></div>
+</main>
+
+<footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Zovo Tools</div><div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div><a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a><div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div></div></footer>
+<nav class="zovo-network" aria-label="Zovo Tools Network"><div class="zovo-network-inner"><h3 class="zovo-network-title">Explore More Tools</h3><div class="zovo-network-links"><a href="https://abwex.com">ABWex — A/B Testing</a><a href="https://claudflow.com">ClaudFlow — Workflows</a><a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a><a href="https://claudkit.com">ClaudKit — API</a><a href="https://enhio.com">Enhio — Text Tools</a><a href="https://epochpilot.com">EpochPilot — Timestamps</a><a href="https://gen8x.com">Gen8X — Color Tools</a><a href="https://heytensor.com">HeyTensor — ML Tools</a><a href="https://invokebot.com">InvokeBot — Webhooks</a><a href="https://kappafy.com">Kappafy — JSON</a><a href="https://kappakit.com">KappaKit — Dev Toolkit</a><a href="https://kickllm.com">KickLLM — LLM Costs</a><a href="https://krzen.com">Krzen — Image Tools</a><a href="https://lochbot.com">LochBot — Security</a><a href="https://lockml.com">LockML — ML Compare</a><a href="https://ml3x.com">ML3X — Matrix Math</a></div></div></nav>
+
+<script>
+(function(){
+  const embeddingCosts = { te3small:0.02, te3large:0.13, cohere:0.10, voyage3:0.06, gte:0 };
+  const embeddingDims = { te3small:1536, te3large:3072, cohere:1024, voyage3:1024, gte:1024 };
+  const llmCosts = { gpt4o:{input:2.50,output:10.00}, gpt4omini:{input:0.15,output:0.60}, sonnet4:{input:3.00,output:15.00}, gemini25flash:{input:0.15,output:0.60} };
+  const llmNames = { gpt4o:'GPT-4o', gpt4omini:'GPT-4o Mini', sonnet4:'Claude Sonnet 4', gemini25flash:'Gemini 2.5 Flash' };
+  const dbNames = { pinecone:'Pinecone', qdrant:'Qdrant', pgvector:'pgvector', weaviate:'Weaviate', chroma:'Chroma' };
+
+  function build() {
+    const chunkSize = parseInt(document.getElementById('rg-chunksize').value) || 512;
+    const overlap = parseInt(document.getElementById('rg-overlap').value) || 64;
+    const topk = parseInt(document.getElementById('rg-topk').value) || 5;
+    const embKey = document.getElementById('rg-embedding').value;
+    const llmKey = document.getElementById('rg-llm').value;
+    const dbKey = document.getElementById('rg-vectordb').value;
+    const chunkStrat = document.getElementById('rg-chunking').value;
+    const rerank = document.getElementById('rg-reranking').value;
+    const contextTokens = topk * chunkSize;
+    const queryEmbedCost = (50/1000000) * embeddingCosts[embKey]; // ~50 tokens per query
+    const llmInputCost = (contextTokens + 200) / 1000000 * llmCosts[llmKey].input;
+    const llmOutputCost = 300 / 1000000 * llmCosts[llmKey].output;
+    const rerankCost = rerank === 'cohere' ? 0.001 : 0;
+    const totalPerQuery = queryEmbedCost + llmInputCost + llmOutputCost + rerankCost;
+    const latency = 200 + (rerank !== 'none' ? 150 : 0) + (contextTokens * 0.5);
+
+    const arch = document.getElementById('rg-arch');
+    arch.innerHTML =
+      '<span class="rg-node">[User Query]</span>\n  <span class="rg-arrow">|</span>\n  <span class="rg-arrow">v</span>\n'+
+      '<span class="rg-node">[Embedding: '+document.getElementById('rg-embedding').options[document.getElementById('rg-embedding').selectedIndex].text.split('(')[0].trim()+']</span>\n  <span class="rg-arrow">|</span>\n  <span class="rg-arrow">v</span>\n'+
+      '<span class="rg-node">[Vector Search: '+dbNames[dbKey]+' (top-'+(rerank!=='none'?'20':''+topk)+')]</span>\n  <span class="rg-arrow">|</span>\n  <span class="rg-arrow">v</span>\n'+
+      (rerank !== 'none' ? '<span class="rg-node">[Reranker: '+(rerank==='cohere'?'Cohere Rerank':'Cross-Encoder')+' -> top-'+topk+']</span>\n  <span class="rg-arrow">|</span>\n  <span class="rg-arrow">v</span>\n' : '')+
+      '<span class="rg-node">[Prompt Assembly: '+topk+' chunks x '+chunkSize+' tokens = '+contextTokens+' context tokens]</span>\n  <span class="rg-arrow">|</span>\n  <span class="rg-arrow">v</span>\n'+
+      '<span class="rg-node">[LLM: '+llmNames[llmKey]+']</span>\n  <span class="rg-arrow">|</span>\n  <span class="rg-arrow">v</span>\n'+
+      '<span class="rg-node">[Response]</span>';
+
+    document.getElementById('rg-stats').style.display = 'grid';
+    document.getElementById('rg-latency').textContent = Math.round(latency) + 'ms';
+    document.getElementById('rg-cost-query').textContent = '$' + totalPerQuery.toFixed(5);
+    document.getElementById('rg-chunks').textContent = Math.ceil(2000 / (chunkSize - overlap));
+    document.getElementById('rg-context').textContent = contextTokens.toLocaleString();
+
+    document.getElementById('rg-result').innerHTML =
+      '<strong>Pipeline Summary:</strong><br>'+
+      'Chunking: '+chunkStrat+' ('+chunkSize+' tokens, '+overlap+' overlap)<br>'+
+      'Embedding: '+embeddingDims[embKey]+' dimensions | Storage: '+(embeddingDims[embKey]*4/1024).toFixed(1)+'KB per chunk<br>'+
+      'Retrieval: top-'+topk+(rerank!=='none' ? ' (reranked from 20)' : '')+' | Context: '+contextTokens+' tokens<br>'+
+      'Cost per query: <strong>$'+totalPerQuery.toFixed(5)+'</strong> | Est. latency: <strong>'+Math.round(latency)+'ms</strong><br>'+
+      'Monthly cost at 50K queries: <strong>$'+(totalPerQuery*50000).toFixed(2)+'</strong>';
+  }
+
+  function optimize() {
+    const doctype = document.getElementById('rg-doctype').value;
+    const presets = {
+      articles: { chunk:512, overlap:64, embed:'te3small', db:'pgvector', topk:5, rerank:'none', llm:'gpt4omini', strategy:'recursive' },
+      docs: { chunk:1024, overlap:128, embed:'te3small', db:'weaviate', topk:5, rerank:'cohere', llm:'gpt4omini', strategy:'markdown' },
+      legal: { chunk:768, overlap:128, embed:'voyage3', db:'pinecone', topk:8, rerank:'cohere', llm:'sonnet4', strategy:'semantic' },
+      code: { chunk:256, overlap:32, embed:'te3large', db:'qdrant', topk:10, rerank:'none', llm:'gpt4o', strategy:'recursive' },
+      support: { chunk:384, overlap:48, embed:'te3small', db:'pgvector', topk:3, rerank:'none', llm:'gemini25flash', strategy:'sentence' },
+      research: { chunk:1024, overlap:128, embed:'voyage3', db:'pinecone', topk:5, rerank:'cohere', llm:'gpt4o', strategy:'semantic' }
+    };
+    const p = presets[doctype];
+    document.getElementById('rg-chunksize').value = p.chunk;
+    document.getElementById('rg-overlap').value = p.overlap;
+    document.getElementById('rg-embedding').value = p.embed;
+    document.getElementById('rg-vectordb').value = p.db;
+    document.getElementById('rg-topk').value = p.topk;
+    document.getElementById('rg-reranking').value = p.rerank;
+    document.getElementById('rg-llm').value = p.llm;
+    document.getElementById('rg-chunking').value = p.strategy;
+    build();
+  }
+
+  function compareChunking() {
+    const docs = parseInt(document.getElementById('rg-corpus-docs').value) || 10000;
+    const tokensPerDoc = parseInt(document.getElementById('rg-corpus-tokens').value) || 2000;
+    const queries = parseInt(document.getElementById('rg-corpus-queries').value) || 50000;
+    const strategies = [
+      { name:'Fixed 256', size:256, overlap:32, quality:72 },
+      { name:'Fixed 512', size:512, overlap:64, quality:78 },
+      { name:'Fixed 1024', size:1024, overlap:128, quality:76 },
+      { name:'Recursive 512', size:512, overlap:64, quality:82 },
+      { name:'Semantic', size:600, overlap:0, quality:86 },
+      { name:'Sentence', size:384, overlap:48, quality:80 }
+    ];
+    const embCost = 0.02; // te3small default
+    let html = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;margin-top:.5rem">';
+    html += '<tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:.4rem;color:var(--accent)">Strategy</th><th style="text-align:right;padding:.4rem;color:var(--accent)">Chunks</th><th style="text-align:right;padding:.4rem;color:var(--accent)">Embed Cost</th><th style="text-align:right;padding:.4rem;color:var(--accent)">Storage</th><th style="text-align:right;padding:.4rem;color:var(--accent)">Quality Est.</th></tr>';
+    strategies.forEach(s => {
+      const chunksPerDoc = Math.ceil(tokensPerDoc / (s.size - s.overlap));
+      const totalChunks = docs * chunksPerDoc;
+      const totalTokens = totalChunks * s.size;
+      const embedCost = (totalTokens / 1000000) * embCost;
+      const storageGB = (totalChunks * 1536 * 4) / (1024*1024*1024);
+      html += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:.35rem;color:var(--text)">'+s.name+'</td>';
+      html += '<td style="text-align:right;padding:.35rem;color:var(--text-muted)">'+totalChunks.toLocaleString()+'</td>';
+      html += '<td style="text-align:right;padding:.35rem;color:var(--text-muted)">$'+embedCost.toFixed(2)+'</td>';
+      html += '<td style="text-align:right;padding:.35rem;color:var(--text-muted)">'+storageGB.toFixed(1)+' GB</td>';
+      html += '<td style="text-align:right;padding:.35rem;color:var(--accent);font-weight:600">'+s.quality+'%</td></tr>';
+    });
+    html += '</table>';
+    document.getElementById('rg-chunk-compare').innerHTML = html;
+  }
+
+  window.rg = { build, optimize, compareChunking };
+})();
+</script>
+</body>
+</html>

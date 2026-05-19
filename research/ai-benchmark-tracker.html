@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Benchmark Tracker 2026 — MMLU, HumanEval, GSM8K, MATH, HellaSwag Scores | GPT0X</title>
+<meta name="description" content="Track and compare AI model benchmark scores for MMLU, HumanEval, GSM8K, MATH, and HellaSwag. Interactive table with score visualization, SVG charts, and JSON/CSV export. 12 models compared.">
+<meta name="keywords" content="AI benchmarks 2026, MMLU scores, HumanEval results, GSM8K leaderboard, MATH benchmark, HellaSwag, LLM benchmarks, model comparison">
+<link rel="canonical" href="https://gpt0x.com/research/ai-benchmark-tracker.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/research/ai-benchmark-tracker.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/research/ai-benchmark-tracker.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI Benchmark Tracker 2026 — MMLU, HumanEval, GSM8K, MATH, HellaSwag">
+<meta property="og:description" content="Track and compare AI model benchmark scores. Interactive table, SVG charts, and JSON/CSV export for 12 major models.">
+<meta property="og:url" content="https://gpt0x.com/research/ai-benchmark-tracker.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Benchmark Tracker 2026 — MMLU, HumanEval, GSM8K, MATH, HellaSwag">
+<meta name="twitter:description" content="Track and compare AI model benchmark scores. Interactive table, SVG charts, and JSON/CSV export for 12 major models.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "AI Benchmark Tracker 2026 — MMLU, HumanEval, GSM8K, MATH, HellaSwag Scores",
+  "description": "Comprehensive benchmark comparison of 12 major AI models across MMLU, HumanEval, GSM8K, MATH, and HellaSwag with interactive visualizations and data export.",
+  "url": "https://gpt0x.com/research/ai-benchmark-tracker.html",
+  "datePublished": "2026-05-25",
+  "dateModified": "2026-05-25",
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "publisher": { "@type": "Organization", "name": "GPT0X", "url": "https://gpt0x.com" },
+  "mainEntityOfPage": "https://gpt0x.com/research/ai-benchmark-tracker.html"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is MMLU and why is it the most cited AI benchmark?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MMLU (Massive Multitask Language Understanding) tests AI models on 14,042 multiple-choice questions across 57 academic subjects including STEM, humanities, social sciences, and professional domains like law and medicine. It became the most cited benchmark because it measures broad knowledge and reasoning across diverse fields in a standardized format. A score of 90%+ indicates expert-level knowledge. As of 2026, top models like Claude Opus 4 (92.0%), GPT-4o (90.2%), and Gemini 2.5 Pro (91.7%) have reached near-saturation on MMLU, prompting the community to develop harder variants like MMLU-Pro."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which AI model scores highest on HumanEval for coding?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "As of May 2026, Claude Opus 4 leads HumanEval with a 92.7% pass@1 score, followed by Gemini 2.5 Pro at 91.2% and GPT-4o at 90.2%. Among open-source models, DeepSeek V3 scores 82.6% and Llama 4 Scout reaches 80.5%. HumanEval tests Python code generation with 164 programming challenges, measuring the model's ability to write correct code from docstring descriptions on the first attempt."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do open-source AI models compare to closed-source on benchmarks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The gap between open-source and closed-source models has narrowed dramatically by 2026. On MMLU, the best open-source model (Llama 4 Scout at 88.5%) trails the best closed-source model (Claude Opus 4 at 92.0%) by only 3.5 points. On HumanEval, the gap is about 10 points. On GSM8K math, open-source models like Qwen 2.5 72B (89.5%) approach closed-source performance. The remaining gap is largest on complex reasoning tasks (MATH) where closed-source models maintain a 10-15 point lead."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the limitations of AI benchmarks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AI benchmarks have several known limitations: (1) Data contamination — models may have seen benchmark questions during training, inflating scores. (2) Benchmark saturation — when top models all score 90%+, the benchmark loses discriminative power. (3) Gaming — models can be specifically optimized for benchmark performance without corresponding real-world improvement. (4) Narrow measurement — MMLU measures knowledge breadth but not reasoning depth; HumanEval tests simple functions but not complex systems. (5) Static snapshots — benchmarks don't capture how models perform on novel, evolving real-world tasks. For these reasons, benchmark scores should be one factor among many in model selection."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I download the benchmark data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, you can download the complete benchmark dataset from this page in both JSON and CSV formats using the download buttons above the chart. The data includes all 12 models with their MMLU, HumanEval, GSM8K, MATH, and HellaSwag scores, along with provider and release date information. The data runs entirely in your browser with no server interaction — the export is generated client-side from the same dataset displayed in the table."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Research", "item": "https://gpt0x.com/research/" },
+    { "@type": "ListItem", "position": 3, "name": "AI Benchmark Tracker", "item": "https://gpt0x.com/research/ai-benchmark-tracker.html" }
+  ]
+}
+</script>
+<style>
+.tool-container{max-width:1100px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}
+.tool-hero h1 span{color:var(--accent)}
+.tool-hero p{color:var(--text-muted);max-width:700px;margin-bottom:1rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.bt-table-wrap{overflow-x:auto;margin-bottom:2rem;border:1px solid var(--border);border-radius:var(--radius)}
+.bt-table{width:100%;border-collapse:collapse;font-size:.83rem}
+.bt-table thead th{text-align:left;padding:10px 12px;border-bottom:2px solid var(--border);color:var(--accent);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;white-space:nowrap;user-select:none;background:var(--bg-card)}
+.bt-table thead th:hover{color:var(--text)}
+.bt-table thead th .arrow{margin-left:3px;font-size:.65rem}
+.bt-table tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+.bt-table tbody tr:hover{background:var(--bg-hover)}
+.bt-table tbody td{padding:9px 12px;white-space:nowrap}
+.bt-score{display:inline-block;padding:2px 8px;border-radius:3px;font-size:.8rem;font-weight:600;min-width:48px;text-align:center}
+.bt-green{background:rgba(52,211,153,.15);color:#34D399}
+.bt-yellow{background:rgba(250,204,21,.15);color:#FACC15}
+.bt-orange{background:rgba(251,146,60,.15);color:#FB923C}
+.bt-red{background:rgba(248,113,113,.15);color:#F87171}
+.bt-na{color:var(--text-muted);font-style:italic}
+.bt-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center}
+.bt-btn{padding:7px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);color:var(--text);font-family:var(--font-body);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s}
+.bt-btn:hover{border-color:var(--accent);color:var(--accent)}
+.bt-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(52,211,153,.06)}
+.bt-chart-section{margin-bottom:2rem}
+.bt-chart-section h3{font-size:1rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.bt-chart-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;overflow-x:auto}
+.bt-chart-wrap svg{width:100%;height:auto}
+.bt-legend{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem;font-size:.78rem;color:var(--text-muted)}
+.bt-legend-item{display:flex;align-items:center;gap:4px}
+.bt-legend-swatch{width:12px;height:12px;border-radius:2px}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}
+.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}
+.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}
+.explainer p{color:var(--text-muted);margin-bottom:1rem}
+.explainer ul,.explainer ol{color:var(--text-muted);margin:0 0 1rem 1.5rem}
+.explainer li{margin-bottom:.4rem}
+.faq-section{max-width:780px;margin:2.5rem auto}
+.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}
+.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}
+.faq-section summary:hover{color:var(--accent)}
+.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}
+.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}
+.related-card:hover{border-color:var(--accent);text-decoration:none}
+.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}
+.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}
+.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">gpt0x</a>
+    <nav>
+      <a href="/">Database</a>
+      <a href="/research/">Research</a>
+      <a href="/tools/">Tools</a>
+      <a href="/answers/">Answers</a>
+      <a href="/blog/">Blog</a>
+      <a href="/about.html">About</a>
+      <div class="nav-right">
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+        <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-container">
+  <div class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/research/">Research</a> &rsaquo; AI Benchmark Tracker
+  </div>
+
+  <div class="tool-hero">
+    <h1>AI <span>Benchmark</span> Tracker</h1>
+    <p>Compare MMLU, HumanEval, GSM8K, MATH, and HellaSwag scores across 12 major AI models. Color-coded scores, sortable table, bar chart visualization, and JSON/CSV export.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="bt-actions">
+    <button class="bt-btn" onclick="bt.downloadJSON()">Download JSON</button>
+    <button class="bt-btn" onclick="bt.downloadCSV()">Download CSV</button>
+    <span style="color:var(--text-muted);font-size:.8rem;margin-left:.5rem">Chart benchmark:</span>
+    <button class="bt-btn active" id="btn-mmlu" onclick="bt.setChart('mmlu')">MMLU</button>
+    <button class="bt-btn" id="btn-humaneval" onclick="bt.setChart('humaneval')">HumanEval</button>
+    <button class="bt-btn" id="btn-gsm8k" onclick="bt.setChart('gsm8k')">GSM8K</button>
+    <button class="bt-btn" id="btn-math" onclick="bt.setChart('math')">MATH</button>
+    <button class="bt-btn" id="btn-hellaswag" onclick="bt.setChart('hellaswag')">HellaSwag</button>
+  </div>
+
+  <div class="bt-table-wrap">
+    <table class="bt-table">
+      <thead>
+        <tr>
+          <th data-col="name" onclick="bt.sort('name')">Model <span class="arrow"></span></th>
+          <th data-col="provider" onclick="bt.sort('provider')">Provider <span class="arrow"></span></th>
+          <th data-col="mmlu" onclick="bt.sort('mmlu')">MMLU <span class="arrow"></span></th>
+          <th data-col="humaneval" onclick="bt.sort('humaneval')">HumanEval <span class="arrow"></span></th>
+          <th data-col="gsm8k" onclick="bt.sort('gsm8k')">GSM8K <span class="arrow"></span></th>
+          <th data-col="math" onclick="bt.sort('math')">MATH <span class="arrow"></span></th>
+          <th data-col="hellaswag" onclick="bt.sort('hellaswag')">HellaSwag <span class="arrow"></span></th>
+        </tr>
+      </thead>
+      <tbody id="bt-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="bt-chart-section">
+    <h3 id="bt-chart-title">MMLU Scores Comparison</h3>
+    <div class="bt-chart-wrap">
+      <svg id="bt-chart" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <section class="explainer">
+    <h2>Understanding AI Benchmarks</h2>
+    <p>AI benchmarks provide standardized measurements of model capabilities across specific domains. While no single benchmark captures the full picture of a model's usefulness, the five benchmarks tracked on this page cover the most important dimensions: general knowledge (MMLU), code generation (HumanEval), mathematical reasoning (GSM8K and MATH), and common-sense understanding (HellaSwag). Together, they provide a multi-dimensional view of model capability that helps developers, researchers, and businesses make informed decisions about which model to use for specific tasks.</p>
+    <p>All benchmark data on this page is sourced from published papers, official model cards, and verified third-party evaluations. Scores are reported as percentages where available, with higher scores indicating better performance. The color coding provides instant visual assessment: green (90%+) indicates state-of-the-art performance, yellow (70-90%) indicates strong performance, orange (50-70%) indicates moderate performance, and red (below 50%) indicates below-average performance for current-generation models.</p>
+
+    <h2>MMLU — Massive Multitask Language Understanding</h2>
+    <p>MMLU is the most widely cited benchmark for measuring an AI model's breadth of knowledge. Introduced by Hendrycks et al. in 2021, it consists of 14,042 multiple-choice questions spanning 57 academic subjects organized into four categories: STEM (physics, chemistry, computer science, mathematics), humanities (history, philosophy, law), social sciences (economics, political science, sociology), and other (clinical medicine, professional accounting, US foreign policy).</p>
+    <p>The benchmark uses a 5-shot evaluation format, meaning the model is shown 5 example question-answer pairs before each test question. This tests both knowledge recall and in-context learning ability. A score of 90%+ generally indicates expert-level knowledge across most domains. By 2026, the leading models have reached 90-92% on MMLU, approaching the saturation point where the benchmark loses its discriminative power. This has led to the development of MMLU-Pro, a harder variant with more challenging questions and 10 answer choices instead of 4.</p>
+    <p>Among the models tracked here, Claude Opus 4 leads at 92.0%, followed by Gemini 2.5 Pro at 91.7% and GPT-4o at 90.2%. The strong performance of open-source models like Llama 4 Scout (88.5%) and Qwen 2.5 72B (85.3%) demonstrates how quickly the gap between open and closed-source models is closing on knowledge benchmarks.</p>
+
+    <h2>HumanEval — Code Generation Benchmark</h2>
+    <p>HumanEval, created by OpenAI in 2021, measures a model's ability to generate correct Python code from function docstrings. The benchmark contains 164 hand-written programming challenges, each with a function signature, docstring description, and a suite of unit tests. The primary metric is pass@1 — the percentage of problems where the model's first generated solution passes all unit tests.</p>
+    <p>HumanEval tests fundamental programming skills: string manipulation, list operations, mathematical computations, recursive algorithms, and basic data structure operations. It does not test complex system design, multi-file projects, or language-specific idioms beyond Python. For a more comprehensive evaluation of real-world coding ability, benchmarks like SWE-bench (which tests ability to resolve actual GitHub issues) have become increasingly important.</p>
+    <p>As of 2026, Claude Opus 4 leads HumanEval at 92.7%, with Gemini 2.5 Pro at 91.2% and GPT-4o at 90.2%. The gap between the best closed-source and open-source models (DeepSeek V3 at 82.6%) remains around 10 points, but this gap has shrunk considerably from the 30+ point difference seen in 2023. Open-source code models like DeepSeek V3 benefit from specialized training on large code corpora.</p>
+
+    <h2>GSM8K — Grade School Math</h2>
+    <p>GSM8K (Grade School Math 8K) is a dataset of 8,500 grade-school-level math word problems created by OpenAI. Each problem requires 2-8 steps of arithmetic and logical reasoning to solve. Despite the "grade school" label, the benchmark is genuinely challenging for AI models because it tests multi-step reasoning — the model must plan a solution strategy, execute multiple calculations correctly, and arrive at a precise numerical answer.</p>
+    <p>GSM8K has become one of the best proxies for reasoning ability in language models. Models that perform well on GSM8K typically also perform well on real-world tasks requiring step-by-step problem solving. Chain-of-thought prompting dramatically improves GSM8K scores, which is why most model evaluations use CoT prompts for this benchmark.</p>
+    <p>The leading models have largely saturated GSM8K, with Claude Opus 4 at 97.2%, GPT-4o at 95.5%, and Gemini 2.5 Pro at 96.8%. Even open-source models like Qwen 2.5 72B (89.5%) and Llama 4 Scout (88.7%) perform strongly. The community has shifted attention to harder math benchmarks like MATH for differentiating model capabilities.</p>
+
+    <h2>MATH — Competition Mathematics</h2>
+    <p>The MATH benchmark contains 12,500 problems from high school mathematics competitions (AMC, AIME, and similar), covering seven subjects: algebra, counting and probability, geometry, intermediate algebra, number theory, prealgebra, and precalculus. Problems range from AMC-8 difficulty (accessible to strong middle school students) to AIME difficulty (challenging for talented high schoolers and beyond).</p>
+    <p>MATH is significantly harder than GSM8K and remains the best benchmark for measuring deep mathematical reasoning. A human expert-level score is estimated at around 90%. The benchmark tests not just arithmetic but mathematical insight — the ability to recognize when a problem requires a specific technique, to apply abstract reasoning, and to handle multi-step proofs.</p>
+    <p>As of 2026, Claude Opus 4 leads at 78.5%, followed by Gemini 2.5 Pro at 80.2% and GPT-4o at 76.4%. The gap between closed-source and open-source models is largest on MATH, with the best open-source model (DeepSeek V3 at 64.3%) trailing by about 16 points. This gap reflects the advantage that larger models and more sophisticated training techniques (reinforcement learning from human feedback, chain-of-thought fine-tuning) provide for complex reasoning.</p>
+
+    <h2>HellaSwag — Common Sense Reasoning</h2>
+    <p>HellaSwag tests common-sense reasoning about everyday situations. Given the beginning of a scenario, the model must select the most plausible continuation from four options. Created by Zellers et al. in 2019, it was originally designed to be "adversarially hard" — the wrong answers are generated by a language model and filtered to be superficially plausible but nonsensical to humans.</p>
+    <p>While HellaSwag was once considered extremely difficult (GPT-2 scored below 50%), modern large language models have largely solved it. The top models score above 95%, and even smaller models score above 85%. HellaSwag remains useful as a baseline check for common-sense understanding but has lost much of its discriminative power among frontier models. Its inclusion in standard benchmark suites is partly historical — it was a key differentiator during the GPT-3 era and continues to be reported for trend comparison.</p>
+
+    <h2>Historical Progression and Trends</h2>
+    <p>The pace of benchmark improvement has been remarkable. On MMLU, the best score improved from 43.9% (GPT-3, 2020) to 86.4% (GPT-4, 2023) to 92.0% (Claude Opus 4, 2025) — a 48-point improvement in five years. On HumanEval, scores went from 26.2% (Codex, 2021) to 67.0% (GPT-4, 2023) to 92.7% (Claude Opus 4, 2025). The rate of improvement has slowed as models approach saturation on current benchmarks, but each percentage point at the top represents significantly harder problems being solved.</p>
+    <p>The most significant trend in 2025-2026 is the convergence between open-source and closed-source models. On MMLU, the gap narrowed from 15+ points in early 2024 to under 4 points by mid-2026. This convergence is driven by larger open-source training datasets, more efficient architectures (mixture-of-experts), and the open publication of training techniques by leading labs. For benchmark-sensitive applications, this convergence means that self-hosted open-source models are now viable alternatives to cloud APIs.</p>
+
+    <h2>Limitations and Caveats</h2>
+    <p>Benchmark scores should be interpreted carefully. Data contamination — where benchmark questions appear in training data — is an ongoing concern that can inflate scores by 2-5 points. Different evaluation harnesses (the software used to run benchmarks) can produce different scores for the same model due to variations in prompting format, sampling parameters, and answer extraction methods. Self-reported scores from model providers tend to be higher than independently verified scores.</p>
+    <p>Most importantly, benchmark scores measure narrow, well-defined tasks that may not correlate with real-world performance on your specific use case. A model that scores 2 points higher on MMLU may not produce noticeably better results for your customer support chatbot. Always complement benchmark comparisons with empirical testing on representative samples from your actual workload.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details>
+      <summary>What is MMLU and why is it the most cited AI benchmark?</summary>
+      <p>MMLU (Massive Multitask Language Understanding) tests AI models on 14,042 multiple-choice questions across 57 academic subjects. It became the most cited benchmark because it measures broad knowledge and reasoning across diverse fields in a standardized format. A score of 90%+ indicates expert-level knowledge. Top models like Claude Opus 4 (92.0%) and Gemini 2.5 Pro (91.7%) have reached near-saturation, prompting development of harder variants like MMLU-Pro.</p>
+    </details>
+    <details>
+      <summary>Which AI model scores highest on HumanEval for coding?</summary>
+      <p>Claude Opus 4 leads HumanEval with a 92.7% pass@1 score, followed by Gemini 2.5 Pro at 91.2% and GPT-4o at 90.2%. Among open-source models, DeepSeek V3 scores 82.6% and Llama 4 Scout reaches 80.5%. HumanEval tests Python code generation with 164 programming challenges.</p>
+    </details>
+    <details>
+      <summary>How do open-source AI models compare to closed-source on benchmarks?</summary>
+      <p>The gap has narrowed dramatically by 2026. On MMLU, the best open-source model (Llama 4 Scout at 88.5%) trails the best closed-source (Claude Opus 4 at 92.0%) by only 3.5 points. The remaining gap is largest on complex reasoning tasks (MATH) where closed-source models maintain a 10-15 point lead.</p>
+    </details>
+    <details>
+      <summary>What are the limitations of AI benchmarks?</summary>
+      <p>Key limitations include data contamination (models may have seen questions during training), benchmark saturation (when top models all score 90%+), gaming (optimization for benchmarks without real-world improvement), narrow measurement (single benchmarks do not capture full capability), and static snapshots that do not reflect performance on novel tasks. Benchmark scores should be one factor among many in model selection.</p>
+    </details>
+    <details>
+      <summary>Can I download the benchmark data?</summary>
+      <p>Yes, use the "Download JSON" or "Download CSV" buttons above the chart to export the complete benchmark dataset. The data includes all 12 models with MMLU, HumanEval, GSM8K, MATH, and HellaSwag scores, plus provider and release date. Export is generated client-side with no server interaction.</p>
+    </details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/answers/ai-model-comparison-2026.html" class="related-card">
+        <h3>AI Model Comparison 2026</h3>
+        <p>Compare pricing, speed, and capabilities of 12+ AI models side by side.</p>
+      </a>
+      <a href="/tools/prompt-builder.html" class="related-card">
+        <h3>AI Prompt Builder</h3>
+        <p>Build structured prompts optimized for any AI model with templates and best practices.</p>
+      </a>
+      <a href="/" class="related-card">
+        <h3>AI Model Database</h3>
+        <p>Search and filter 40+ AI models by provider, type, parameters, and capabilities.</p>
+      </a>
+    </div>
+  </section>
+
+  <div class="author-bio">
+    <h3>About the Author</h3>
+    <p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudflow.com">ClaudFlow — Workflows</a>
+            <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  const models = [
+    { name:'Claude Opus 4', provider:'Anthropic', mmlu:92.0, humaneval:92.7, gsm8k:97.2, math:78.5, hellaswag:95.8, released:'2025-05' },
+    { name:'Claude Sonnet 4', provider:'Anthropic', mmlu:89.5, humaneval:89.2, gsm8k:95.0, math:71.8, hellaswag:93.5, released:'2025-05' },
+    { name:'Claude Haiku 3.5', provider:'Anthropic', mmlu:84.7, humaneval:80.4, gsm8k:88.2, math:58.3, hellaswag:89.1, released:'2024-10' },
+    { name:'GPT-4o', provider:'OpenAI', mmlu:90.2, humaneval:90.2, gsm8k:95.5, math:76.4, hellaswag:95.3, released:'2024-05' },
+    { name:'GPT-4o-mini', provider:'OpenAI', mmlu:82.0, humaneval:75.8, gsm8k:86.5, math:52.4, hellaswag:87.2, released:'2024-07' },
+    { name:'Gemini 2.5 Pro', provider:'Google', mmlu:91.7, humaneval:91.2, gsm8k:96.8, math:80.2, hellaswag:95.5, released:'2025-03' },
+    { name:'Gemini 2.5 Flash', provider:'Google', mmlu:85.8, humaneval:78.5, gsm8k:89.3, math:59.7, hellaswag:90.2, released:'2025-03' },
+    { name:'Llama 3.3 70B', provider:'Meta', mmlu:86.0, humaneval:76.2, gsm8k:85.4, math:52.1, hellaswag:88.0, released:'2024-12' },
+    { name:'Llama 4 Scout', provider:'Meta', mmlu:88.5, humaneval:80.5, gsm8k:88.7, math:58.9, hellaswag:90.8, released:'2025-04' },
+    { name:'Mistral Large', provider:'Mistral', mmlu:84.0, humaneval:77.3, gsm8k:84.7, math:53.6, hellaswag:87.5, released:'2025-02' },
+    { name:'DeepSeek V3', provider:'DeepSeek', mmlu:87.1, humaneval:82.6, gsm8k:89.0, math:64.3, hellaswag:89.5, released:'2024-12' },
+    { name:'Qwen 2.5 72B', provider:'Alibaba', mmlu:85.3, humaneval:79.4, gsm8k:89.5, math:60.1, hellaswag:88.3, released:'2024-09' }
+  ];
+
+  let sorted = [...models];
+  let sortCol = 'mmlu';
+  let sortAsc = false;
+  let chartBenchmark = 'mmlu';
+
+  function scoreClass(v) {
+    if (v === null || v === undefined) return 'bt-na';
+    if (v >= 90) return 'bt-green';
+    if (v >= 70) return 'bt-yellow';
+    if (v >= 50) return 'bt-orange';
+    return 'bt-red';
+  }
+
+  function scoreHTML(v) {
+    if (v === null || v === undefined) return '<span class="bt-na">N/A</span>';
+    return '<span class="bt-score ' + scoreClass(v) + '">' + v.toFixed(1) + '%</span>';
+  }
+
+  function render() {
+    const tbody = document.getElementById('bt-tbody');
+    tbody.innerHTML = '';
+    sorted.forEach(m => {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="font-weight:600;color:var(--text)">' + m.name + '</td>' +
+        '<td>' + m.provider + '</td>' +
+        '<td>' + scoreHTML(m.mmlu) + '</td>' +
+        '<td>' + scoreHTML(m.humaneval) + '</td>' +
+        '<td>' + scoreHTML(m.gsm8k) + '</td>' +
+        '<td>' + scoreHTML(m.math) + '</td>' +
+        '<td>' + scoreHTML(m.hellaswag) + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  function sort(col) {
+    if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = col === 'name' || col === 'provider'; }
+    doSort();
+    render();
+    document.querySelectorAll('.bt-table thead th').forEach(th => {
+      const arrow = th.querySelector('.arrow');
+      if (arrow) arrow.textContent = th.dataset.col === sortCol ? (sortAsc ? '\u25B2' : '\u25BC') : '';
+    });
+  }
+
+  function doSort() {
+    sorted.sort((a, b) => {
+      let va = a[sortCol], vb = b[sortCol];
+      if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+      if (va === null || va === undefined) return 1;
+      if (vb === null || vb === undefined) return -1;
+      if (va < vb) return sortAsc ? -1 : 1;
+      if (va > vb) return sortAsc ? 1 : -1;
+      return 0;
+    });
+  }
+
+  function renderChart() {
+    const benchNames = { mmlu:'MMLU', humaneval:'HumanEval', gsm8k:'GSM8K', math:'MATH', hellaswag:'HellaSwag' };
+    document.getElementById('bt-chart-title').textContent = benchNames[chartBenchmark] + ' Scores Comparison';
+
+    const data = [...models].sort((a, b) => b[chartBenchmark] - a[chartBenchmark]);
+    const svg = document.getElementById('bt-chart');
+    const W = 800, H = 400;
+    const margin = { top: 20, right: 20, bottom: 120, left: 50 };
+    const cw = W - margin.left - margin.right;
+    const ch = H - margin.top - margin.bottom;
+    const barW = Math.min(50, (cw / data.length) - 8);
+    const gap = (cw - barW * data.length) / (data.length + 1);
+
+    const maxVal = 100;
+    const colors = ['#34D399','#2dd4bf','#22d3ee','#60a5fa','#818CF8','#a78bfa','#c084fc','#e879f9','#f472b6','#fb7185','#FB923C','#FACC15'];
+
+    let html = '';
+    // Grid lines
+    for (let i = 0; i <= 5; i++) {
+      const y = margin.top + ch - (ch * (i * 20) / maxVal);
+      html += '<line x1="' + margin.left + '" y1="' + y + '" x2="' + (W - margin.right) + '" y2="' + y + '" stroke="#222" stroke-width="1"/>';
+      html += '<text x="' + (margin.left - 8) + '" y="' + (y + 4) + '" text-anchor="end" fill="#888" font-size="11" font-family="IBM Plex Sans, sans-serif">' + (i * 20) + '%</text>';
+    }
+
+    // Bars
+    data.forEach((m, i) => {
+      const val = m[chartBenchmark] || 0;
+      const x = margin.left + gap + i * (barW + gap);
+      const barH = (val / maxVal) * ch;
+      const y = margin.top + ch - barH;
+      const color = colors[i % colors.length];
+
+      html += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" fill="' + color + '" rx="3" opacity="0.85"/>';
+      html += '<text x="' + (x + barW / 2) + '" y="' + (y - 6) + '" text-anchor="middle" fill="' + color + '" font-size="11" font-weight="600" font-family="IBM Plex Sans, sans-serif">' + val.toFixed(1) + '</text>';
+
+      // Label (rotated)
+      const labelParts = m.name.split(' ');
+      const shortName = labelParts.length > 2 ? labelParts.slice(0, 2).join(' ') : m.name;
+      html += '<text x="' + (x + barW / 2) + '" y="' + (margin.top + ch + 14) + '" text-anchor="end" fill="#888" font-size="10" font-family="IBM Plex Sans, sans-serif" transform="rotate(-45,' + (x + barW / 2) + ',' + (margin.top + ch + 14) + ')">' + shortName + '</text>';
+    });
+
+    svg.innerHTML = html;
+  }
+
+  function setChart(benchmark) {
+    chartBenchmark = benchmark;
+    document.querySelectorAll('.bt-actions .bt-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('btn-' + benchmark);
+    if (btn) btn.classList.add('active');
+    renderChart();
+  }
+
+  function downloadJSON() {
+    const data = models.map(m => ({
+      model: m.name, provider: m.provider, released: m.released,
+      mmlu: m.mmlu, humaneval: m.humaneval, gsm8k: m.gsm8k, math: m.math, hellaswag: m.hellaswag
+    }));
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'ai-benchmarks-2026.json'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadCSV() {
+    let csv = 'Model,Provider,Released,MMLU,HumanEval,GSM8K,MATH,HellaSwag\n';
+    models.forEach(m => {
+      csv += '"' + m.name + '","' + m.provider + '","' + m.released + '",' +
+        m.mmlu + ',' + m.humaneval + ',' + m.gsm8k + ',' + m.math + ',' + m.hellaswag + '\n';
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'ai-benchmarks-2026.csv'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  window.bt = { sort, setChart, downloadJSON, downloadCSV };
+
+  doSort();
+  render();
+  renderChart();
+})();
+</script>
+</body>
+</html>

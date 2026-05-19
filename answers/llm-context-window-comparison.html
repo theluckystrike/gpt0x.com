@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Context Window Comparison — All Models Ranked by Size (2026) | GPT0X</title>
+<meta name="description" content="Compare context window sizes across all major AI models: GPT-4o (128K), Claude Opus 4 (200K), Gemini 2.5 Pro (1M), and more. Interactive table with effective limits, pricing impact, and practical recommendations for long-context tasks.">
+<meta name="keywords" content="context window comparison, LLM context size, GPT context window, Claude context window, Gemini context window, long context LLM, context length comparison, AI model context limits">
+<link rel="canonical" href="https://gpt0x.com/answers/llm-context-window-comparison.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/answers/llm-context-window-comparison.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/answers/llm-context-window-comparison.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLM Context Window Comparison — All Models Ranked by Size (2026)">
+<meta property="og:description" content="Compare context windows across GPT-4o, Claude, Gemini, and all major AI models with practical recommendations.">
+<meta property="og:url" content="https://gpt0x.com/answers/llm-context-window-comparison.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LLM Context Window Comparison — All Models Ranked by Size (2026)">
+<meta name="twitter:description" content="Compare context windows across all major AI models.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"LLM Context Window Comparison — All Models Ranked by Size","url":"https://gpt0x.com/answers/llm-context-window-comparison.html","description":"Compare context window sizes across all major AI models.","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"},"publisher":{"@type":"Organization","name":"GPT0X","url":"https://gpt0x.com"},"datePublished":"2026-05-25","dateModified":"2026-05-25","mainEntityOfPage":"https://gpt0x.com/answers/llm-context-window-comparison.html"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Which AI model has the largest context window?","acceptedAnswer":{"@type":"Answer","text":"Gemini 2.5 Pro has the largest context window at 1 million tokens, equivalent to approximately 750,000 words or 1,500 pages of text. Gemini 2.5 Flash also supports 1M tokens. Claude Opus 4 and Sonnet 4 support 200K tokens. GPT-4o supports 128K tokens. For open-source models, Llama 3.3 supports 128K and some fine-tuned variants support up to 256K. The practical effective limit is often lower than the advertised maximum due to quality degradation at extreme lengths."}},
+{"@type":"Question","name":"How many pages of text fit in a 128K context window?","acceptedAnswer":{"@type":"Answer","text":"A 128K token context window holds approximately 96,000 words or about 190 pages of standard text (500 words per page). In practical terms: one full-length novel (80K-100K words), 300+ standard web pages, or about 50,000 lines of code. However, you need to reserve tokens for the output (typically 2K-8K tokens), so the effective input capacity is 120K-126K tokens. For code, where token density is higher (more tokens per word), the capacity in lines of code may be 20-30% lower."}},
+{"@type":"Question","name":"Does model quality degrade with longer contexts?","acceptedAnswer":{"@type":"Answer","text":"Yes. Research on 'lost in the middle' shows that models attend less to information in the center of long contexts compared to the beginning and end. GPT-4o and Claude maintain strong performance up to about 60-70% of their context window. Beyond that, recall for specific facts embedded in the middle of the context drops measurably. Gemini 2.5 Pro demonstrates better long-context consistency, likely due to training optimizations for its 1M window. For critical accuracy, keep important information in the first or last 20% of the context."}},
+{"@type":"Question","name":"How much does it cost to fill a full context window?","acceptedAnswer":{"@type":"Answer","text":"Filling the full context window is expensive. GPT-4o at 128K input tokens costs $0.32 per request (input only). Claude Opus 4 at 200K input tokens costs $3.00 per request. Gemini 2.5 Pro at 1M tokens costs $1.25 per request. Adding output costs, a single full-context GPT-4o request with 4K output tokens costs approximately $0.36. Prompt caching can dramatically reduce these costs for repeated long-context requests — up to 90% savings when the prefix is cached."}},
+{"@type":"Question","name":"When should I use RAG vs a large context window?","acceptedAnswer":{"@type":"Answer","text":"Use RAG when your knowledge base exceeds 50-100 pages, when you need to search across many documents, or when cost matters (RAG retrieves only relevant chunks). Use a large context window when the entire document fits within the window, when document structure matters (cross-references, narrative flow), or when you need to analyze the complete document holistically. Hybrid approaches work well: use RAG to find the most relevant documents, then load the top 3-5 complete documents into the context window for detailed analysis."}}
+]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://gpt0x.com/"},{"@type":"ListItem","position":2,"name":"Answers","item":"https://gpt0x.com/answers/"},{"@type":"ListItem","position":3,"name":"Context Window Comparison","item":"https://gpt0x.com/answers/llm-context-window-comparison.html"}]}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}.tool-hero h1 span{color:var(--accent)}.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.cw-table-wrap{overflow-x:auto;margin-bottom:2rem}.cw-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.cw-table th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.3px;padding:.6rem .5rem;text-align:left;border:1px solid var(--border);white-space:nowrap}
+.cw-table td{padding:.5rem;border:1px solid var(--border);color:var(--text-muted)}.cw-table tr:hover td{background:var(--bg-card)}.cw-table .cw-hl{color:var(--accent);font-weight:600}
+.cw-bar{display:inline-block;height:16px;background:var(--accent);border-radius:3px;min-width:4px;opacity:.7}
+.cw-filters{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}.cw-filters select{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 12px;font-family:var(--font-body);font-size:.83rem}.cw-filters select:focus{outline:none;border-color:var(--accent)}
+.cw-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.cw-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.cw-field{margin-bottom:1rem}.cw-field label{display:block;font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px}
+.cw-field input,.cw-field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-family:var(--font-body);font-size:.83rem}.cw-field input:focus,.cw-field select:focus{outline:none;border-color:var(--accent)}
+.cw-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;background:var(--accent);color:#000}.cw-btn:hover{opacity:.85}
+.cw-result{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-top:1rem;font-size:.85rem;color:var(--text-muted)}.cw-result strong{color:var(--accent)}
+.cw-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}@media(max-width:768px){.cw-grid{grid-template-columns:1fr}}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}.explainer p{color:var(--text-muted);margin-bottom:1rem}.explainer ul{color:var(--text-muted);margin:0 0 1rem 1.5rem}.explainer li{margin-bottom:.4rem}
+.explainer table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}.explainer th,.explainer td{padding:.5rem .75rem;border:1px solid var(--border);text-align:left}.explainer th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}.explainer td{color:var(--text-muted)}
+.faq-section{max-width:780px;margin:2.5rem auto}.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}.faq-section summary:hover{color:var(--accent)}.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}.related-card:hover{border-color:var(--accent);text-decoration:none}.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header><div class="container"><a href="/" class="logo">gpt0x</a><nav><a href="/">Database</a><a href="/research/">Research</a><a href="/tools/">Tools</a><a href="/answers/">Answers</a><a href="/blog/">Blog</a><a href="/about.html">About</a><div class="nav-right"><a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a><a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a></div></nav></div></header>
+
+<main class="tool-container">
+  <div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/answers/">Answers</a> &rsaquo; Context Window Comparison</div>
+  <div class="tool-hero">
+    <h1>LLM <span>Context Window</span> Comparison</h1>
+    <p>Compare context window sizes across every major AI model. Interactive table with token counts, word equivalents, page estimates, and cost to fill. Includes effective limits (where quality starts degrading) and recommendations for long-context tasks. Updated May 2026.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="cw-filters">
+    <select id="cw-provider" onchange="cw.filter()"><option value="all">All Providers</option><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="google">Google</option><option value="meta">Meta</option><option value="other">Other</option></select>
+    <select id="cw-sort" onchange="cw.filter()"><option value="context">Sort by Context Size</option><option value="effective">Sort by Effective Limit</option><option value="cost">Sort by Fill Cost</option><option value="name">Sort by Name</option></select>
+  </div>
+
+  <div class="cw-table-wrap"><table class="cw-table"><thead><tr><th>Model</th><th>Provider</th><th>Context (tokens)</th><th>~Words</th><th>~Pages</th><th>Effective Limit</th><th>Fill Cost (input)</th><th>Visual</th></tr></thead><tbody id="cw-tbody"></tbody></table></div>
+
+  <div class="cw-grid">
+    <div class="cw-panel">
+      <h3>Document Fit Calculator</h3>
+      <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Check if your document fits in a model's context window.</p>
+      <div class="cw-field"><label>Document word count</label><input type="number" id="cw-words" value="50000" min="100"></div>
+      <div class="cw-field"><label>Content type</label><select id="cw-content"><option value="1.3">English prose (~1.3 tokens/word)</option><option value="1.8">Source code (~1.8 tokens/word)</option><option value="2.5">JSON data (~2.5 tokens/word)</option><option value="2.0">Mixed content (~2.0 tokens/word)</option></select></div>
+      <div class="cw-field"><label>Reserve for output (tokens)</label><input type="number" id="cw-reserve" value="4096" min="256"></div>
+      <button class="cw-btn" onclick="cw.checkFit()">Check Fit</button>
+      <div class="cw-result" id="cw-fit-result">Enter document details and click "Check Fit".</div>
+    </div>
+    <div class="cw-panel">
+      <h3>Context Cost Calculator</h3>
+      <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Estimate the cost of using different percentages of the context window.</p>
+      <div class="cw-field"><label>Model</label><select id="cw-cost-model"><option value="gpt4o">GPT-4o (128K, $2.50/1M)</option><option value="opus4">Claude Opus 4 (200K, $15/1M)</option><option value="sonnet4">Claude Sonnet 4 (200K, $3/1M)</option><option value="gemini25pro">Gemini 2.5 Pro (1M, $1.25/1M)</option><option value="gemini25flash">Gemini 2.5 Flash (1M, $0.15/1M)</option></select></div>
+      <div class="cw-field"><label>Context utilization (%)</label><input type="number" id="cw-util" value="50" min="1" max="100"></div>
+      <div class="cw-field"><label>Requests per month</label><input type="number" id="cw-cost-reqs" value="1000" min="1"></div>
+      <button class="cw-btn" onclick="cw.calcCost()">Calculate</button>
+      <div class="cw-result" id="cw-cost-result">Select a model and click "Calculate".</div>
+    </div>
+  </div>
+
+  <section class="explainer">
+    <h2>Understanding Context Windows in 2026</h2>
+    <p>A context window is the total number of tokens an AI model can process in a single request, including both input (your prompt) and output (the model's response). Think of it as the model's working memory — everything it needs to consider must fit within this window. Context window sizes have expanded dramatically: GPT-3 started with 4K tokens in 2020, and by 2026, Gemini 2.5 Pro offers 1 million tokens. This expansion enables entirely new use cases, from analyzing entire codebases to processing full-length books in a single prompt.</p>
+
+    <h2>Context Window Sizes Compared</h2>
+    <table>
+      <tr><th>Model</th><th>Context</th><th>~Words</th><th>~Pages</th><th>Use Case</th></tr>
+      <tr><td>Gemini 2.5 Pro</td><td>1,000,000</td><td>750,000</td><td>1,500</td><td>Full codebases, multiple books</td></tr>
+      <tr><td>Gemini 2.5 Flash</td><td>1,000,000</td><td>750,000</td><td>1,500</td><td>Large document processing</td></tr>
+      <tr><td>Claude Opus 4</td><td>200,000</td><td>150,000</td><td>300</td><td>Long documents, analysis</td></tr>
+      <tr><td>Claude Sonnet 4</td><td>200,000</td><td>150,000</td><td>300</td><td>Multi-document analysis</td></tr>
+      <tr><td>GPT-4o</td><td>128,000</td><td>96,000</td><td>190</td><td>Large reports, codebases</td></tr>
+      <tr><td>o3</td><td>200,000</td><td>150,000</td><td>300</td><td>Complex reasoning over large inputs</td></tr>
+      <tr><td>Llama 3.3 70B</td><td>128,000</td><td>96,000</td><td>190</td><td>Self-hosted long context</td></tr>
+    </table>
+
+    <h2>Effective vs Advertised Limits</h2>
+    <p>The advertised context window and the effective context window are not the same. Research on the "lost in the middle" phenomenon shows that models attend less carefully to information placed in the middle of very long contexts. For GPT-4o, information recall remains strong up to about 80K tokens (~60% of the window) and then degrades. Claude models maintain better consistency up to about 150K of their 200K window. Gemini 2.5 Pro shows the best long-context consistency, maintaining recall up to about 700K tokens. For critical accuracy, place the most important information at the beginning or end of your prompt.</p>
+
+    <h2>Practical Implications</h2>
+    <h3>Cost of Long Context</h3>
+    <p>Using more context costs more money — linearly. Filling GPT-4o's 128K window costs $0.32 per request in input tokens alone. For 1,000 requests per month, that is $320 just in input costs. Gemini 2.5 Pro at 1M tokens costs $1.25 per request. Most applications do not need to fill the entire context window. The cost calculator above helps you estimate the financial impact of different utilization levels.</p>
+
+    <h3>RAG vs Long Context</h3>
+    <p>For knowledge bases under 100 pages, loading the entire content into a long context window can outperform RAG because the model has full access to all information simultaneously. For larger knowledge bases, RAG remains more cost-effective and scalable. A hybrid approach works best: use RAG to find the most relevant documents, then load those complete documents into the context window for thorough analysis. This gives you the precision of RAG with the comprehensiveness of full-document context.</p>
+
+    <h3>Optimal Context Utilization</h3>
+    <p>For most tasks, staying under 50% of the context window provides the best balance of quality, cost, and output capacity. This leaves ample room for the model's response and avoids the quality degradation zone. For tasks that genuinely require full-context analysis (code review of entire files, summarization of complete documents), use the full window but verify the model's attention to middle sections by including test questions about information placed there.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details><summary>Which AI model has the largest context window?</summary><p>Gemini 2.5 Pro at 1 million tokens (~750,000 words, ~1,500 pages). Claude models support 200K tokens. GPT-4o supports 128K tokens.</p></details>
+    <details><summary>How many pages fit in a 128K context window?</summary><p>About 190 pages of standard text (96K words). Reserve 2K-8K tokens for output, leaving 120K-126K effective input capacity.</p></details>
+    <details><summary>Does model quality degrade with longer contexts?</summary><p>Yes. The "lost in the middle" effect reduces attention to information in the center. GPT-4o maintains strong recall up to ~60% of context. Claude up to ~75%. Gemini 2.5 Pro up to ~70%.</p></details>
+    <details><summary>How much does it cost to fill a full context window?</summary><p>GPT-4o 128K: $0.32/request. Claude Opus 4 200K: $3.00/request. Gemini 2.5 Pro 1M: $1.25/request. Prompt caching reduces repeat costs by up to 90%.</p></details>
+    <details><summary>When should I use RAG vs a large context window?</summary><p>Use long context for documents under 100 pages where full-document analysis is needed. Use RAG for large knowledge bases and cost-sensitive applications. Hybrid approaches combine the best of both.</p></details>
+  </section>
+
+  <section class="related-tools"><h2>Related Tools</h2><div class="related-grid"><a href="/tools/token-counter.html" class="related-card"><h3>Token Counter</h3><p>Count tokens to check if your content fits a model's context window.</p></a><a href="/tools/ai-cost-estimator.html" class="related-card"><h3>Cost Estimator</h3><p>Project monthly costs based on context utilization.</p></a><a href="/guides/rag-pipeline-builder.html" class="related-card"><h3>RAG Builder</h3><p>Design RAG pipelines when content exceeds context limits.</p></a></div></section>
+  <div class="author-bio"><h3>About the Author</h3><p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p></div>
+</main>
+<footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Zovo Tools</div><div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div><a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a><div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div></div></footer>
+<nav class="zovo-network" aria-label="Zovo Tools Network"><div class="zovo-network-inner"><h3 class="zovo-network-title">Explore More Tools</h3><div class="zovo-network-links"><a href="https://abwex.com">ABWex — A/B Testing</a><a href="https://claudflow.com">ClaudFlow — Workflows</a><a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a><a href="https://claudkit.com">ClaudKit — API</a><a href="https://enhio.com">Enhio — Text Tools</a><a href="https://epochpilot.com">EpochPilot — Timestamps</a><a href="https://gen8x.com">Gen8X — Color Tools</a><a href="https://heytensor.com">HeyTensor — ML Tools</a><a href="https://invokebot.com">InvokeBot — Webhooks</a><a href="https://kappafy.com">Kappafy — JSON</a><a href="https://kappakit.com">KappaKit — Dev Toolkit</a><a href="https://kickllm.com">KickLLM — LLM Costs</a><a href="https://krzen.com">Krzen — Image Tools</a><a href="https://lochbot.com">LochBot — Security</a><a href="https://lockml.com">LockML — ML Compare</a><a href="https://ml3x.com">ML3X — Matrix Math</a></div></div></nav>
+
+<script>
+(function(){
+  const data = [
+    { name:'Gemini 2.5 Pro', provider:'google', ctx:1000000, effective:700000, inputPer1M:1.25 },
+    { name:'Gemini 2.5 Flash', provider:'google', ctx:1000000, effective:700000, inputPer1M:0.15 },
+    { name:'Claude Opus 4', provider:'anthropic', ctx:200000, effective:150000, inputPer1M:15.00 },
+    { name:'Claude Sonnet 4', provider:'anthropic', ctx:200000, effective:150000, inputPer1M:3.00 },
+    { name:'Claude Haiku 3.5', provider:'anthropic', ctx:200000, effective:150000, inputPer1M:0.80 },
+    { name:'o3', provider:'openai', ctx:200000, effective:140000, inputPer1M:10.00 },
+    { name:'o3-mini', provider:'openai', ctx:200000, effective:140000, inputPer1M:1.10 },
+    { name:'o4-mini', provider:'openai', ctx:200000, effective:140000, inputPer1M:1.10 },
+    { name:'GPT-4o', provider:'openai', ctx:128000, effective:100000, inputPer1M:2.50 },
+    { name:'GPT-4o Mini', provider:'openai', ctx:128000, effective:100000, inputPer1M:0.15 },
+    { name:'Llama 3.3 70B', provider:'meta', ctx:128000, effective:90000, inputPer1M:0.60 },
+    { name:'Llama 3.3 8B', provider:'meta', ctx:128000, effective:90000, inputPer1M:0.10 },
+    { name:'DeepSeek V3', provider:'other', ctx:128000, effective:80000, inputPer1M:0.27 },
+    { name:'DeepSeek R1', provider:'other', ctx:128000, effective:80000, inputPer1M:0.55 },
+    { name:'Mistral Large', provider:'other', ctx:128000, effective:80000, inputPer1M:2.00 },
+    { name:'Qwen 2.5 72B', provider:'other', ctx:128000, effective:80000, inputPer1M:0.30 }
+  ];
+  const maxCtx = 1000000;
+  const costModels = { gpt4o:{ctx:128000,input:2.50}, opus4:{ctx:200000,input:15.00}, sonnet4:{ctx:200000,input:3.00}, gemini25pro:{ctx:1000000,input:1.25}, gemini25flash:{ctx:1000000,input:0.15} };
+
+  function renderTable(list) {
+    const tbody = document.getElementById('cw-tbody');
+    let html = '';
+    list.forEach(m => {
+      const words = Math.round(m.ctx * 0.75);
+      const pages = Math.round(words / 500);
+      const fillCost = (m.ctx / 1000000) * m.inputPer1M;
+      const barPct = (m.ctx / maxCtx * 100).toFixed(1);
+      html += '<tr><td style="font-weight:600;color:var(--text)">'+m.name+'</td><td>'+m.provider.charAt(0).toUpperCase()+m.provider.slice(1)+'</td>';
+      html += '<td class="cw-hl">'+m.ctx.toLocaleString()+'</td><td>'+words.toLocaleString()+'</td><td>'+pages.toLocaleString()+'</td>';
+      html += '<td>'+m.effective.toLocaleString()+'</td><td>$'+fillCost.toFixed(2)+'</td>';
+      html += '<td><span class="cw-bar" style="width:'+barPct+'%"></span></td></tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  function filter() {
+    const provider = document.getElementById('cw-provider').value;
+    const sort = document.getElementById('cw-sort').value;
+    let filtered = [...data];
+    if (provider !== 'all') filtered = filtered.filter(m => m.provider === provider);
+    if (sort === 'context') filtered.sort((a,b) => b.ctx - a.ctx);
+    else if (sort === 'effective') filtered.sort((a,b) => b.effective - a.effective);
+    else if (sort === 'cost') filtered.sort((a,b) => (a.ctx/1000000*a.inputPer1M) - (b.ctx/1000000*b.inputPer1M));
+    else filtered.sort((a,b) => a.name.localeCompare(b.name));
+    renderTable(filtered);
+  }
+
+  function checkFit() {
+    const words = parseInt(document.getElementById('cw-words').value) || 50000;
+    const ratio = parseFloat(document.getElementById('cw-content').value);
+    const reserve = parseInt(document.getElementById('cw-reserve').value) || 4096;
+    const tokens = Math.ceil(words * ratio);
+    const totalNeeded = tokens + reserve;
+    let html = 'Your document: <strong>'+words.toLocaleString()+' words = ~'+tokens.toLocaleString()+' tokens</strong> (+ '+reserve.toLocaleString()+' output reserve = '+totalNeeded.toLocaleString()+' total)<br><br>';
+    data.forEach(m => {
+      const fits = totalNeeded <= m.ctx;
+      const pct = (totalNeeded / m.ctx * 100).toFixed(0);
+      const icon = fits ? '<span style="color:#34d399;font-weight:700">FITS</span>' : '<span style="color:#f472b6;font-weight:700">TOO LARGE</span>';
+      const cost = (tokens / 1000000) * m.inputPer1M;
+      if (fits || pct < 200) {
+        html += icon+' '+m.name+' ('+m.ctx.toLocaleString()+' tokens) — '+pct+'% utilized — $'+cost.toFixed(4)+' input cost<br>';
+      }
+    });
+    document.getElementById('cw-fit-result').innerHTML = html;
+  }
+
+  function calcCost() {
+    const key = document.getElementById('cw-cost-model').value;
+    const m = costModels[key];
+    const util = parseInt(document.getElementById('cw-util').value) || 50;
+    const reqs = parseInt(document.getElementById('cw-cost-reqs').value) || 1000;
+    const inputTokens = Math.round(m.ctx * util / 100);
+    const costPerReq = (inputTokens / 1000000) * m.input;
+    const monthly = costPerReq * reqs;
+    document.getElementById('cw-cost-result').innerHTML =
+      'Context used: <strong>'+inputTokens.toLocaleString()+' tokens</strong> ('+util+'% of '+m.ctx.toLocaleString()+')<br>'+
+      'Cost per request (input only): <strong>$'+costPerReq.toFixed(4)+'</strong><br>'+
+      'Monthly cost ('+reqs.toLocaleString()+' requests): <strong>$'+monthly.toFixed(2)+'</strong><br>'+
+      'Annual cost: <strong>$'+(monthly*12).toFixed(2)+'</strong>';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() { filter(); });
+  window.cw = { filter, checkFit, calcCost };
+})();
+</script>
+</body>
+</html>

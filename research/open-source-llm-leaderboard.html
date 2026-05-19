@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open-Source LLM Leaderboard — Interactive Benchmark Rankings (2026) | GPT0X</title>
+<meta name="description" content="Interactive leaderboard of open-source LLMs ranked by MMLU, HumanEval, GSM8K, MATH, MT-Bench, and more. Filter by model size, license, and benchmark. Compare Llama 3.3, DeepSeek, Qwen, Mistral, and 30+ models. Updated May 2026.">
+<meta name="keywords" content="open source LLM leaderboard, AI model rankings, MMLU scores, HumanEval benchmark, LLM comparison, Llama 3 benchmark, DeepSeek benchmark, open source AI models, model evaluation">
+<link rel="canonical" href="https://gpt0x.com/research/open-source-llm-leaderboard.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/research/open-source-llm-leaderboard.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/research/open-source-llm-leaderboard.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Open-Source LLM Leaderboard — Interactive Benchmark Rankings (2026)">
+<meta property="og:description" content="Interactive leaderboard of open-source LLMs with benchmark filtering and model comparisons.">
+<meta property="og:url" content="https://gpt0x.com/research/open-source-llm-leaderboard.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Open-Source LLM Leaderboard — Interactive Benchmark Rankings (2026)">
+<meta name="twitter:description" content="Interactive leaderboard of open-source LLMs with benchmark filtering.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"Open-Source LLM Leaderboard — Interactive Benchmark Rankings","url":"https://gpt0x.com/research/open-source-llm-leaderboard.html","description":"Interactive leaderboard of open-source LLMs ranked by multiple benchmarks with filtering.","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"},"publisher":{"@type":"Organization","name":"GPT0X","url":"https://gpt0x.com"},"datePublished":"2026-05-25","dateModified":"2026-05-25","mainEntityOfPage":"https://gpt0x.com/research/open-source-llm-leaderboard.html"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"What is the best open-source LLM in 2026?","acceptedAnswer":{"@type":"Answer","text":"As of May 2026, Llama 3.3 70B leads among open-weight models on most general benchmarks (MMLU 86.0, HumanEval 82.3). DeepSeek V3 offers the best quality-to-cost ratio with near-GPT-4 performance. Qwen 2.5 72B excels at multilingual tasks. For smaller models, Llama 3.3 8B and Mistral 7B offer the best performance per parameter. The best choice depends on your deployment constraints: GPU memory, latency requirements, and license restrictions."}},
+{"@type":"Question","name":"How do open-source LLMs compare to GPT-4o and Claude?","acceptedAnswer":{"@type":"Answer","text":"The gap has narrowed dramatically. Llama 3.3 70B matches GPT-4o on coding benchmarks (HumanEval) and comes within 3-5% on MMLU. DeepSeek V3 and R1 match or exceed GPT-4o on math reasoning (GSM8K, MATH). However, closed models still lead on complex multi-step reasoning, instruction following consistency, and safety. For many production tasks — classification, extraction, summarization, code generation — the top open-source models are functionally equivalent to closed models at 5-20x lower cost when self-hosted."}},
+{"@type":"Question","name":"What GPU do I need to run a 70B parameter model?","acceptedAnswer":{"@type":"Answer","text":"A 70B model requires approximately 140GB of VRAM in float16 (2 bytes per parameter). In practice: 2x A100 80GB (or 2x H100) for float16 inference, 1x A100 80GB for 4-bit quantized (GPTQ/AWQ), or 1x RTX 4090 24GB for 4-bit quantized with offloading (slow). Cloud costs range from $2-6/hr for dual A100 setups. For production serving, a single H100 with 80GB VRAM running a 4-bit quantized 70B model can serve 50-100+ concurrent requests at reasonable latency using vLLM or TGI."}},
+{"@type":"Question","name":"What do the different benchmarks measure?","acceptedAnswer":{"@type":"Answer","text":"MMLU (Massive Multitask Language Understanding) tests broad knowledge across 57 subjects. HumanEval measures code generation ability with Python programming tasks. GSM8K tests grade-school math word problem solving. MATH evaluates advanced mathematical reasoning including algebra and calculus. MT-Bench uses GPT-4 as a judge to rate multi-turn conversation quality on a 1-10 scale. ARC tests scientific reasoning. Each benchmark captures a different capability — no single benchmark predicts overall model quality. We recommend evaluating on the benchmarks most relevant to your specific use case."}},
+{"@type":"Question","name":"Are open-source LLMs safe to use in production?","acceptedAnswer":{"@type":"Answer","text":"Open-source LLMs require more safety engineering than commercial APIs. Models like Llama 3.3 include built-in safety training, but it is less comprehensive than GPT-4o or Claude's safety layers. For production deployment: add an output filter for toxicity and PII, implement content moderation on inputs and outputs, use guardrails frameworks (NeMo Guardrails, Guardrails AI) for structured safety enforcement, and conduct domain-specific red-teaming. The tradeoff is more engineering effort for more control and customizability over safety behaviors."}}
+]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://gpt0x.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://gpt0x.com/research/"},{"@type":"ListItem","position":3,"name":"LLM Leaderboard","item":"https://gpt0x.com/research/open-source-llm-leaderboard.html"}]}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}.tool-hero h1 span{color:var(--accent)}.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.lb-filters{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.lb-filters select,.lb-filters input{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 12px;font-family:var(--font-body);font-size:.83rem}
+.lb-filters select:focus,.lb-filters input:focus{outline:none;border-color:var(--accent)}
+.lb-filters input{flex:1;min-width:150px}
+.lb-count{font-size:.82rem;color:var(--text-muted);margin-bottom:.75rem}
+.lb-table-wrap{overflow-x:auto;margin-bottom:2rem}
+.lb-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.lb-table th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.3px;padding:.5rem .4rem;text-align:left;border:1px solid var(--border);white-space:nowrap;cursor:pointer}
+.lb-table th:hover{color:var(--text)}
+.lb-table td{padding:.45rem .4rem;border:1px solid var(--border);color:var(--text-muted);font-variant-numeric:tabular-nums}
+.lb-table tr:hover td{background:var(--bg-card)}
+.lb-table .lb-rank{font-weight:700;color:var(--accent);text-align:center;width:30px}
+.lb-table .lb-name{font-weight:600;color:var(--text);white-space:nowrap}
+.lb-table .lb-best{color:var(--accent);font-weight:700}
+.lb-table .lb-size{color:var(--text-muted)}
+.lb-bar-sm{display:inline-block;height:12px;border-radius:2px;min-width:2px;vertical-align:middle;margin-right:4px}
+.lb-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.lb-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.lb-compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:768px){.lb-compare{grid-template-columns:1fr}}
+.lb-compare select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-family:var(--font-body);font-size:.83rem}
+.lb-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;background:var(--accent);color:#000}.lb-btn:hover{opacity:.85}
+.lb-compare-result{margin-top:1rem;font-size:.85rem;color:var(--text-muted)}
+.lb-compare-result strong{color:var(--accent)}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}.explainer p{color:var(--text-muted);margin-bottom:1rem}.explainer ul{color:var(--text-muted);margin:0 0 1rem 1.5rem}.explainer li{margin-bottom:.4rem}
+.explainer table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}.explainer th,.explainer td{padding:.5rem .75rem;border:1px solid var(--border);text-align:left}.explainer th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}.explainer td{color:var(--text-muted)}
+.faq-section{max-width:780px;margin:2.5rem auto}.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}.faq-section summary:hover{color:var(--accent)}.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}.related-card:hover{border-color:var(--accent);text-decoration:none}.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header><div class="container"><a href="/" class="logo">gpt0x</a><nav><a href="/">Database</a><a href="/research/">Research</a><a href="/tools/">Tools</a><a href="/answers/">Answers</a><a href="/blog/">Blog</a><a href="/about.html">About</a><div class="nav-right"><a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a><a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a></div></nav></div></header>
+
+<main class="tool-container">
+  <div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/research/">Research</a> &rsaquo; LLM Leaderboard</div>
+  <div class="tool-hero">
+    <h1>Open-Source LLM <span>Leaderboard</span></h1>
+    <p>Interactive rankings of 20+ open-source language models across MMLU, HumanEval, GSM8K, MATH, MT-Bench, and ARC benchmarks. Filter by model size, license, and specific benchmarks. Compare any two models head-to-head. Includes closed-model reference scores for context. Updated May 2026.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="lb-filters">
+    <select id="lb-size" onchange="lb.filter()"><option value="all">All Sizes</option><option value="small">Small (under 10B)</option><option value="medium">Medium (10-40B)</option><option value="large">Large (40B+)</option></select>
+    <select id="lb-license" onchange="lb.filter()"><option value="all">All Licenses</option><option value="open">Fully Open (Apache/MIT)</option><option value="restricted">Restricted (Llama/Custom)</option><option value="closed">Closed (Reference)</option></select>
+    <select id="lb-sort" onchange="lb.filter()"><option value="avg">Sort by Average</option><option value="mmlu">Sort by MMLU</option><option value="humaneval">Sort by HumanEval</option><option value="gsm8k">Sort by GSM8K</option><option value="math">Sort by MATH</option><option value="mtbench">Sort by MT-Bench</option><option value="arc">Sort by ARC</option></select>
+    <input type="text" id="lb-search" placeholder="Search models..." oninput="lb.filter()">
+  </div>
+  <div class="lb-count" id="lb-count">Showing 0 models</div>
+
+  <div class="lb-table-wrap"><table class="lb-table"><thead><tr><th>#</th><th>Model</th><th>Size</th><th>License</th><th>MMLU</th><th>HumanEval</th><th>GSM8K</th><th>MATH</th><th>MT-Bench</th><th>ARC</th><th>Avg</th></tr></thead><tbody id="lb-tbody"></tbody></table></div>
+
+  <div class="lb-panel">
+    <h3>Head-to-Head Comparison</h3>
+    <div class="lb-compare">
+      <select id="lb-model-a"></select>
+      <select id="lb-model-b"></select>
+    </div>
+    <button class="lb-btn" onclick="lb.compare()">Compare</button>
+    <div class="lb-compare-result" id="lb-compare-result">Select two models and click "Compare" to see a head-to-head breakdown.</div>
+  </div>
+
+  <section class="explainer">
+    <h2>Understanding the Open-Source LLM Landscape in 2026</h2>
+    <p>The open-source AI model ecosystem has matured dramatically. Models like Llama 3.3 70B now match GPT-4-level performance on many benchmarks, while smaller models (7-8B parameters) can run on consumer hardware with competitive quality for focused tasks. This leaderboard tracks the most important open-source models and provides context by including closed-model reference scores. Understanding benchmark scores helps you choose the right model for your specific deployment constraints — GPU budget, latency requirements, and task focus.</p>
+
+    <h2>Benchmark Descriptions</h2>
+    <h3>MMLU (Massive Multitask Language Understanding)</h3>
+    <p>Tests knowledge across 57 subjects from STEM to humanities at undergraduate level. A strong MMLU score indicates broad general knowledge. Scores above 80 are considered strong; above 85 is state-of-the-art for open models. MMLU is the most cited overall capability benchmark but does not measure reasoning depth or creative abilities.</p>
+
+    <h3>HumanEval</h3>
+    <p>Evaluates code generation by asking models to implement Python functions from docstrings. The score represents pass@1 — the percentage of problems solved correctly on the first attempt. Scores above 70 indicate strong coding ability. HumanEval is particularly relevant for code assistant applications and reflects practical programming capability.</p>
+
+    <h3>GSM8K</h3>
+    <p>Grade School Math: 8,500 math word problems requiring multi-step arithmetic reasoning. Tests the model's ability to break down and solve structured mathematical problems. Scores above 85 are strong. GSM8K performance correlates well with general reasoning ability beyond just math.</p>
+
+    <h3>MATH</h3>
+    <p>Advanced mathematics covering algebra, geometry, number theory, and calculus. Significantly harder than GSM8K — problems require genuine mathematical reasoning rather than pattern matching. Scores above 50 are considered strong for open models. MATH scores have the highest variance across models, making it a good differentiator.</p>
+
+    <h3>MT-Bench</h3>
+    <p>Multi-turn conversation benchmark scored by GPT-4 as a judge on a 1-10 scale. Tests the model's ability to maintain coherent, helpful conversations across follow-up questions. Scores above 8.0 indicate strong conversational ability. MT-Bench is the most relevant benchmark for chatbot and assistant applications.</p>
+
+    <h3>ARC (AI2 Reasoning Challenge)</h3>
+    <p>Science reasoning questions at grade-school level. Tests common-sense and scientific reasoning rather than factual recall. ARC-Challenge (the harder subset) is the standard variant. Scores above 85 are strong. ARC complements MMLU by testing reasoning rather than knowledge.</p>
+
+    <h2>Model Size vs Performance Tradeoffs</h2>
+    <p>Model size affects both capability and deployment cost. A 70B model requires 2x A100 GPUs (~$4-6/hr) or 1x A100 with 4-bit quantization (~$2/hr). An 8B model runs on a single A10G (~$0.50/hr) or even consumer GPUs. The quality gap between 8B and 70B models is typically 5-15% on benchmarks — significant for complex reasoning but negligible for simpler tasks like classification, extraction, and formatting. For production, the optimal strategy is often to use a small model for most requests and route complex requests to a larger model.</p>
+
+    <h2>License Considerations</h2>
+    <p>Model licenses affect what you can do in production. Apache 2.0 and MIT licenses (Mistral 7B, some Qwen models) allow unrestricted commercial use. The Llama license permits commercial use but with user count restrictions and requires accepting Meta's terms. Some models use custom licenses that restrict specific use cases (medical, legal) or require attribution. Always verify the license before deploying in production — license violations can result in legal liability regardless of whether the model is "open source."</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details><summary>What is the best open-source LLM in 2026?</summary><p>Llama 3.3 70B leads on most general benchmarks. DeepSeek V3 offers the best quality-to-cost ratio. Qwen 2.5 72B excels at multilingual tasks. For smaller models, Llama 3.3 8B and Mistral 7B lead.</p></details>
+    <details><summary>How do open-source LLMs compare to GPT-4o and Claude?</summary><p>The gap has narrowed to 3-5% on coding and math benchmarks. Closed models still lead on complex reasoning and safety. For many production tasks, open-source models are functionally equivalent at 5-20x lower cost when self-hosted.</p></details>
+    <details><summary>What GPU do I need to run a 70B parameter model?</summary><p>Float16: 2x A100 80GB ($4-6/hr). 4-bit quantized: 1x A100 80GB ($2/hr) or 1x RTX 4090 24GB (slow). vLLM or TGI for production serving.</p></details>
+    <details><summary>What do the different benchmarks measure?</summary><p>MMLU: broad knowledge. HumanEval: code generation. GSM8K: math reasoning. MATH: advanced math. MT-Bench: conversation quality. ARC: scientific reasoning. No single benchmark predicts overall quality.</p></details>
+    <details><summary>Are open-source LLMs safe to use in production?</summary><p>They require more safety engineering than commercial APIs. Add output filters, content moderation, guardrails frameworks, and domain-specific red-teaming. More effort but more control over safety behaviors.</p></details>
+  </section>
+
+  <section class="related-tools"><h2>Related Tools</h2><div class="related-grid"><a href="/research/ai-safety-benchmark.html" class="related-card"><h3>Safety Benchmark</h3><p>Evaluate AI models across 8 safety dimensions with interactive scoring.</p></a><a href="/answers/llm-context-window-comparison.html" class="related-card"><h3>Context Windows</h3><p>Compare context window sizes across all models.</p></a><a href="/tools/ai-cost-estimator.html" class="related-card"><h3>Cost Estimator</h3><p>Project deployment costs for self-hosted models.</p></a></div></section>
+  <div class="author-bio"><h3>About the Author</h3><p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p></div>
+</main>
+<footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Zovo Tools</div><div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div><a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a><div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div></div></footer>
+<nav class="zovo-network" aria-label="Zovo Tools Network"><div class="zovo-network-inner"><h3 class="zovo-network-title">Explore More Tools</h3><div class="zovo-network-links"><a href="https://abwex.com">ABWex — A/B Testing</a><a href="https://claudflow.com">ClaudFlow — Workflows</a><a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a><a href="https://claudkit.com">ClaudKit — API</a><a href="https://enhio.com">Enhio — Text Tools</a><a href="https://epochpilot.com">EpochPilot — Timestamps</a><a href="https://gen8x.com">Gen8X — Color Tools</a><a href="https://heytensor.com">HeyTensor — ML Tools</a><a href="https://invokebot.com">InvokeBot — Webhooks</a><a href="https://kappafy.com">Kappafy — JSON</a><a href="https://kappakit.com">KappaKit — Dev Toolkit</a><a href="https://kickllm.com">KickLLM — LLM Costs</a><a href="https://krzen.com">Krzen — Image Tools</a><a href="https://lochbot.com">LochBot — Security</a><a href="https://lockml.com">LockML — ML Compare</a><a href="https://ml3x.com">ML3X — Matrix Math</a></div></div></nav>
+
+<script>
+(function(){
+  const models = [
+    { name:'Llama 3.3 70B', size:'large', params:'70B', license:'restricted', mmlu:86.0, humaneval:82.3, gsm8k:93.0, math:51.2, mtbench:8.5, arc:92.0 },
+    { name:'Llama 3.3 8B', size:'small', params:'8B', license:'restricted', mmlu:73.0, humaneval:68.5, gsm8k:79.0, math:30.5, mtbench:7.8, arc:83.0 },
+    { name:'DeepSeek V3', size:'large', params:'671B MoE', license:'open', mmlu:87.5, humaneval:81.0, gsm8k:95.0, math:61.0, mtbench:8.7, arc:91.5 },
+    { name:'DeepSeek R1', size:'large', params:'671B MoE', license:'open', mmlu:85.0, humaneval:78.0, gsm8k:97.0, math:72.0, mtbench:8.3, arc:89.0 },
+    { name:'Qwen 2.5 72B', size:'large', params:'72B', license:'open', mmlu:85.5, humaneval:79.0, gsm8k:91.0, math:52.0, mtbench:8.4, arc:90.5 },
+    { name:'Qwen 2.5 32B', size:'medium', params:'32B', license:'open', mmlu:81.0, humaneval:74.0, gsm8k:86.0, math:43.0, mtbench:8.0, arc:87.0 },
+    { name:'Qwen 2.5 7B', size:'small', params:'7B', license:'open', mmlu:70.5, humaneval:62.0, gsm8k:72.0, math:28.0, mtbench:7.4, arc:79.0 },
+    { name:'Mistral Large 2', size:'large', params:'123B', license:'restricted', mmlu:84.0, humaneval:77.5, gsm8k:89.0, math:48.0, mtbench:8.3, arc:89.5 },
+    { name:'Mistral 7B v0.3', size:'small', params:'7B', license:'open', mmlu:64.0, humaneval:55.0, gsm8k:58.0, math:18.0, mtbench:7.0, arc:75.0 },
+    { name:'Mixtral 8x22B', size:'large', params:'141B MoE', license:'open', mmlu:77.5, humaneval:71.0, gsm8k:81.0, math:38.0, mtbench:7.9, arc:85.5 },
+    { name:'Phi-4', size:'small', params:'14B', license:'open', mmlu:78.0, humaneval:75.0, gsm8k:88.0, math:45.0, mtbench:7.8, arc:86.0 },
+    { name:'Gemma 2 27B', size:'medium', params:'27B', license:'open', mmlu:78.5, humaneval:67.0, gsm8k:82.0, math:35.0, mtbench:7.7, arc:84.5 },
+    { name:'Gemma 2 9B', size:'small', params:'9B', license:'open', mmlu:71.0, humaneval:58.0, gsm8k:68.0, math:24.0, mtbench:7.2, arc:78.5 },
+    { name:'Command R+', size:'large', params:'104B', license:'restricted', mmlu:80.0, humaneval:72.0, gsm8k:84.0, math:40.0, mtbench:8.0, arc:87.0 },
+    { name:'Yi-1.5 34B', size:'medium', params:'34B', license:'open', mmlu:78.0, humaneval:68.0, gsm8k:80.0, math:36.0, mtbench:7.6, arc:84.0 },
+    // Closed model references
+    { name:'GPT-4o (ref)', size:'large', params:'?', license:'closed', mmlu:88.7, humaneval:87.0, gsm8k:95.5, math:68.0, mtbench:9.0, arc:96.0 },
+    { name:'Claude Opus 4 (ref)', size:'large', params:'?', license:'closed', mmlu:87.0, humaneval:84.0, gsm8k:94.0, math:65.0, mtbench:8.9, arc:95.0 },
+    { name:'Gemini 2.5 Pro (ref)', size:'large', params:'?', license:'closed', mmlu:89.0, humaneval:85.5, gsm8k:96.0, math:70.0, mtbench:9.1, arc:95.5 }
+  ];
+
+  const benchmarks = ['mmlu','humaneval','gsm8k','math','mtbench','arc'];
+  const benchLabels = { mmlu:'MMLU', humaneval:'HumanEval', gsm8k:'GSM8K', math:'MATH', mtbench:'MT-Bench', arc:'ARC' };
+  const benchMaxes = { mmlu:100, humaneval:100, gsm8k:100, math:100, mtbench:10, arc:100 };
+
+  function getAvg(m) {
+    return ((m.mmlu + m.humaneval + m.gsm8k + m.math + (m.mtbench*10) + m.arc) / 6).toFixed(1);
+  }
+
+  function renderTable(list) {
+    const tbody = document.getElementById('lb-tbody');
+    // Find max per benchmark for highlighting
+    const maxes = {};
+    benchmarks.forEach(b => { maxes[b] = Math.max(...list.map(m => m[b])); });
+    let html = '';
+    list.forEach((m, i) => {
+      const avg = getAvg(m);
+      const licenseLabel = m.license === 'open' ? 'Apache/MIT' : m.license === 'restricted' ? 'Restricted' : 'Closed';
+      html += '<tr><td class="lb-rank">'+(i+1)+'</td><td class="lb-name">'+m.name+'</td><td class="lb-size">'+m.params+'</td><td>'+licenseLabel+'</td>';
+      benchmarks.forEach(b => {
+        const val = m[b];
+        const max = benchMaxes[b];
+        const isBest = val === maxes[b];
+        const pct = (val / max * 100).toFixed(0);
+        const color = pct >= 85 ? '#34d399' : pct >= 70 ? '#fbbf24' : '#f472b6';
+        html += '<td'+(isBest?' class="lb-best"':'')+'><span class="lb-bar-sm" style="width:'+Math.min(pct,100)*0.4+'px;background:'+color+'"></span>'+(b==='mtbench'?val.toFixed(1):val.toFixed(1))+'</td>';
+      });
+      html += '<td style="font-weight:700;color:var(--accent)">'+avg+'</td></tr>';
+    });
+    tbody.innerHTML = html;
+    document.getElementById('lb-count').textContent = 'Showing '+list.length+' models';
+  }
+
+  function filter() {
+    const size = document.getElementById('lb-size').value;
+    const license = document.getElementById('lb-license').value;
+    const sort = document.getElementById('lb-sort').value;
+    const search = document.getElementById('lb-search').value.toLowerCase();
+    let filtered = [...models];
+    if (size !== 'all') filtered = filtered.filter(m => m.size === size);
+    if (license !== 'all') filtered = filtered.filter(m => m.license === license);
+    if (search) filtered = filtered.filter(m => m.name.toLowerCase().includes(search));
+    if (sort === 'avg') filtered.sort((a,b) => getAvg(b) - getAvg(a));
+    else if (sort === 'mtbench') filtered.sort((a,b) => b.mtbench - a.mtbench);
+    else filtered.sort((a,b) => b[sort] - a[sort]);
+    renderTable(filtered);
+  }
+
+  function populateSelects() {
+    const selA = document.getElementById('lb-model-a');
+    const selB = document.getElementById('lb-model-b');
+    let opts = '';
+    models.forEach((m,i) => { opts += '<option value="'+i+'">'+m.name+'</option>'; });
+    selA.innerHTML = opts;
+    selB.innerHTML = opts;
+    if (models.length > 1) selB.value = '1';
+  }
+
+  function compare() {
+    const a = models[parseInt(document.getElementById('lb-model-a').value)];
+    const b = models[parseInt(document.getElementById('lb-model-b').value)];
+    let html = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;margin-top:.5rem">';
+    html += '<tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:.4rem;color:var(--accent)">Benchmark</th><th style="text-align:right;padding:.4rem;color:var(--accent)">'+a.name+'</th><th style="text-align:right;padding:.4rem;color:var(--accent)">'+b.name+'</th><th style="text-align:center;padding:.4rem;color:var(--accent)">Winner</th></tr>';
+    let aWins = 0, bWins = 0;
+    benchmarks.forEach(bm => {
+      const av = bm === 'mtbench' ? a[bm].toFixed(1) : a[bm].toFixed(1);
+      const bv = bm === 'mtbench' ? b[bm].toFixed(1) : b[bm].toFixed(1);
+      const winner = a[bm] > b[bm] ? a.name : a[bm] < b[bm] ? b.name : 'Tie';
+      if (a[bm] > b[bm]) aWins++; else if (b[bm] > a[bm]) bWins++;
+      const winColor = winner === a.name ? '#34d399' : winner === b.name ? '#60a5fa' : 'var(--text-muted)';
+      html += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:.35rem;color:var(--text)">'+benchLabels[bm]+'</td>';
+      html += '<td style="text-align:right;padding:.35rem;'+(a[bm]>=b[bm]?'color:var(--accent);font-weight:600':'color:var(--text-muted)')+'">'+av+'</td>';
+      html += '<td style="text-align:right;padding:.35rem;'+(b[bm]>=a[bm]?'color:var(--accent);font-weight:600':'color:var(--text-muted)')+'">'+bv+'</td>';
+      html += '<td style="text-align:center;padding:.35rem;color:'+winColor+';font-weight:600">'+winner+'</td></tr>';
+    });
+    html += '<tr style="border-top:2px solid var(--accent)"><td style="padding:.4rem;font-weight:700;color:var(--text)">Average</td>';
+    html += '<td style="text-align:right;padding:.4rem;font-weight:700;color:var(--accent)">'+getAvg(a)+'</td>';
+    html += '<td style="text-align:right;padding:.4rem;font-weight:700;color:var(--accent)">'+getAvg(b)+'</td>';
+    html += '<td style="text-align:center;padding:.4rem;font-weight:700;color:var(--accent)">'+(aWins > bWins ? a.name+' ('+aWins+'-'+bWins+')' : bWins > aWins ? b.name+' ('+bWins+'-'+aWins+')' : 'Tie')+'</td></tr>';
+    html += '</table>';
+    document.getElementById('lb-compare-result').innerHTML = html;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() { filter(); populateSelects(); });
+  window.lb = { filter, compare };
+})();
+</script>
+</body>
+</html>

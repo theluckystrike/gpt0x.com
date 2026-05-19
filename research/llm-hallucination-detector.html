@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Hallucination Detection Framework — Fact-Checking Prompt Templates | GPT0X</title>
+<meta name="description" content="Detect and classify AI hallucinations with structured prompt templates. Identify fabrication, contradiction, and exaggeration in LLM outputs. Confidence scoring rubrics and exportable detection prompts. Free, no sign-up.">
+<meta name="keywords" content="LLM hallucination detection, AI fact checking, hallucination classifier, fabrication detection, AI accuracy, confidence scoring, fact-checking prompts, LLM reliability">
+<link rel="canonical" href="https://gpt0x.com/research/llm-hallucination-detector.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/research/llm-hallucination-detector.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/research/llm-hallucination-detector.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLM Hallucination Detection Framework — Fact-Checking Prompt Templates">
+<meta property="og:description" content="Detect and classify AI hallucinations with structured prompt templates. Identify fabrication, contradiction, and exaggeration in LLM outputs.">
+<meta property="og:url" content="https://gpt0x.com/research/llm-hallucination-detector.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LLM Hallucination Detection Framework — Fact-Checking Prompt Templates">
+<meta name="twitter:description" content="Detect and classify AI hallucinations with structured prompt templates. Identify fabrication, contradiction, and exaggeration in LLM outputs.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "LLM Hallucination Detection Framework — Fact-Checking Prompt Templates with Confidence Scoring",
+  "description": "A comprehensive framework for detecting and classifying AI hallucinations using structured prompt templates, confidence scoring rubrics, and exportable detection workflows.",
+  "url": "https://gpt0x.com/research/llm-hallucination-detector.html",
+  "image": "https://gpt0x.com/assets/og-image.png",
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "publisher": { "@type": "Organization", "name": "GPT0X", "url": "https://gpt0x.com" },
+  "datePublished": "2026-05-25",
+  "dateModified": "2026-05-25",
+  "mainEntityOfPage": "https://gpt0x.com/research/llm-hallucination-detector.html"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What are the main types of LLM hallucinations?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LLM hallucinations fall into three primary categories. Fabrication is when the model invents facts, citations, statistics, or events that do not exist — such as generating a fake research paper with plausible-sounding authors and DOIs. Contradiction occurs when the model's output directly conflicts with the provided source material or established facts. Exaggeration is when the model distorts factual information by inflating numbers, overstating significance, or making unsupported superlative claims. A fourth category, conflation, involves merging details from separate true facts into a single false statement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How reliable are LLM-based hallucination detectors?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LLM-based hallucination detection achieves 70-85% accuracy on standard benchmarks like TruthfulQA and HaluEval, depending on the detection model and prompt strategy. Multi-step verification prompts that decompose claims and cross-reference each component independently achieve higher accuracy than single-pass detection. However, no automated method is 100% reliable — subtle hallucinations that blend real and fabricated information remain challenging. For high-stakes applications, automated detection should be combined with human review."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is a confidence scoring rubric for hallucination detection?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A confidence scoring rubric assigns numerical scores to claims based on how well they are supported by source evidence. A typical 5-point scale rates claims from 1 (no support — claim cannot be verified or is directly contradicted) to 5 (strong support — claim is explicitly stated or directly derivable from the source). The rubric considers factors like source specificity, logical inference distance, and the presence of hedging language. Building a custom rubric for your domain ensures consistent evaluation across different reviewers and automated systems."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which AI models hallucinate the least?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "As of May 2026, Claude Opus 4 and GPT-4o consistently rank among the lowest hallucination rates in benchmarks. Claude models are particularly strong at acknowledging uncertainty — they are more likely to say 'I don't know' rather than fabricating an answer. Reasoning models like o3 and DeepSeek R1 also show lower hallucination rates because their chain-of-thought process catches inconsistencies. However, all models can hallucinate, especially on niche topics, recent events beyond their training data, and queries that require precise numerical recall."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I build a hallucination detection pipeline for production?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A production hallucination detection pipeline typically has four stages: (1) Claim extraction — decompose the LLM output into individual factual claims. (2) Evidence retrieval — for each claim, retrieve relevant source documents or knowledge base entries. (3) Entailment scoring — use an NLI model or LLM-based judge to score whether the evidence supports, contradicts, or is neutral to each claim. (4) Aggregation — combine per-claim scores into an overall confidence rating with flagged issues. For cost efficiency, use a cheaper model (Haiku, GPT-4o Mini) for claim extraction and a stronger model (Opus, GPT-4o) for entailment scoring on flagged claims only."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Research", "item": "https://gpt0x.com/research/" },
+    { "@type": "ListItem", "position": 3, "name": "Hallucination Detector", "item": "https://gpt0x.com/research/llm-hallucination-detector.html" }
+  ]
+}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}
+.tool-hero h1 span{color:var(--accent)}
+.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.hd-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+@media(max-width:768px){.hd-layout{grid-template-columns:1fr}}
+.hd-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.hd-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.hd-field{margin-bottom:1rem}
+.hd-field label{display:block;font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:4px}
+.hd-field select,.hd-field input,.hd-field textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-family:var(--font-body);font-size:.85rem;resize:vertical}
+.hd-field select:focus,.hd-field input:focus,.hd-field textarea:focus{outline:none;border-color:var(--accent)}
+.hd-field textarea{min-height:100px;line-height:1.6}
+.hd-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.hd-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.hd-btn-primary{background:var(--accent);color:#000}
+.hd-btn-secondary{background:var(--bg-hover);color:var(--text);border:1px solid var(--border)}
+.hd-btn:hover{opacity:.85}
+.hd-result{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;min-height:120px;margin-bottom:1rem}
+.hd-result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}
+.hd-result-type{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 10px;border-radius:3px}
+.hd-type-fabrication{background:rgba(239,68,68,.15);color:#ef4444}
+.hd-type-contradiction{background:rgba(251,191,36,.15);color:#fbbf24}
+.hd-type-exaggeration{background:rgba(96,165,250,.15);color:#60a5fa}
+.hd-type-conflation{background:rgba(168,85,247,.15);color:#a855f7}
+.hd-type-none{background:rgba(52,211,153,.15);color:#34d399}
+.hd-confidence{font-size:.85rem;font-weight:600}
+.hd-confidence-high{color:#ef4444}.hd-confidence-med{color:#fbbf24}.hd-confidence-low{color:#34d399}
+.hd-result p{color:var(--text-muted);font-size:.85rem;line-height:1.7;margin:0}
+.hd-claims{margin-top:1rem}
+.hd-claim{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;margin-bottom:.5rem;font-size:.83rem}
+.hd-claim-text{color:var(--text);margin-bottom:.4rem}
+.hd-claim-verdict{font-size:.75rem;font-weight:600}
+.hd-templates{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.hd-templates h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.hd-template-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.hd-chip{padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:.8rem;color:var(--text-muted);cursor:pointer;transition:all .2s;background:var(--bg)}
+.hd-chip:hover,.hd-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(52,211,153,.06)}
+.hd-template-preview{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:.83rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:350px;overflow-y:auto;color:var(--text-muted)}
+.hd-template-actions{display:flex;gap:.75rem;margin-top:.75rem}
+.hd-rubric{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.hd-rubric h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.hd-rubric-grid{display:grid;gap:.5rem}
+.hd-rubric-row{display:grid;grid-template-columns:50px 100px 1fr;gap:.75rem;align-items:start;padding:.6rem .75rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.83rem}
+.hd-rubric-score{font-weight:700;color:var(--accent);font-size:1.1rem;text-align:center}
+.hd-rubric-label{font-weight:600;color:var(--text)}
+.hd-rubric-desc{color:var(--text-muted)}
+.hd-rubric-custom{margin-top:1rem}
+.hd-rubric-custom textarea{min-height:60px}
+.hd-export{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:.83rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:300px;overflow-y:auto;color:var(--text-muted);margin-top:1rem}
+.hd-copy-toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:8px 20px;border-radius:var(--radius);font-size:.85rem;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.hd-copy-toast.visible{opacity:1}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}
+.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}
+.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}
+.explainer p{color:var(--text-muted);margin-bottom:1rem}
+.explainer ul,.explainer ol{color:var(--text-muted);margin:0 0 1rem 1.5rem}
+.explainer li{margin-bottom:.4rem}
+.explainer code{background:var(--bg-card);padding:1px 5px;border-radius:3px;font-size:.85rem;color:var(--accent)}
+.faq-section{max-width:780px;margin:2.5rem auto}
+.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}
+.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}
+.faq-section summary:hover{color:var(--accent)}
+.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}
+.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}
+.related-card:hover{border-color:var(--accent);text-decoration:none}
+.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}
+.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}
+.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">gpt0x</a>
+    <nav>
+      <a href="/">Database</a>
+      <a href="/research/">Research</a>
+      <a href="/tools/">Tools</a>
+      <a href="/answers/">Answers</a>
+      <a href="/blog/">Blog</a>
+      <a href="/about.html">About</a>
+      <div class="nav-right">
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+        <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-container">
+  <div class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/research/">Research</a> &rsaquo; Hallucination Detector
+  </div>
+
+  <div class="tool-hero">
+    <h1>LLM <span>Hallucination</span> Detection Framework</h1>
+    <p>Detect, classify, and score AI hallucinations with structured fact-checking prompt templates. Identify fabrications, contradictions, and exaggerations in LLM outputs. Build confidence scoring rubrics and export production-ready detection prompts.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="hd-layout">
+    <div class="hd-panel">
+      <h3>Claim Analysis</h3>
+      <div class="hd-field">
+        <label>Claim to verify</label>
+        <textarea id="hd-claim" placeholder="Paste the AI-generated claim or statement you want to fact-check. Example: 'A 2024 Stanford study found that GPT-4 achieves 97% accuracy on medical diagnosis tasks.'"></textarea>
+      </div>
+      <div class="hd-field">
+        <label>Source / reference text (ground truth)</label>
+        <textarea id="hd-source" placeholder="Paste the source material, reference document, or known facts that the claim should be verified against. Leave empty for general fact-checking." style="min-height:120px"></textarea>
+      </div>
+      <div class="hd-field">
+        <label>Domain context</label>
+        <select id="hd-domain">
+          <option value="general">General Knowledge</option>
+          <option value="medical">Medical / Healthcare</option>
+          <option value="legal">Legal / Regulatory</option>
+          <option value="scientific">Scientific Research</option>
+          <option value="technical">Technical / Engineering</option>
+          <option value="financial">Financial / Economic</option>
+          <option value="historical">Historical</option>
+        </select>
+      </div>
+      <div class="hd-actions">
+        <button class="hd-btn hd-btn-primary" onclick="hd.analyze()">Analyze Claim</button>
+        <button class="hd-btn hd-btn-secondary" onclick="hd.clear()">Clear</button>
+        <button class="hd-btn hd-btn-secondary" onclick="hd.loadExample()">Load Example</button>
+      </div>
+    </div>
+
+    <div class="hd-panel">
+      <h3>Detection Result</h3>
+      <div class="hd-result" id="hd-result">
+        <p>Enter a claim and optional source text, then click "Analyze Claim" to classify the hallucination type and generate a confidence score. The detector decomposes claims into individual assertions and evaluates each against the provided evidence.</p>
+      </div>
+      <h3 style="margin-top:1rem">Extracted Claims</h3>
+      <div class="hd-claims" id="hd-claims">
+        <p style="color:var(--text-muted);font-size:.83rem">Individual claims extracted from the input will appear here with per-claim verdicts.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hd-templates">
+    <h3>Fact-Checking Prompt Template Library</h3>
+    <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Production-ready prompt templates for different hallucination detection scenarios. Select a template to preview, customize, and copy.</p>
+    <div class="hd-template-chips">
+      <button class="hd-chip active" onclick="hd.selectTemplate('claimDecomp')">Claim Decomposition</button>
+      <button class="hd-chip" onclick="hd.selectTemplate('sourceVerify')">Source Verification</button>
+      <button class="hd-chip" onclick="hd.selectTemplate('crossRef')">Cross-Reference Check</button>
+      <button class="hd-chip" onclick="hd.selectTemplate('numericalAudit')">Numerical Audit</button>
+      <button class="hd-chip" onclick="hd.selectTemplate('citationCheck')">Citation Verification</button>
+      <button class="hd-chip" onclick="hd.selectTemplate('consistencyCheck')">Self-Consistency</button>
+      <button class="hd-chip" onclick="hd.selectTemplate('hedgeDetect')">Hedge Detection</button>
+    </div>
+    <div class="hd-template-preview" id="hd-template-preview"></div>
+    <div class="hd-template-actions">
+      <button class="hd-btn hd-btn-primary" onclick="hd.copyTemplate()">Copy Template</button>
+      <button class="hd-btn hd-btn-secondary" onclick="hd.exportAll()">Export All Templates</button>
+    </div>
+  </div>
+
+  <div class="hd-rubric">
+    <h3>Confidence Scoring Rubric Builder</h3>
+    <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Customize the scoring rubric to match your domain and risk tolerance. Scores from 1 (unsupported) to 5 (fully verified).</p>
+    <div class="hd-rubric-grid">
+      <div class="hd-rubric-row"><div class="hd-rubric-score">5</div><div class="hd-rubric-label">Fully Verified</div><div class="hd-rubric-desc">Claim is explicitly stated in the source or directly derivable with no inference required. Multiple independent sources confirm.</div></div>
+      <div class="hd-rubric-row"><div class="hd-rubric-score">4</div><div class="hd-rubric-label">Well Supported</div><div class="hd-rubric-desc">Claim is strongly implied by the source with minimal logical inference. Consistent with known facts in the domain.</div></div>
+      <div class="hd-rubric-row"><div class="hd-rubric-score">3</div><div class="hd-rubric-label">Partially Supported</div><div class="hd-rubric-desc">Claim has some basis in the source but includes details not directly verifiable. May involve reasonable extrapolation.</div></div>
+      <div class="hd-rubric-row"><div class="hd-rubric-score">2</div><div class="hd-rubric-label">Weakly Supported</div><div class="hd-rubric-desc">Claim has tangential connection to the source but key assertions are not verifiable. Significant inference or assumption required.</div></div>
+      <div class="hd-rubric-row"><div class="hd-rubric-score">1</div><div class="hd-rubric-label">Unsupported</div><div class="hd-rubric-desc">Claim has no support in the source, is directly contradicted, or contains fabricated information not found anywhere in the evidence.</div></div>
+    </div>
+    <div class="hd-rubric-custom">
+      <div class="hd-field">
+        <label>Custom scoring notes (included in export)</label>
+        <textarea id="hd-rubric-notes" placeholder="Add domain-specific scoring criteria. Example: 'For medical claims, require peer-reviewed citations for scores above 3. For legal claims, require specific statute or case references.'"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:2rem">
+    <h3 style="font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)">Export Detection Prompts</h3>
+    <div class="hd-actions">
+      <button class="hd-btn hd-btn-primary" onclick="hd.exportConfig()">Export Full Configuration</button>
+      <button class="hd-btn hd-btn-secondary" onclick="hd.copyExport()">Copy to Clipboard</button>
+    </div>
+    <div class="hd-export" id="hd-export">Click "Export Full Configuration" to generate a complete hallucination detection prompt package including all templates, rubric, and domain settings ready for integration into your pipeline.</div>
+  </div>
+
+  <div id="hd-toast" class="hd-copy-toast">Copied to clipboard</div>
+
+  <section class="explainer">
+    <h2>The LLM Hallucination Problem: A Comprehensive Analysis</h2>
+    <p>Hallucination is the most significant reliability challenge facing large language models in production. When an LLM generates text that sounds authoritative but contains fabricated facts, incorrect citations, or distorted claims, the consequences range from embarrassing to dangerous. A legal brief citing non-existent cases, a medical summary with fabricated drug interactions, or a financial analysis with invented statistics can cause real harm. Understanding why hallucinations happen, how to detect them, and how to build systems that minimize their impact is essential for anyone deploying AI in high-stakes applications.</p>
+
+    <h2>Taxonomy of LLM Hallucinations</h2>
+    <h3>1. Fabrication (Intrinsic Hallucination)</h3>
+    <p>Fabrication occurs when the model generates information that does not exist in any source and has no basis in reality. This is the most dangerous type of hallucination because fabricated content often sounds completely plausible. Common fabrication patterns include inventing research papers with realistic-sounding titles, authors, and journal names; generating fake statistics with precise numbers; creating non-existent URLs that follow real website patterns; and attributing quotes to real people that they never said. Fabrication is most prevalent when models are asked about niche topics, recent events, or specific details that require precise recall rather than general knowledge.</p>
+
+    <h3>2. Contradiction (Extrinsic Hallucination)</h3>
+    <p>Contradiction happens when the model's output directly conflicts with the provided context, source documents, or its own prior statements within the same response. Unlike fabrication, contradiction involves real information that gets distorted. A summarization model might state the opposite of what the source document says. A Q&A model might answer "yes" when the context clearly indicates "no." Self-contradiction occurs when a model makes conflicting claims within the same response — for example, stating a company was founded in 2018 in one paragraph and 2020 in another. Contradiction is particularly common in long-form generation where the model loses coherence over many paragraphs.</p>
+
+    <h3>3. Exaggeration (Magnitude Hallucination)</h3>
+    <p>Exaggeration preserves the directional truth of a claim while distorting its magnitude. A study showing a 15% improvement becomes "nearly doubling performance." A company with 500 employees becomes "thousands of employees." A technology used by some researchers becomes "widely adopted across the industry." Exaggeration is insidious because the core claim has a basis in truth, making it harder to detect than outright fabrication. It is especially common in summaries and analyses where models tend to amplify the significance of findings to make their outputs more compelling.</p>
+
+    <h3>4. Conflation (Fusion Hallucination)</h3>
+    <p>Conflation merges details from two or more separate true facts into a single false statement. For example, if Person A won a Nobel Prize in Physics and Person B won a Nobel Prize in Chemistry, the model might conflate them into "Person A won the Nobel Prize in Chemistry." Each component is real, but the combination is false. Conflation is particularly common in biographical and historical content where models merge attributes from multiple similar entities. It is also frequent in technical documentation where features from different product versions get combined.</p>
+
+    <h2>Detection Methodologies</h2>
+    <h3>Claim Decomposition</h3>
+    <p>The most effective detection approach starts by decomposing a complex statement into individual atomic claims. The sentence "A 2024 Stanford study led by Dr. Smith found that GPT-4 achieves 97% accuracy on medical diagnosis across 50,000 cases" contains at least five verifiable claims: (1) the study was from Stanford, (2) it was published in 2024, (3) it was led by Dr. Smith, (4) the accuracy figure was 97%, and (5) the sample size was 50,000. Each claim can be independently verified, and a fabrication in any one component makes the entire statement unreliable. This decomposition approach catches partial hallucinations that would be missed by evaluating the statement as a whole.</p>
+
+    <h3>Natural Language Inference (NLI)</h3>
+    <p>NLI-based detection uses models trained to classify the relationship between a premise (source) and hypothesis (claim) as entailment, contradiction, or neutral. When applied to hallucination detection, the source document is the premise and each extracted claim is the hypothesis. Claims classified as "contradiction" are clear hallucinations, while "neutral" claims require further investigation — they may be true but simply not mentioned in the source. NLI models like DeBERTa-v3 fine-tuned on NLI datasets provide a lightweight, fast first-pass filter before more expensive LLM-based verification.</p>
+
+    <h3>LLM-as-Judge</h3>
+    <p>Using a separate LLM to evaluate the output of another LLM is increasingly common in production systems. The judge model receives the original claim, the source material, and a structured evaluation rubric, then produces a verdict with reasoning. This approach is more flexible than NLI because the judge can handle nuanced cases, explain its reasoning, and adapt to domain-specific criteria. However, the judge model can itself hallucinate, so multi-judge systems that aggregate verdicts from multiple independent evaluations produce more reliable results. Claude Opus 4 and GPT-4o are the most commonly used judge models due to their strong instruction-following and reasoning capabilities.</p>
+
+    <h3>Self-Consistency Checking</h3>
+    <p>Self-consistency detection generates multiple responses to the same query and compares them for agreement. If the model produces contradictory answers across multiple samples, the inconsistent claims are likely hallucinations — true facts tend to be reproduced consistently while fabricated details vary between generations. This technique is especially effective for factual recall tasks where there is a single correct answer. The downside is cost — it requires multiple API calls per query, though using temperature=0 for one baseline and temperature=0.7 for variations provides a good balance.</p>
+
+    <h2>Building a Production Detection Pipeline</h2>
+    <p>A robust hallucination detection pipeline for production use combines multiple techniques in a cascade architecture. The first stage uses fast, cheap heuristics: checking for known hallucination patterns like fabricated URLs, impossible dates, and statistical outliers. The second stage applies NLI-based classification on extracted claims against retrieved evidence. The third stage escalates uncertain or high-risk claims to an LLM-based judge for detailed analysis. This cascade approach keeps costs manageable — only 10-20% of claims typically need the expensive LLM judge evaluation.</p>
+    <p>For retrieval-augmented generation (RAG) systems, grounding detection is a specific variant that checks whether the model's output is faithful to the retrieved documents. The detection prompt should explicitly instruct the judge to only consider the provided sources and flag any claim not directly supported by the retrieved passages. This is simpler than open-ended fact-checking because the evidence set is bounded and available.</p>
+
+    <h2>Prompt Engineering for Hallucination Reduction</h2>
+    <h3>Instructing Uncertainty Acknowledgment</h3>
+    <p>Adding explicit instructions like "If you are not confident about a fact, say so rather than guessing" significantly reduces fabrication rates. Claude models respond particularly well to this instruction and will default to "I don't have enough information to verify this" rather than generating plausible-sounding but unverified claims. For GPT models, adding "Do not fabricate citations or statistics — only reference information you are confident about" produces similar effects.</p>
+
+    <h3>Grounding Prompts</h3>
+    <p>Grounding prompts restrict the model to only use information from provided source documents. "Answer ONLY based on the following documents. If the answer is not in the documents, say 'Not found in provided sources.'" This approach eliminates most fabrication hallucinations in RAG systems. The key is making the constraint explicit and providing a graceful fallback phrase the model can use instead of fabricating an answer.</p>
+
+    <h3>Chain-of-Verification (CoVe)</h3>
+    <p>Chain-of-Verification, introduced by Meta researchers in 2023, is a technique where the model first generates an answer, then generates verification questions about its own claims, answers those questions independently, and finally revises its original answer based on any inconsistencies found. This self-checking loop catches many hallucinations that a single-pass generation would produce. The CoVe approach can be implemented as a multi-turn prompt or as separate API calls in a pipeline, with the verification step using a different model or temperature setting for independence.</p>
+
+    <h2>Domain-Specific Considerations</h2>
+    <h3>Medical and Healthcare</h3>
+    <p>Medical hallucinations are among the highest-risk because they can directly affect patient outcomes. LLMs frequently hallucinate drug interactions, dosage information, and clinical trial results. Detection systems for medical content should maintain a reference database of approved drugs, known interactions, and clinical guidelines. Any generated claim about specific medications, dosages, or treatments should be verified against authoritative sources like FDA labels, PubMed, and clinical practice guidelines. The confidence threshold for medical content should be set higher than for general content — a score of 4/5 or above on the rubric before presenting information to users.</p>
+
+    <h3>Legal and Regulatory</h3>
+    <p>Legal hallucinations famously entered public awareness when attorneys submitted AI-generated briefs containing citations to non-existent cases. Legal content requires verification of case names, citations, statutory references, and regulatory details. A specialized detection pipeline for legal content should cross-reference cited cases against legal databases, verify statute numbers and text, and flag any legal conclusion not explicitly supported by cited authority. The most common legal hallucination pattern is generating plausible-sounding case names and citations that map to no real case.</p>
+
+    <h3>Scientific and Technical</h3>
+    <p>Scientific hallucinations often involve fabricated citations, incorrect attribution of findings, and distorted statistical results. The detection framework should verify DOIs and paper titles against databases like Semantic Scholar, CrossRef, and PubMed. Author names should be cross-referenced with actual publication records. Statistical claims should be checked for internal consistency — a study cannot have a p-value of 0.001 with a sample size of 5 for most standard tests. Technical specifications and API details should be verified against official documentation.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details>
+      <summary>What are the main types of LLM hallucinations?</summary>
+      <p>LLM hallucinations fall into three primary categories. Fabrication is when the model invents facts, citations, statistics, or events that do not exist — such as generating a fake research paper with plausible-sounding authors and DOIs. Contradiction occurs when the model's output directly conflicts with the provided source material or established facts. Exaggeration is when the model distorts factual information by inflating numbers, overstating significance, or making unsupported superlative claims. A fourth category, conflation, involves merging details from separate true facts into a single false statement.</p>
+    </details>
+    <details>
+      <summary>How reliable are LLM-based hallucination detectors?</summary>
+      <p>LLM-based hallucination detection achieves 70-85% accuracy on standard benchmarks like TruthfulQA and HaluEval, depending on the detection model and prompt strategy. Multi-step verification prompts that decompose claims and cross-reference each component independently achieve higher accuracy than single-pass detection. However, no automated method is 100% reliable — subtle hallucinations that blend real and fabricated information remain challenging. For high-stakes applications, automated detection should be combined with human review.</p>
+    </details>
+    <details>
+      <summary>What is a confidence scoring rubric for hallucination detection?</summary>
+      <p>A confidence scoring rubric assigns numerical scores to claims based on how well they are supported by source evidence. A typical 5-point scale rates claims from 1 (no support — claim cannot be verified or is directly contradicted) to 5 (strong support — claim is explicitly stated or directly derivable from the source). The rubric considers factors like source specificity, logical inference distance, and the presence of hedging language. Building a custom rubric for your domain ensures consistent evaluation across different reviewers and automated systems.</p>
+    </details>
+    <details>
+      <summary>Which AI models hallucinate the least?</summary>
+      <p>As of May 2026, Claude Opus 4 and GPT-4o consistently rank among the lowest hallucination rates in benchmarks. Claude models are particularly strong at acknowledging uncertainty — they are more likely to say "I don't know" rather than fabricating an answer. Reasoning models like o3 and DeepSeek R1 also show lower hallucination rates because their chain-of-thought process catches inconsistencies. However, all models can hallucinate, especially on niche topics, recent events beyond their training data, and queries that require precise numerical recall.</p>
+    </details>
+    <details>
+      <summary>How do I build a hallucination detection pipeline for production?</summary>
+      <p>A production hallucination detection pipeline typically has four stages: (1) Claim extraction — decompose the LLM output into individual factual claims. (2) Evidence retrieval — for each claim, retrieve relevant source documents or knowledge base entries. (3) Entailment scoring — use an NLI model or LLM-based judge to score whether the evidence supports, contradicts, or is neutral to each claim. (4) Aggregation — combine per-claim scores into an overall confidence rating with flagged issues. For cost efficiency, use a cheaper model (Haiku, GPT-4o Mini) for claim extraction and a stronger model (Opus, GPT-4o) for entailment scoring on flagged claims only.</p>
+    </details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/tools/prompt-builder.html" class="related-card">
+        <h3>AI Prompt Builder</h3>
+        <p>Build structured, high-quality prompts for any AI model with template-based engineering.</p>
+      </a>
+      <a href="/tools/token-counter.html" class="related-card">
+        <h3>Token Counter</h3>
+        <p>Count tokens and estimate API costs for GPT-4o, Claude, Gemini, and 15+ models.</p>
+      </a>
+      <a href="/research/ai-benchmark-tracker.html" class="related-card">
+        <h3>Benchmark Tracker</h3>
+        <p>MMLU, HumanEval, GSM8K, and MATH scores for all major models with visualizations.</p>
+      </a>
+    </div>
+  </section>
+
+  <div class="author-bio">
+    <h3>About the Author</h3>
+    <p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudflow.com">ClaudFlow — Workflows</a>
+            <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  const templates = {
+    claimDecomp: {
+      name: 'Claim Decomposition',
+      prompt: `You are a fact-checking analyst. Your task is to decompose a complex claim into individual atomic assertions that can be independently verified.
+
+## Input
+Claim: {CLAIM}
+
+Source material (if provided): {SOURCE}
+
+## Instructions
+1. Break the claim into the smallest possible independent factual assertions
+2. For each assertion, identify:
+   - The specific fact being claimed
+   - What evidence would be needed to verify it
+   - Whether the source material supports, contradicts, or is silent on this assertion
+3. Rate each assertion on the confidence scale (1-5)
+4. Classify the overall hallucination type: fabrication, contradiction, exaggeration, conflation, or none
+
+## Output Format
+For each assertion:
+- Assertion: [text]
+- Evidence needed: [what would verify this]
+- Source support: [supported/contradicted/not addressed]
+- Confidence: [1-5]
+- Reasoning: [brief explanation]
+
+Overall verdict: [hallucination type or "no hallucination detected"]
+Overall confidence: [1-5]`
+    },
+    sourceVerify: {
+      name: 'Source Verification',
+      prompt: `You are a rigorous fact-checker specializing in source verification. Your task is to determine whether a claim is faithfully supported by the provided source material.
+
+## Source Material
+{SOURCE}
+
+## Claim to Verify
+{CLAIM}
+
+## Instructions
+1. Read the source material carefully and identify all relevant passages
+2. For each factual element in the claim, find the corresponding passage in the source
+3. Check for:
+   - Direct quotes: Are they accurate and in context?
+   - Statistics: Do the numbers match the source exactly?
+   - Attributions: Are findings attributed to the correct authors/organizations?
+   - Temporal claims: Are dates and timelines accurate?
+   - Causal claims: Does the source support the stated causal relationship?
+4. Identify any information in the claim NOT present in the source
+
+## Output Format
+- Supported elements: [list with source citations]
+- Unsupported elements: [list of claims not in source]
+- Contradicted elements: [list with explanation]
+- Distorted elements: [claims that exaggerate or understate the source]
+- Verdict: [faithful / partially faithful / unfaithful]
+- Confidence: [1-5]`
+    },
+    crossRef: {
+      name: 'Cross-Reference Check',
+      prompt: `You are an investigative researcher performing cross-reference verification. Your task is to evaluate a claim by checking it against multiple knowledge domains and identifying inconsistencies.
+
+## Claim
+{CLAIM}
+
+## Instructions
+1. Identify all domains of knowledge relevant to this claim (e.g., dates, geography, science, biography)
+2. For each domain, assess whether the claim is consistent with established knowledge
+3. Look for:
+   - Anachronisms (events placed in wrong time periods)
+   - Geographic impossibilities
+   - Scientific inaccuracies
+   - Biographical errors (wrong people, wrong roles, wrong institutions)
+   - Statistical impossibilities (percentages over 100%, negative counts, etc.)
+4. Flag any element that would fail cross-referencing
+
+## Output Format
+- Domain checks performed: [list]
+- Consistent elements: [list]
+- Inconsistent elements: [list with explanation]
+- Suspicious but unverifiable: [list]
+- Cross-reference verdict: [consistent / inconsistent / partially consistent]
+- Confidence: [1-5]`
+    },
+    numericalAudit: {
+      name: 'Numerical Audit',
+      prompt: `You are a quantitative analyst specializing in numerical verification. Your task is to audit all numerical claims for accuracy, consistency, and plausibility.
+
+## Claim
+{CLAIM}
+
+## Source (if provided)
+{SOURCE}
+
+## Instructions
+1. Extract every numerical value, percentage, date, quantity, and measurement from the claim
+2. For each number, evaluate:
+   - Source match: Does the number match the source material exactly?
+   - Internal consistency: Do the numbers add up? (e.g., do percentages sum to 100?)
+   - Plausibility: Is the number within a reasonable range for its context?
+   - Precision: Is the level of precision appropriate? (e.g., "97.3%" vs "about 97%")
+   - Unit correctness: Are units used correctly and consistently?
+3. Check for common numerical hallucination patterns:
+   - Round numbers substituted for precise ones (or vice versa)
+   - Order of magnitude errors (millions vs billions)
+   - Percentage vs percentage point confusion
+   - Correlation coefficients outside [-1, 1] range
+
+## Output Format
+For each numerical claim:
+- Value: [the number/statistic]
+- Source value: [what the source says, or "not in source"]
+- Assessment: [accurate / inaccurate / plausible but unverified / implausible]
+- Issue: [description if any]
+
+Overall numerical reliability: [high / medium / low]
+Confidence: [1-5]`
+    },
+    citationCheck: {
+      name: 'Citation Verification',
+      prompt: `You are an academic integrity specialist. Your task is to evaluate the authenticity and accuracy of citations, references, and attributions in the given text.
+
+## Text to Check
+{CLAIM}
+
+## Instructions
+1. Extract all citations, references, attributions, and sourced claims
+2. For each citation, evaluate:
+   - Does the author name appear to be real?
+   - Is the publication venue real?
+   - Is the year plausible given the topic?
+   - Does the claimed finding match the typical scope of such research?
+   - Is the citation format internally consistent?
+3. Flag common citation hallucination patterns:
+   - Real author + fake paper
+   - Real journal + fake volume/issue
+   - Plausible DOI format but non-existent DOI
+   - Findings attributed to wrong author
+   - Real paper but misrepresented findings
+
+## Output Format
+For each citation:
+- Citation: [the reference as stated]
+- Author verification: [likely real / suspicious / likely fabricated]
+- Venue verification: [real / suspicious / likely fabricated]
+- Finding verification: [consistent with field / suspicious / likely fabricated]
+- Overall assessment: [likely authentic / needs verification / likely hallucinated]
+
+Citation reliability summary: [high / medium / low]
+Confidence: [1-5]`
+    },
+    consistencyCheck: {
+      name: 'Self-Consistency',
+      prompt: `You are a logical consistency analyst. Your task is to check whether a piece of AI-generated text is internally consistent — that it does not contradict itself across different parts of the response.
+
+## Text to Analyze
+{CLAIM}
+
+## Instructions
+1. Identify all factual claims, assertions, and stated relationships in the text
+2. Create a graph of related claims and check for contradictions:
+   - Same entity with different attributes in different paragraphs
+   - Contradictory cause-effect relationships
+   - Timeline inconsistencies (event A before B in one place, after B in another)
+   - Numerical contradictions (different numbers for the same metric)
+   - Scope contradictions ("all" in one place, "some" in another for the same set)
+3. Check logical flow:
+   - Do conclusions follow from premises?
+   - Are there unstated assumptions that create hidden contradictions?
+   - Do recommendations align with the analysis?
+
+## Output Format
+- Claims inventory: [numbered list of key assertions]
+- Contradictions found: [pairs of contradicting claims with explanation]
+- Logical gaps: [missing steps in reasoning]
+- Consistency rating: [fully consistent / minor issues / significant contradictions]
+- Confidence: [1-5]`
+    },
+    hedgeDetect: {
+      name: 'Hedge Detection',
+      prompt: `You are a precision language analyst. Your task is to identify hedging language, weasel words, and vague qualifiers that may obscure the accuracy or confidence level of claims.
+
+## Text to Analyze
+{CLAIM}
+
+## Instructions
+1. Identify all hedging and qualifying language:
+   - Vague quantifiers: "some", "many", "most", "several", "significant"
+   - Weasel phrases: "it is believed that", "studies suggest", "experts say"
+   - Passive voice hiding attribution: "it was found that", "it has been shown"
+   - Confidence downgrades: "likely", "probably", "may", "could", "might"
+   - False precision: specific-sounding numbers without sources
+   - Appeal to unnamed authority: "researchers have found", "according to experts"
+2. For each hedge, assess whether it:
+   - Appropriately reflects genuine uncertainty
+   - Hides a lack of knowledge or source
+   - Disguises a fabricated or unverified claim
+
+## Output Format
+For each hedge found:
+- Text: [the hedging phrase in context]
+- Type: [vague quantifier / weasel phrase / passive attribution / confidence hedge / false precision / unnamed authority]
+- Assessment: [appropriate uncertainty / potential hallucination cover / needs verification]
+
+Hedging density: [low / moderate / high / excessive]
+Risk assessment: [the text is confident and verifiable / the text uses hedging to obscure uncertainty / the text may be hiding hallucinations behind qualifiers]
+Confidence: [1-5]`
+    }
+  };
+
+  let selectedTemplate = 'claimDecomp';
+
+  function selectTemplate(key) {
+    selectedTemplate = key;
+    document.querySelectorAll('.hd-chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.hd-chip').forEach(c => {
+      if (c.textContent === templates[key].name) c.classList.add('active');
+    });
+    renderTemplate();
+  }
+
+  function renderTemplate() {
+    const t = templates[selectedTemplate];
+    document.getElementById('hd-template-preview').textContent = t.prompt;
+  }
+
+  function copyTemplate() {
+    const text = document.getElementById('hd-template-preview').textContent;
+    navigator.clipboard.writeText(text).then(() => showToast());
+  }
+
+  function exportAll() {
+    let text = '# Hallucination Detection Prompt Templates\n# Exported from GPT0X Hallucination Detection Framework\n# https://gpt0x.com/research/llm-hallucination-detector.html\n\n';
+    Object.keys(templates).forEach(key => {
+      text += '---\n## ' + templates[key].name + '\n---\n' + templates[key].prompt + '\n\n';
+    });
+    const notes = document.getElementById('hd-rubric-notes').value.trim();
+    if (notes) {
+      text += '---\n## Custom Scoring Notes\n---\n' + notes + '\n';
+    }
+    navigator.clipboard.writeText(text).then(() => showToast());
+  }
+
+  function analyze() {
+    const claim = document.getElementById('hd-claim').value.trim();
+    const source = document.getElementById('hd-source').value.trim();
+    const domain = document.getElementById('hd-domain').value;
+
+    if (!claim) {
+      document.getElementById('hd-result').innerHTML = '<p>Please enter a claim to analyze.</p>';
+      return;
+    }
+
+    // Extract atomic claims
+    const claims = extractClaims(claim);
+    const analysis = analyzeClaimsAgainstSource(claims, source, domain);
+
+    // Render result
+    renderResult(analysis);
+    renderClaims(analysis.claims);
+  }
+
+  function extractClaims(text) {
+    const atomicClaims = [];
+    // Split on sentence boundaries
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    sentences.forEach(sentence => {
+      const s = sentence.trim();
+      if (!s) return;
+      // Check for compound claims with conjunctions
+      const parts = s.split(/(?:,\s*(?:and|but|while|whereas))|(?:\s+(?:and|but|while|whereas)\s+)/i);
+      parts.forEach(part => {
+        const p = part.trim().replace(/^[,;]\s*/, '');
+        if (p.length > 10) atomicClaims.push(p);
+      });
+    });
+    return atomicClaims.length > 0 ? atomicClaims : [text];
+  }
+
+  function analyzeClaimsAgainstSource(claims, source, domain) {
+    const results = [];
+    let overallType = 'none';
+    let overallScore = 5;
+    const sourceLower = source.toLowerCase();
+    const hasSource = source.length > 0;
+
+    claims.forEach(claimText => {
+      const c = claimText.toLowerCase();
+      let type = 'none';
+      let score = 5;
+      let reason = '';
+
+      // Check for numerical claims
+      const numbers = claimText.match(/\d[\d,.]*%?/g) || [];
+      const hasSpecificNumbers = numbers.length > 0;
+      const hasCitation = /(?:study|research|paper|found|showed|published|journal|et al|doi)/i.test(claimText);
+      const hasAttribution = /(?:according to|said|stated|reported|announced)/i.test(claimText);
+      const hasSuperlative = /(?:most|best|worst|largest|smallest|first|only|never|always|every|all|none)/i.test(claimText);
+      const hasHedge = /(?:may|might|could|probably|likely|some|many|several|suggest)/i.test(claimText);
+
+      if (hasSource) {
+        // Check contradiction
+        const claimWords = c.split(/\s+/).filter(w => w.length > 4);
+        const matchingWords = claimWords.filter(w => sourceLower.includes(w));
+        const overlapRatio = claimWords.length > 0 ? matchingWords.length / claimWords.length : 0;
+
+        if (overlapRatio < 0.2 && !hasHedge) {
+          type = 'fabrication';
+          score = 1;
+          reason = 'Claim content has minimal overlap with source material. Key terms not found in the provided evidence.';
+        } else if (overlapRatio < 0.4) {
+          if (hasSpecificNumbers) {
+            // Check if numbers appear in source
+            const numbersInSource = numbers.filter(n => source.includes(n));
+            if (numbersInSource.length < numbers.length) {
+              type = 'exaggeration';
+              score = 2;
+              reason = 'Specific numerical values not found in source material. Numbers may be fabricated or distorted.';
+            } else {
+              type = 'none';
+              score = 4;
+              reason = 'Numerical values found in source. Claim appears supported.';
+            }
+          } else {
+            type = 'none';
+            score = 3;
+            reason = 'Partial overlap with source. Some elements verifiable, others not addressed.';
+          }
+        } else {
+          type = 'none';
+          score = overlapRatio > 0.7 ? 5 : 4;
+          reason = 'Claim is well-supported by source material.';
+        }
+      } else {
+        // No source — heuristic analysis
+        if (hasCitation && hasSpecificNumbers) {
+          type = 'fabrication';
+          score = 2;
+          reason = 'Specific citation with precise numbers but no source provided for verification. High risk of fabricated statistics or references.';
+        } else if (hasCitation) {
+          type = 'fabrication';
+          score = 2;
+          reason = 'References a study or source that cannot be verified without reference material. Common hallucination pattern.';
+        } else if (hasSuperlative && !hasHedge) {
+          type = 'exaggeration';
+          score = 3;
+          reason = 'Contains superlative or absolute language without qualification. May overstate the actual situation.';
+        } else if (hasSpecificNumbers && !hasHedge) {
+          type = 'exaggeration';
+          score = 3;
+          reason = 'Contains specific numerical claims without hedging. Precision suggests either accurate recall or fabrication.';
+        } else if (hasHedge) {
+          type = 'none';
+          score = 4;
+          reason = 'Claim uses appropriate hedging language, suggesting awareness of uncertainty.';
+        } else {
+          type = 'none';
+          score = 4;
+          reason = 'General claim without high-risk hallucination indicators. Standard verification recommended.';
+        }
+      }
+
+      // Domain-specific adjustments
+      if (domain === 'medical' || domain === 'legal') {
+        if (score > 2 && (hasCitation || hasSpecificNumbers)) score = Math.max(1, score - 1);
+        if (type === 'none' && (hasCitation || hasSpecificNumbers)) {
+          reason += ' High-risk domain requires additional verification for specific claims.';
+        }
+      }
+
+      results.push({ text: claimText, type, score, reason });
+
+      if (score < overallScore) {
+        overallScore = score;
+        overallType = type;
+      }
+    });
+
+    return { type: overallType, score: overallScore, claims: results };
+  }
+
+  function renderResult(analysis) {
+    const typeLabels = {
+      fabrication: 'Fabrication Detected',
+      contradiction: 'Contradiction Detected',
+      exaggeration: 'Exaggeration Detected',
+      conflation: 'Conflation Detected',
+      none: 'No Hallucination Detected'
+    };
+    const typeClass = 'hd-type-' + analysis.type;
+    const confClass = analysis.score <= 2 ? 'hd-confidence-high' : analysis.score <= 3 ? 'hd-confidence-med' : 'hd-confidence-low';
+    const confLabel = analysis.score <= 2 ? 'HIGH RISK' : analysis.score <= 3 ? 'MEDIUM RISK' : 'LOW RISK';
+
+    let html = '<div class="hd-result-header">';
+    html += '<span class="hd-result-type ' + typeClass + '">' + typeLabels[analysis.type] + '</span>';
+    html += '<span class="hd-confidence ' + confClass + '">Confidence: ' + analysis.score + '/5 (' + confLabel + ')</span>';
+    html += '</div>';
+    html += '<p>' + analysis.claims.length + ' atomic claim(s) extracted and analyzed. ' +
+      analysis.claims.filter(c => c.type !== 'none').length + ' potential issue(s) found. ' +
+      'See individual claims below for detailed verdicts.</p>';
+    document.getElementById('hd-result').innerHTML = html;
+  }
+
+  function renderClaims(claims) {
+    let html = '';
+    claims.forEach((c, i) => {
+      const typeClass = 'hd-type-' + c.type;
+      const typeLabel = c.type === 'none' ? 'Supported' : c.type.charAt(0).toUpperCase() + c.type.slice(1);
+      html += '<div class="hd-claim">';
+      html += '<div class="hd-claim-text">' + (i + 1) + '. ' + escapeHtml(c.text) + '</div>';
+      html += '<span class="hd-claim-verdict ' + typeClass + '" style="display:inline-block;padding:2px 8px;border-radius:3px;margin-right:.5rem">' + typeLabel + ' (' + c.score + '/5)</span>';
+      html += '<span style="color:var(--text-muted);font-size:.78rem">' + c.reason + '</span>';
+      html += '</div>';
+    });
+    document.getElementById('hd-claims').innerHTML = html;
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function clear() {
+    document.getElementById('hd-claim').value = '';
+    document.getElementById('hd-source').value = '';
+    document.getElementById('hd-domain').value = 'general';
+    document.getElementById('hd-result').innerHTML = '<p>Enter a claim and optional source text, then click "Analyze Claim" to classify the hallucination type and generate a confidence score. The detector decomposes claims into individual assertions and evaluates each against the provided evidence.</p>';
+    document.getElementById('hd-claims').innerHTML = '<p style="color:var(--text-muted);font-size:.83rem">Individual claims extracted from the input will appear here with per-claim verdicts.</p>';
+    document.getElementById('hd-export').textContent = 'Click "Export Full Configuration" to generate a complete hallucination detection prompt package including all templates, rubric, and domain settings ready for integration into your pipeline.';
+  }
+
+  function loadExample() {
+    document.getElementById('hd-claim').value = 'A 2024 Stanford University study led by Dr. Sarah Chen found that GPT-4 achieves 97.3% accuracy on medical diagnosis tasks across a dataset of 50,000 patient records, outperforming human physicians by 12 percentage points. The research was published in Nature Medicine and has been cited over 500 times.';
+    document.getElementById('hd-source').value = 'Stanford researchers published a study in 2024 examining AI-assisted medical diagnosis. The study evaluated GPT-4 on a curated set of 5,000 case descriptions from electronic health records. Results showed the model achieved 82% diagnostic accuracy, compared to 78% for general practitioners in the same evaluation. The lead author was Dr. Michael Torres. The paper appeared in the Journal of Medical AI Research.';
+    document.getElementById('hd-domain').value = 'medical';
+    analyze();
+  }
+
+  function exportConfig() {
+    const domain = document.getElementById('hd-domain').value;
+    const notes = document.getElementById('hd-rubric-notes').value.trim();
+    let config = '# Hallucination Detection Configuration\n';
+    config += '# Generated by GPT0X — https://gpt0x.com/research/llm-hallucination-detector.html\n';
+    config += '# Date: 2026-05-25\n\n';
+    config += '## Domain: ' + domain.charAt(0).toUpperCase() + domain.slice(1) + '\n\n';
+    config += '## Confidence Scoring Rubric\n';
+    config += '5 - Fully Verified: Claim explicitly stated in source or directly derivable\n';
+    config += '4 - Well Supported: Strongly implied with minimal inference\n';
+    config += '3 - Partially Supported: Some basis but includes unverifiable details\n';
+    config += '2 - Weakly Supported: Tangential connection, significant assumptions required\n';
+    config += '1 - Unsupported: No support, contradicted, or fabricated\n\n';
+    if (notes) config += '## Custom Notes\n' + notes + '\n\n';
+    config += '## Detection Templates\n\n';
+    Object.keys(templates).forEach(key => {
+      config += '### ' + templates[key].name + '\n';
+      config += templates[key].prompt + '\n\n';
+    });
+    document.getElementById('hd-export').textContent = config;
+  }
+
+  function copyExport() {
+    const text = document.getElementById('hd-export').textContent;
+    if (!text || text.startsWith('Click')) return;
+    navigator.clipboard.writeText(text).then(() => showToast());
+  }
+
+  function showToast() {
+    const toast = document.getElementById('hd-toast');
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 2000);
+  }
+
+  window.hd = { analyze, clear, loadExample, selectTemplate, copyTemplate, exportAll, exportConfig, copyExport };
+
+  // Initialize
+  renderTemplate();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Safety Evaluation Framework — Interactive Scoring for LLMs (2026) | GPT0X</title>
+<meta name="description" content="Evaluate AI model safety across 8 dimensions: toxicity, bias, hallucination, refusal, jailbreak resistance, privacy, instruction following, and robustness. Interactive scoring tool with model comparisons. Updated May 2026.">
+<meta name="keywords" content="AI safety benchmark, LLM safety evaluation, AI model safety, toxicity testing, bias detection, hallucination rate, jailbreak resistance, AI alignment, responsible AI">
+<link rel="canonical" href="https://gpt0x.com/research/ai-safety-benchmark.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/research/ai-safety-benchmark.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/research/ai-safety-benchmark.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI Safety Evaluation Framework — Interactive Scoring for LLMs (2026)">
+<meta property="og:description" content="Evaluate AI model safety across 8 dimensions with interactive scoring, model comparisons, and benchmarking.">
+<meta property="og:url" content="https://gpt0x.com/research/ai-safety-benchmark.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Safety Evaluation Framework — Interactive Scoring for LLMs (2026)">
+<meta name="twitter:description" content="Evaluate AI model safety across 8 dimensions with interactive scoring and model comparisons.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "AI Safety Evaluation Framework — Interactive Scoring for LLMs",
+  "url": "https://gpt0x.com/research/ai-safety-benchmark.html",
+  "description": "Evaluate AI model safety across 8 dimensions with interactive scoring, model comparisons, and benchmarking.",
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "publisher": { "@type": "Organization", "name": "GPT0X", "url": "https://gpt0x.com" },
+  "datePublished": "2026-05-25",
+  "dateModified": "2026-05-25",
+  "mainEntityOfPage": "https://gpt0x.com/research/ai-safety-benchmark.html"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What are the key dimensions of AI safety evaluation?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AI safety evaluation typically covers 8 key dimensions: toxicity (harmful content generation), bias (demographic and cultural fairness), hallucination (factual accuracy and confidence calibration), refusal appropriateness (correctly declining harmful requests without over-refusing benign ones), jailbreak resistance (robustness against prompt injection attacks), privacy (protection of personal information), instruction following (adherence to system prompt constraints), and robustness (consistent behavior across varied inputs). Each dimension requires different evaluation methodologies and test sets."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which AI model is safest in 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Safety leadership varies by dimension. Claude Opus 4 consistently scores highest on refusal appropriateness and harmful content avoidance, reflecting Anthropic's Constitutional AI approach. GPT-4o leads on instruction following and factual grounding. Gemini 2.5 Pro excels at bias mitigation across languages. No single model dominates all safety dimensions. The safest choice depends on your specific use case: customer-facing applications prioritize toxicity and bias scores, while research applications may prioritize hallucination rates and robustness."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is AI hallucination measured?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hallucination is measured using factual accuracy benchmarks where the model's claims are verified against ground-truth databases. Common metrics include: factual consistency rate (percentage of claims that are verifiable), contradiction rate (self-contradictions within a response), attribution accuracy (correctly citing sources when asked), and confabulation rate (inventing plausible-sounding but false details). TruthfulQA is the standard benchmark, testing models on questions designed to elicit common misconceptions. Real-world hallucination rates are typically higher than benchmark scores because production queries are more diverse and adversarial."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between AI safety and AI alignment?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AI safety is the broader field of ensuring AI systems do not cause harm, encompassing technical safeguards, evaluation frameworks, and deployment practices. AI alignment is a subset focused specifically on ensuring the model's objectives and behaviors match human intent — that the model does what users want, not just what it was literally instructed to do. Safety includes concrete measures like content filtering, rate limiting, and output monitoring. Alignment addresses deeper challenges like reward hacking, goal misspecification, and value learning. Both are essential: a model can be safe (not producing toxic content) but misaligned (optimizing for engagement over helpfulness)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I evaluate AI safety for my specific application?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Start by identifying which safety dimensions matter most for your use case. Customer support bots should prioritize toxicity, bias, and hallucination. Code generation tools need instruction following and security awareness. Medical or legal applications require extreme hallucination resistance. Create a domain-specific test set with 100+ inputs covering normal operations, edge cases, and adversarial attacks. Score each output on the relevant dimensions. Our interactive scoring tool lets you weight dimensions by importance and generate a composite safety score. Re-evaluate monthly as models are updated and new attack vectors emerge."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Research", "item": "https://gpt0x.com/research/" },
+    { "@type": "ListItem", "position": 3, "name": "AI Safety Benchmark", "item": "https://gpt0x.com/research/ai-safety-benchmark.html" }
+  ]
+}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}
+.tool-hero h1 span{color:var(--accent)}
+.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.sf-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+@media(max-width:768px){.sf-grid{grid-template-columns:1fr}}
+.sf-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.sf-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.sf-field{margin-bottom:.75rem}
+.sf-field label{display:block;font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px}
+.sf-field select,.sf-field input[type="number"]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-family:var(--font-body);font-size:.83rem}
+.sf-field select:focus,.sf-field input:focus{outline:none;border-color:var(--accent)}
+.sf-slider-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem}
+.sf-slider-row label{width:140px;font-size:.78rem;color:var(--text-muted);flex-shrink:0}
+.sf-slider-row input[type="range"]{flex:1;accent-color:var(--accent)}
+.sf-slider-row .sf-slider-val{width:36px;text-align:right;font-size:.82rem;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.sf-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;background:var(--accent);color:#000}
+.sf-btn:hover{opacity:.85}
+.sf-radar{width:100%;max-width:400px;margin:1rem auto}
+.sf-score{text-align:center;margin:1rem 0}
+.sf-score-value{font-size:2.5rem;font-weight:700;color:var(--accent);font-family:var(--font-display)}
+.sf-score-label{font-size:.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.sf-comparison{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.sf-comparison h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.sf-comp-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.sf-comp-table th{background:var(--bg);color:var(--accent);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.3px;padding:.5rem;text-align:center;border:1px solid var(--border)}
+.sf-comp-table th:first-child{text-align:left}
+.sf-comp-table td{padding:.5rem;border:1px solid var(--border);text-align:center;color:var(--text-muted)}
+.sf-comp-table td:first-child{text-align:left;font-weight:600;color:var(--text)}
+.sf-bar{display:inline-block;height:16px;border-radius:3px;min-width:4px}
+.sf-bar-good{background:var(--accent)}
+.sf-bar-mid{background:#fbbf24}
+.sf-bar-low{background:#f472b6}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}
+.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}
+.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}
+.explainer p{color:var(--text-muted);margin-bottom:1rem}
+.explainer ul,.explainer ol{color:var(--text-muted);margin:0 0 1rem 1.5rem}
+.explainer li{margin-bottom:.4rem}
+.explainer table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}
+.explainer th,.explainer td{padding:.5rem .75rem;border:1px solid var(--border);text-align:left}
+.explainer th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}
+.explainer td{color:var(--text-muted)}
+.faq-section{max-width:780px;margin:2.5rem auto}
+.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}
+.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}
+.faq-section summary:hover{color:var(--accent)}
+.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}
+.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}
+.related-card:hover{border-color:var(--accent);text-decoration:none}
+.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}
+.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}
+.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">gpt0x</a>
+    <nav>
+      <a href="/">Database</a>
+      <a href="/research/">Research</a>
+      <a href="/tools/">Tools</a>
+      <a href="/answers/">Answers</a>
+      <a href="/blog/">Blog</a>
+      <a href="/about.html">About</a>
+      <div class="nav-right">
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+        <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-container">
+  <div class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/research/">Research</a> &rsaquo; AI Safety Benchmark
+  </div>
+
+  <div class="tool-hero">
+    <h1>AI <span>Safety</span> Evaluation Framework</h1>
+    <p>Evaluate and score AI models across 8 safety dimensions: toxicity, bias, hallucination, refusal, jailbreak resistance, privacy, instruction following, and robustness. Compare models side by side with weighted composite scores tailored to your use case.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="sf-grid">
+    <div class="sf-panel">
+      <h3>Safety Scoring Tool</h3>
+      <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Rate a model from 1-10 on each safety dimension. Weights default to equal but can be adjusted for your use case.</p>
+      <div class="sf-field">
+        <label>Model being evaluated</label>
+        <select id="sf-model">
+          <option value="gpt4o">GPT-4o</option>
+          <option value="opus4">Claude Opus 4</option>
+          <option value="sonnet4">Claude Sonnet 4</option>
+          <option value="gemini25pro">Gemini 2.5 Pro</option>
+          <option value="llama33">Llama 3.3 70B</option>
+          <option value="custom">Custom Model</option>
+        </select>
+      </div>
+      <div id="sf-sliders">
+        <div class="sf-slider-row"><label>Toxicity</label><input type="range" min="1" max="10" value="8" data-dim="toxicity" oninput="sf.updateSlider(this)"><span class="sf-slider-val">8</span></div>
+        <div class="sf-slider-row"><label>Bias Fairness</label><input type="range" min="1" max="10" value="7" data-dim="bias" oninput="sf.updateSlider(this)"><span class="sf-slider-val">7</span></div>
+        <div class="sf-slider-row"><label>Hallucination</label><input type="range" min="1" max="10" value="7" data-dim="hallucination" oninput="sf.updateSlider(this)"><span class="sf-slider-val">7</span></div>
+        <div class="sf-slider-row"><label>Refusal Quality</label><input type="range" min="1" max="10" value="7" data-dim="refusal" oninput="sf.updateSlider(this)"><span class="sf-slider-val">7</span></div>
+        <div class="sf-slider-row"><label>Jailbreak Resistance</label><input type="range" min="1" max="10" value="6" data-dim="jailbreak" oninput="sf.updateSlider(this)"><span class="sf-slider-val">6</span></div>
+        <div class="sf-slider-row"><label>Privacy</label><input type="range" min="1" max="10" value="8" data-dim="privacy" oninput="sf.updateSlider(this)"><span class="sf-slider-val">8</span></div>
+        <div class="sf-slider-row"><label>Instruction Following</label><input type="range" min="1" max="10" value="8" data-dim="instruction" oninput="sf.updateSlider(this)"><span class="sf-slider-val">8</span></div>
+        <div class="sf-slider-row"><label>Robustness</label><input type="range" min="1" max="10" value="7" data-dim="robustness" oninput="sf.updateSlider(this)"><span class="sf-slider-val">7</span></div>
+      </div>
+      <div style="margin-top:1rem">
+        <button class="sf-btn" onclick="sf.calculate()">Calculate Score</button>
+        <button class="sf-btn" onclick="sf.loadPreset()" style="background:var(--bg-hover);color:var(--text);border:1px solid var(--border);margin-left:.5rem">Load Preset</button>
+      </div>
+      <div class="sf-score" id="sf-score" style="display:none">
+        <div class="sf-score-value" id="sf-score-val">0</div>
+        <div class="sf-score-label" id="sf-score-label">Composite Safety Score</div>
+      </div>
+    </div>
+
+    <div class="sf-panel">
+      <h3>Dimension Weights</h3>
+      <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Adjust weights to prioritize dimensions that matter for your use case. Higher weight = more impact on composite score.</p>
+      <div id="sf-weights">
+        <div class="sf-slider-row"><label>Toxicity</label><input type="range" min="0" max="5" value="3" data-weight="toxicity" oninput="sf.updateWeight(this)"><span class="sf-slider-val">3</span></div>
+        <div class="sf-slider-row"><label>Bias Fairness</label><input type="range" min="0" max="5" value="3" data-weight="bias" oninput="sf.updateWeight(this)"><span class="sf-slider-val">3</span></div>
+        <div class="sf-slider-row"><label>Hallucination</label><input type="range" min="0" max="5" value="3" data-weight="hallucination" oninput="sf.updateWeight(this)"><span class="sf-slider-val">3</span></div>
+        <div class="sf-slider-row"><label>Refusal Quality</label><input type="range" min="0" max="5" value="2" data-weight="refusal" oninput="sf.updateWeight(this)"><span class="sf-slider-val">2</span></div>
+        <div class="sf-slider-row"><label>Jailbreak Resistance</label><input type="range" min="0" max="5" value="2" data-weight="jailbreak" oninput="sf.updateWeight(this)"><span class="sf-slider-val">2</span></div>
+        <div class="sf-slider-row"><label>Privacy</label><input type="range" min="0" max="5" value="3" data-weight="privacy" oninput="sf.updateWeight(this)"><span class="sf-slider-val">3</span></div>
+        <div class="sf-slider-row"><label>Instruction Following</label><input type="range" min="0" max="5" value="2" data-weight="instruction" oninput="sf.updateWeight(this)"><span class="sf-slider-val">2</span></div>
+        <div class="sf-slider-row"><label>Robustness</label><input type="range" min="0" max="5" value="2" data-weight="robustness" oninput="sf.updateWeight(this)"><span class="sf-slider-val">2</span></div>
+      </div>
+      <div style="margin-top:1rem">
+        <label style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600">Quick Presets:</label>
+        <div style="display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap">
+          <button class="sf-btn" onclick="sf.weightPreset('customer')" style="font-size:.75rem;padding:4px 12px;background:var(--bg-hover);color:var(--text);border:1px solid var(--border)">Customer-Facing</button>
+          <button class="sf-btn" onclick="sf.weightPreset('research')" style="font-size:.75rem;padding:4px 12px;background:var(--bg-hover);color:var(--text);border:1px solid var(--border)">Research</button>
+          <button class="sf-btn" onclick="sf.weightPreset('code')" style="font-size:.75rem;padding:4px 12px;background:var(--bg-hover);color:var(--text);border:1px solid var(--border)">Code Gen</button>
+          <button class="sf-btn" onclick="sf.weightPreset('equal')" style="font-size:.75rem;padding:4px 12px;background:var(--bg-hover);color:var(--text);border:1px solid var(--border)">Equal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sf-comparison">
+    <h3>Model Safety Comparison (Pre-loaded Benchmark Scores)</h3>
+    <table class="sf-comp-table">
+      <thead>
+        <tr><th>Dimension</th><th>GPT-4o</th><th>Claude Opus 4</th><th>Sonnet 4</th><th>Gemini 2.5 Pro</th><th>Llama 3.3</th></tr>
+      </thead>
+      <tbody id="sf-comp-tbody"></tbody>
+    </table>
+  </div>
+
+  <section class="explainer">
+    <h2>Understanding AI Safety Evaluation</h2>
+    <p>AI safety evaluation is the systematic process of measuring how well a language model avoids harmful outputs, maintains factual accuracy, respects user privacy, and behaves consistently. As LLMs become embedded in critical applications — from healthcare advice to legal document generation to financial analysis — rigorous safety evaluation is no longer optional. This framework provides a structured approach to assessing safety that works across model families and use cases.</p>
+
+    <h2>The Eight Safety Dimensions</h2>
+    <h3>1. Toxicity</h3>
+    <p>Toxicity measures the model's tendency to generate harmful, offensive, or inappropriate content including hate speech, violent content, sexually explicit material, and harassment. Modern models have strong toxicity filters, but edge cases remain — particularly when toxic content is embedded in seemingly benign contexts, when the model is asked to roleplay, or when generation involves sensitive topics like conflict or crime. Evaluation uses adversarial test sets with 500+ prompts designed to elicit toxic outputs across different attack vectors.</p>
+
+    <h3>2. Bias and Fairness</h3>
+    <p>Bias evaluation measures whether the model produces systematically different quality, tone, or accuracy for different demographic groups. This includes gender bias in professional recommendations, racial bias in creative writing, cultural bias in knowledge representation, and socioeconomic assumptions in advice-giving. Testing involves paired prompts that differ only in demographic identifiers, measuring output divergence. A fair model produces comparably helpful and accurate responses regardless of the demographic context implied by the prompt.</p>
+
+    <h3>3. Hallucination</h3>
+    <p>Hallucination rate is the frequency at which a model generates false, unverifiable, or fabricated information presented as fact. This is measured using knowledge-intensive questions with verifiable answers, checking both the accuracy of claims and the model's calibration (whether it expresses appropriate uncertainty for uncertain claims). TruthfulQA, SimpleQA, and custom domain-specific benchmarks are used. Hallucination is particularly dangerous in high-stakes domains: a hallucinated legal citation or medical dosage can cause real harm.</p>
+
+    <h3>4. Refusal Quality</h3>
+    <p>Refusal quality measures the model's ability to correctly decline harmful requests while avoiding over-refusal of benign ones. A model that refuses to write a story about a villain is overly cautious; a model that provides step-by-step instructions for dangerous activities has insufficient safeguards. The ideal balance is evaluated using mixed test sets containing genuinely harmful requests, ambiguous requests, and benign requests that superficially resemble harmful ones. The metric captures both false negatives (harmful requests not refused) and false positives (benign requests incorrectly refused).</p>
+
+    <h3>5. Jailbreak Resistance</h3>
+    <p>Jailbreak resistance measures how well the model maintains its safety behaviors when subjected to adversarial prompt engineering attacks. Common techniques include role-playing scenarios, encoding/decoding tricks, multi-turn manipulation, and prompt injection through user-controlled content. Evaluation uses a continuously updated set of known jailbreak techniques, testing whether the model maintains refusal behavior under each attack pattern. This dimension evolves rapidly as new attack techniques are discovered.</p>
+
+    <h3>6. Privacy</h3>
+    <p>Privacy evaluation checks whether the model protects personal information — both in its training data (not regurgitating memorized PII) and in its interactions (not requesting unnecessary personal details). Tests probe for memorized phone numbers, email addresses, physical addresses, and private documents. Additional tests check whether the model appropriately declines requests to process or store personal information in ways that violate common privacy principles like data minimization and purpose limitation.</p>
+
+    <h3>7. Instruction Following</h3>
+    <p>Instruction following measures adherence to system prompt constraints, output format requirements, and explicit behavioral rules. A model that is told to respond only in JSON but occasionally returns markdown has poor instruction following. This dimension is critical for production applications where consistent output format is required for downstream processing. Tests include format constraints, content restrictions, length limits, and complex multi-rule system prompts to evaluate prioritization when rules conflict.</p>
+
+    <h3>8. Robustness</h3>
+    <p>Robustness measures consistency across paraphrased inputs, typos, different languages, and edge-case inputs. A robust model provides the same quality response whether a question is asked formally or casually, with perfect grammar or with typos, in English or in other languages. Testing involves generating multiple paraphrased versions of the same question and measuring output variance. Models with low robustness produce unreliable results in production environments where input quality varies.</p>
+
+    <h2>Scoring Methodology</h2>
+    <p>Each dimension is scored on a 1-10 scale where 1 represents severe safety failures and 10 represents near-perfect safety. The composite score is a weighted average, with weights customizable based on use case. Customer-facing applications typically weight toxicity, bias, and hallucination heavily. Research applications prioritize hallucination and robustness. Code generation applications emphasize instruction following and jailbreak resistance (to prevent prompt injection in generated code). The framework encourages teams to define their own weights rather than relying on a universal ranking — safety requirements are inherently context-dependent.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details><summary>What are the key dimensions of AI safety evaluation?</summary><p>AI safety evaluation typically covers 8 key dimensions: toxicity (harmful content generation), bias (demographic and cultural fairness), hallucination (factual accuracy and confidence calibration), refusal appropriateness (correctly declining harmful requests without over-refusing benign ones), jailbreak resistance (robustness against prompt injection attacks), privacy (protection of personal information), instruction following (adherence to system prompt constraints), and robustness (consistent behavior across varied inputs). Each dimension requires different evaluation methodologies and test sets.</p></details>
+    <details><summary>Which AI model is safest in 2026?</summary><p>Safety leadership varies by dimension. Claude Opus 4 consistently scores highest on refusal appropriateness and harmful content avoidance, reflecting Anthropic's Constitutional AI approach. GPT-4o leads on instruction following and factual grounding. Gemini 2.5 Pro excels at bias mitigation across languages. No single model dominates all safety dimensions. The safest choice depends on your specific use case.</p></details>
+    <details><summary>How is AI hallucination measured?</summary><p>Hallucination is measured using factual accuracy benchmarks where the model's claims are verified against ground-truth databases. Common metrics include: factual consistency rate, contradiction rate, attribution accuracy, and confabulation rate. TruthfulQA is the standard benchmark. Real-world hallucination rates are typically higher than benchmark scores because production queries are more diverse and adversarial.</p></details>
+    <details><summary>What is the difference between AI safety and AI alignment?</summary><p>AI safety is the broader field of ensuring AI systems do not cause harm, encompassing technical safeguards, evaluation frameworks, and deployment practices. AI alignment is a subset focused specifically on ensuring the model's objectives and behaviors match human intent. Safety includes concrete measures like content filtering. Alignment addresses deeper challenges like reward hacking and value learning. Both are essential.</p></details>
+    <details><summary>How do I evaluate AI safety for my specific application?</summary><p>Start by identifying which safety dimensions matter most for your use case. Create a domain-specific test set with 100+ inputs covering normal operations, edge cases, and adversarial attacks. Score each output on the relevant dimensions. Our interactive scoring tool lets you weight dimensions by importance and generate a composite safety score. Re-evaluate monthly as models are updated and new attack vectors emerge.</p></details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/research/open-source-llm-leaderboard.html" class="related-card"><h3>LLM Leaderboard</h3><p>Interactive leaderboard of open-source models with benchmark filtering.</p></a>
+      <a href="/tools/ai-prompt-debugger.html" class="related-card"><h3>Prompt Debugger</h3><p>Debug and analyze prompts for safety and effectiveness issues.</p></a>
+      <a href="/answers/llm-context-window-comparison.html" class="related-card"><h3>Context Windows</h3><p>Compare context window sizes across all major AI models.</p></a>
+    </div>
+  </section>
+
+  <div class="author-bio">
+    <h3>About the Author</h3>
+    <p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudflow.com">ClaudFlow — Workflows</a>
+            <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  const dims = ['toxicity','bias','hallucination','refusal','jailbreak','privacy','instruction','robustness'];
+  const dimLabels = { toxicity:'Toxicity', bias:'Bias Fairness', hallucination:'Hallucination', refusal:'Refusal Quality', jailbreak:'Jailbreak Resistance', privacy:'Privacy', instruction:'Instruction Following', robustness:'Robustness' };
+  const presets = {
+    gpt4o:      { toxicity:8, bias:7, hallucination:8, refusal:7, jailbreak:6, privacy:8, instruction:9, robustness:8 },
+    opus4:      { toxicity:9, bias:8, hallucination:7, refusal:9, jailbreak:8, privacy:9, instruction:8, robustness:7 },
+    sonnet4:    { toxicity:9, bias:8, hallucination:7, refusal:8, jailbreak:7, privacy:8, instruction:8, robustness:7 },
+    gemini25pro:{ toxicity:8, bias:9, hallucination:7, refusal:7, jailbreak:6, privacy:7, instruction:8, robustness:8 },
+    llama33:    { toxicity:6, bias:6, hallucination:6, refusal:5, jailbreak:4, privacy:5, instruction:7, robustness:6 }
+  };
+  const weightPresets = {
+    customer: { toxicity:5, bias:5, hallucination:4, refusal:3, jailbreak:2, privacy:4, instruction:2, robustness:2 },
+    research: { toxicity:1, bias:2, hallucination:5, refusal:1, jailbreak:1, privacy:2, instruction:3, robustness:5 },
+    code:     { toxicity:2, bias:1, hallucination:3, refusal:2, jailbreak:4, privacy:3, instruction:5, robustness:3 },
+    equal:    { toxicity:3, bias:3, hallucination:3, refusal:3, jailbreak:3, privacy:3, instruction:3, robustness:3 }
+  };
+
+  function getScores() {
+    const scores = {};
+    document.querySelectorAll('#sf-sliders input[type="range"]').forEach(s => { scores[s.dataset.dim] = parseInt(s.value); });
+    return scores;
+  }
+  function getWeights() {
+    const w = {};
+    document.querySelectorAll('#sf-weights input[type="range"]').forEach(s => { w[s.dataset.weight] = parseInt(s.value); });
+    return w;
+  }
+  function updateSlider(el) { el.nextElementSibling.textContent = el.value; }
+  function updateWeight(el) { el.nextElementSibling.textContent = el.value; }
+
+  function calculate() {
+    const scores = getScores();
+    const weights = getWeights();
+    let totalWeight = 0, weighted = 0;
+    dims.forEach(d => { totalWeight += weights[d]; weighted += scores[d] * weights[d]; });
+    const composite = totalWeight > 0 ? (weighted / totalWeight) : 0;
+    document.getElementById('sf-score').style.display = 'block';
+    document.getElementById('sf-score-val').textContent = composite.toFixed(1);
+    const model = document.getElementById('sf-model');
+    const label = model.value === 'custom' ? 'Custom Model' : model.options[model.selectedIndex].text;
+    document.getElementById('sf-score-label').textContent = label + ' — Composite Safety Score';
+  }
+
+  function loadPreset() {
+    const key = document.getElementById('sf-model').value;
+    const p = presets[key];
+    if (!p) return;
+    document.querySelectorAll('#sf-sliders input[type="range"]').forEach(s => {
+      if (p[s.dataset.dim] !== undefined) { s.value = p[s.dataset.dim]; s.nextElementSibling.textContent = p[s.dataset.dim]; }
+    });
+  }
+
+  function weightPreset(name) {
+    const wp = weightPresets[name];
+    document.querySelectorAll('#sf-weights input[type="range"]').forEach(s => {
+      if (wp[s.dataset.weight] !== undefined) { s.value = wp[s.dataset.weight]; s.nextElementSibling.textContent = wp[s.dataset.weight]; }
+    });
+  }
+
+  function renderComparison() {
+    const tbody = document.getElementById('sf-comp-tbody');
+    const models = ['gpt4o','opus4','sonnet4','gemini25pro','llama33'];
+    let html = '';
+    dims.forEach(d => {
+      html += '<tr><td>'+dimLabels[d]+'</td>';
+      models.forEach(m => {
+        const val = presets[m][d];
+        const color = val >= 8 ? 'sf-bar-good' : val >= 6 ? 'sf-bar-mid' : 'sf-bar-low';
+        html += '<td><span class="sf-bar '+color+'" style="width:'+val*10+'%"></span> '+val+'/10</td>';
+      });
+      html += '</tr>';
+    });
+    // Composite row
+    html += '<tr style="border-top:2px solid var(--accent)"><td style="color:var(--accent);font-weight:700">Composite</td>';
+    models.forEach(m => {
+      const avg = dims.reduce((s,d) => s + presets[m][d], 0) / dims.length;
+      html += '<td style="color:var(--accent);font-weight:700">'+avg.toFixed(1)+'/10</td>';
+    });
+    html += '</tr>';
+    tbody.innerHTML = html;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() { renderComparison(); });
+  window.sf = { calculate, loadPreset, weightPreset, updateSlider, updateWeight };
+})();
+</script>
+</body>
+</html>

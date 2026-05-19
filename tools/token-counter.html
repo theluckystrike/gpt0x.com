@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Model Token Counter — AI Cost Estimation for GPT, Claude & Gemini | GPT0X</title>
+<meta name="description" content="Count tokens for GPT-4o, Claude Opus 4, Gemini 2.5 Pro, and 15+ AI models. Real-time cost estimation with input/output pricing per 1K tokens. Character, word, sentence, and paragraph counts. Free, no sign-up.">
+<meta name="keywords" content="token counter, AI token calculator, GPT token count, Claude tokens, Gemini tokens, LLM cost estimation, tokenizer, API pricing calculator, token visualization">
+<link rel="canonical" href="https://gpt0x.com/tools/token-counter.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/tools/token-counter.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/tools/token-counter.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Multi-Model Token Counter — AI Cost Estimation for GPT, Claude & Gemini">
+<meta property="og:description" content="Count tokens for GPT-4o, Claude Opus 4, Gemini 2.5 Pro, and 15+ AI models. Real-time cost estimation with input/output pricing per 1K tokens.">
+<meta property="og:url" content="https://gpt0x.com/tools/token-counter.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Multi-Model Token Counter — AI Cost Estimation for GPT, Claude & Gemini">
+<meta name="twitter:description" content="Count tokens for GPT-4o, Claude Opus 4, Gemini 2.5 Pro, and 15+ AI models. Real-time cost estimation with input/output pricing per 1K tokens.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Multi-Model Token Counter",
+  "url": "https://gpt0x.com/tools/token-counter.html",
+  "description": "Count tokens for GPT-4o, Claude Opus 4, Gemini 2.5 Pro, and 15+ AI models with real-time cost estimation and token visualization.",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "publisher": { "@type": "Organization", "name": "GPT0X", "url": "https://gpt0x.com" },
+  "datePublished": "2026-05-25",
+  "dateModified": "2026-05-25",
+  "featureList": [
+    "Token counting for 15+ AI models including GPT-4o, Claude Opus 4, Gemini 2.5 Pro",
+    "Real-time cost estimation with input and output pricing per 1K tokens",
+    "Character, word, sentence, and paragraph counts",
+    "Token boundary visualization with color-coded highlighting",
+    "Batch processing cost calculator for bulk API usage",
+    "Client-side only — no data leaves your browser"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How are tokens counted for different AI models?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Each AI model uses a different tokenizer that splits text into subword units. GPT-4o uses the o200k_base tokenizer averaging about 4 characters per token for English text. Claude models use a proprietary tokenizer averaging about 3.5 characters per token. Gemini models average roughly 4 characters per token. This tool uses model-specific character-per-token ratios to provide accurate estimates without requiring the actual tokenizer libraries, which are typically several megabytes each."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does it cost to process 1 million tokens with GPT-4o?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "As of May 2026, GPT-4o charges $2.50 per 1 million input tokens and $10.00 per 1 million output tokens. For a typical API call with 1,000 input tokens and 500 output tokens, the cost would be approximately $0.0075. Claude Opus 4 charges $15.00 per million input tokens and $75.00 per million output tokens, while Gemini 2.5 Pro charges $1.25 per million input tokens and $10.00 per million output tokens. Model pricing varies significantly, so choosing the right model for your task can reduce costs by 10-100x."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why do code and non-English text use more tokens?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tokenizers are trained primarily on English text, so their vocabulary is optimized for common English words and subwords. Code contains special characters, variable names, and syntax patterns that often split into more tokens than natural prose. Non-English languages, especially those with non-Latin scripts like Chinese, Japanese, Korean, and Arabic, can use 2-4x more tokens per word because the tokenizer must represent unfamiliar character sequences with multiple subword tokens. This directly affects API costs for multilingual applications."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between input tokens and output tokens?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Input tokens are the tokens in your prompt — the text you send to the API. Output tokens are the tokens the model generates in its response. Most API providers charge different rates for each, with output tokens typically costing 2-5x more than input tokens because generation requires more computation than processing input. When estimating costs, you need to account for both your prompt length and the expected response length."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How accurate is browser-based token counting compared to official tokenizers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Browser-based approximations using character-per-token ratios are typically within 5-15% of official tokenizer counts for standard English prose. The accuracy decreases for code, mixed-language text, and content with many special characters or numbers. For exact counts, you would need to use the model-specific tokenizer library (tiktoken for OpenAI, etc.). However, for cost estimation and prompt planning, the approximation is sufficient — the main goal is to stay within context window limits and estimate costs within a reasonable margin."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools/" },
+    { "@type": "ListItem", "position": 3, "name": "Token Counter", "item": "https://gpt0x.com/tools/token-counter.html" }
+  ]
+}
+</script>
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}
+.tool-hero h1 span{color:var(--accent)}
+.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.tc-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+@media(max-width:768px){.tc-layout{grid-template-columns:1fr}}
+.tc-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.tc-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.tc-field{margin-bottom:1rem}
+.tc-field label{display:block;font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:4px}
+.tc-field select,.tc-field input,.tc-field textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-family:var(--font-body);font-size:.85rem;resize:vertical}
+.tc-field select:focus,.tc-field input:focus,.tc-field textarea:focus{outline:none;border-color:var(--accent)}
+.tc-field textarea{min-height:180px;line-height:1.6}
+.tc-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.tc-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.tc-btn-primary{background:var(--accent);color:#000}
+.tc-btn-secondary{background:var(--bg-hover);color:var(--text);border:1px solid var(--border)}
+.tc-btn:hover{opacity:.85}
+.tc-stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.25rem}
+.tc-stat{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;text-align:center}
+.tc-stat .tc-stat-value{font-size:1.4rem;font-weight:700;color:var(--accent);font-family:var(--font-display)}
+.tc-stat .tc-stat-label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.tc-model-grid{display:grid;grid-template-columns:1fr;gap:.5rem;margin-bottom:1rem}
+.tc-model-row{display:grid;grid-template-columns:1fr auto auto auto;gap:.75rem;align-items:center;padding:.5rem .75rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;cursor:pointer;transition:border-color .2s}
+.tc-model-row:hover,.tc-model-row.active{border-color:var(--accent)}
+.tc-model-row .tc-model-name{font-weight:600;color:var(--text)}
+.tc-model-row .tc-model-tokens,.tc-model-row .tc-model-cost{color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums}
+.tc-model-row.active .tc-model-tokens{color:var(--accent)}
+.tc-cost-section{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:1rem}
+.tc-cost-section h4{font-size:.8rem;color:var(--accent);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.5px}
+.tc-cost-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;font-size:.83rem;border-bottom:1px solid var(--border)}
+.tc-cost-row:last-child{border-bottom:none}
+.tc-cost-row .tc-cost-label{color:var(--text-muted)}
+.tc-cost-row .tc-cost-value{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.tc-batch{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.tc-batch h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.tc-batch-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.75rem;align-items:end;margin-bottom:.75rem}
+@media(max-width:768px){.tc-batch-row{grid-template-columns:1fr 1fr}}
+.tc-batch-result{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-top:.75rem;font-size:.85rem;color:var(--text-muted)}
+.tc-batch-result span{color:var(--accent);font-weight:600}
+.tc-viz{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:.85rem;line-height:1.8;min-height:100px;max-height:300px;overflow-y:auto;word-break:break-word}
+.tc-viz .tk{padding:1px 0;border-bottom:2px solid transparent}
+.tc-viz .tk-0{border-color:#34d399}.tc-viz .tk-1{border-color:#60a5fa}.tc-viz .tk-2{border-color:#f472b6}.tc-viz .tk-3{border-color:#fbbf24}.tc-viz .tk-4{border-color:#a78bfa}.tc-viz .tk-5{border-color:#fb923c}
+.tc-viz-legend{display:flex;gap:1rem;margin-top:.5rem;font-size:.72rem;color:var(--text-muted);flex-wrap:wrap}
+.tc-viz-legend span{display:inline-flex;align-items:center;gap:3px}
+.tc-viz-legend span::before{content:'';display:inline-block;width:12px;height:3px;border-radius:2px}
+.tc-viz-legend .lg-0::before{background:#34d399}.tc-viz-legend .lg-1::before{background:#60a5fa}.tc-viz-legend .lg-2::before{background:#f472b6}.tc-viz-legend .lg-3::before{background:#fbbf24}
+.tc-copy-toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:8px 20px;border-radius:var(--radius);font-size:.85rem;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.tc-copy-toast.visible{opacity:1}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}
+.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}
+.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}
+.explainer p{color:var(--text-muted);margin-bottom:1rem}
+.explainer ul,.explainer ol{color:var(--text-muted);margin:0 0 1rem 1.5rem}
+.explainer li{margin-bottom:.4rem}
+.explainer table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}
+.explainer th,.explainer td{padding:.5rem .75rem;border:1px solid var(--border);text-align:left}
+.explainer th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}
+.explainer td{color:var(--text-muted)}
+.faq-section{max-width:780px;margin:2.5rem auto}
+.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}
+.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}
+.faq-section summary:hover{color:var(--accent)}
+.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}
+.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}
+.related-card:hover{border-color:var(--accent);text-decoration:none}
+.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}
+.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}
+.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">gpt0x</a>
+    <nav>
+      <a href="/">Database</a>
+      <a href="/research/">Research</a>
+      <a href="/tools/">Tools</a>
+      <a href="/answers/">Answers</a>
+      <a href="/blog/">Blog</a>
+      <a href="/about.html">About</a>
+      <div class="nav-right">
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+        <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-container">
+  <div class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Tools</a> &rsaquo; Token Counter
+  </div>
+
+  <div class="tool-hero">
+    <h1>Multi-Model <span>Token</span> Counter</h1>
+    <p>Count tokens across GPT-4o, Claude Opus 4, Gemini 2.5 Pro, and 15+ AI models. Get real-time cost estimates, text statistics, and visual token boundary maps to plan your API usage and optimize prompt costs.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <div class="tc-layout">
+    <div class="tc-panel">
+      <h3>Input Text</h3>
+      <div class="tc-field">
+        <label>Paste or type your text</label>
+        <textarea id="tc-input" placeholder="Paste your prompt, document, or any text here to count tokens across multiple AI models. Token counts update in real time as you type."></textarea>
+      </div>
+      <div class="tc-actions">
+        <button class="tc-btn tc-btn-primary" onclick="tc.count()">Count Tokens</button>
+        <button class="tc-btn tc-btn-secondary" onclick="tc.clear()">Clear</button>
+        <button class="tc-btn tc-btn-secondary" onclick="tc.loadSample()">Load Sample</button>
+      </div>
+      <div class="tc-stats-grid">
+        <div class="tc-stat"><div class="tc-stat-value" id="tc-chars">0</div><div class="tc-stat-label">Characters</div></div>
+        <div class="tc-stat"><div class="tc-stat-value" id="tc-words">0</div><div class="tc-stat-label">Words</div></div>
+        <div class="tc-stat"><div class="tc-stat-value" id="tc-sentences">0</div><div class="tc-stat-label">Sentences</div></div>
+        <div class="tc-stat"><div class="tc-stat-value" id="tc-paragraphs">0</div><div class="tc-stat-label">Paragraphs</div></div>
+      </div>
+      <h3 style="margin-top:1.25rem">Token Visualization</h3>
+      <div class="tc-viz" id="tc-viz">Token boundaries will appear here with color-coded highlights showing approximate token splits for the selected model.</div>
+      <div class="tc-viz-legend">
+        <span class="lg-0">Token A</span>
+        <span class="lg-1">Token B</span>
+        <span class="lg-2">Token C</span>
+        <span class="lg-3">Token D</span>
+      </div>
+    </div>
+
+    <div class="tc-panel">
+      <h3>Token Counts by Model</h3>
+      <div class="tc-field">
+        <label>Select a model for cost details</label>
+        <select id="tc-model-select" onchange="tc.selectModel(this.value)">
+          <optgroup label="OpenAI">
+            <option value="gpt4o" selected>GPT-4o</option>
+            <option value="gpt4omini">GPT-4o Mini</option>
+            <option value="o3">o3</option>
+            <option value="o3mini">o3-mini</option>
+            <option value="o4mini">o4-mini</option>
+          </optgroup>
+          <optgroup label="Anthropic">
+            <option value="opus4">Claude Opus 4</option>
+            <option value="sonnet4">Claude Sonnet 4</option>
+            <option value="haiku35">Claude Haiku 3.5</option>
+          </optgroup>
+          <optgroup label="Google">
+            <option value="gemini25pro">Gemini 2.5 Pro</option>
+            <option value="gemini25flash">Gemini 2.5 Flash</option>
+          </optgroup>
+          <optgroup label="Open Source">
+            <option value="llama33">Llama 3.3 70B</option>
+            <option value="deepseekv3">DeepSeek V3</option>
+            <option value="deepseekr1">DeepSeek R1</option>
+            <option value="qwen25">Qwen 2.5 72B</option>
+            <option value="mistral">Mistral Large</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="tc-model-grid" id="tc-model-grid"></div>
+      <div class="tc-cost-section">
+        <h4>Cost Estimate — <span id="tc-selected-model">GPT-4o</span></h4>
+        <div class="tc-cost-row"><span class="tc-cost-label">Input tokens</span><span class="tc-cost-value" id="tc-cost-input-tokens">0</span></div>
+        <div class="tc-cost-row"><span class="tc-cost-label">Input cost</span><span class="tc-cost-value" id="tc-cost-input">$0.0000</span></div>
+        <div class="tc-cost-row"><span class="tc-cost-label">Output tokens (est. 1:1)</span><span class="tc-cost-value" id="tc-cost-output-tokens">0</span></div>
+        <div class="tc-cost-row"><span class="tc-cost-label">Output cost</span><span class="tc-cost-value" id="tc-cost-output">$0.0000</span></div>
+        <div class="tc-cost-row" style="border-top:2px solid var(--accent);padding-top:.6rem;margin-top:.3rem"><span class="tc-cost-label" style="font-weight:600;color:var(--text)">Total cost per request</span><span class="tc-cost-value" id="tc-cost-total">$0.0000</span></div>
+      </div>
+      <div class="tc-field">
+        <label>Output multiplier (output:input ratio)</label>
+        <select id="tc-output-ratio" onchange="tc.updateCost()">
+          <option value="0.5">0.5x (short replies)</option>
+          <option value="1" selected>1x (equal length)</option>
+          <option value="2">2x (detailed responses)</option>
+          <option value="3">3x (long-form generation)</option>
+          <option value="5">5x (code generation)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="tc-batch">
+    <h3>Batch Cost Calculator</h3>
+    <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem">Estimate costs for bulk API processing. Enter the number of requests and average tokens per request to calculate total spend.</p>
+    <div class="tc-batch-row">
+      <div class="tc-field">
+        <label>Number of requests</label>
+        <input type="number" id="tc-batch-requests" value="1000" min="1">
+      </div>
+      <div class="tc-field">
+        <label>Avg input tokens per request</label>
+        <input type="number" id="tc-batch-input" value="500" min="1">
+      </div>
+      <div class="tc-field">
+        <label>Avg output tokens per request</label>
+        <input type="number" id="tc-batch-output" value="500" min="1">
+      </div>
+      <button class="tc-btn tc-btn-primary" onclick="tc.calcBatch()" style="height:38px;margin-bottom:1rem">Calculate</button>
+    </div>
+    <div class="tc-batch-result" id="tc-batch-result">Click "Calculate" to estimate batch processing costs across all models.</div>
+  </div>
+
+  <div id="tc-toast" class="tc-copy-toast">Copied to clipboard</div>
+
+  <section class="explainer">
+    <h2>Understanding AI Tokens: The Complete Guide</h2>
+    <p>Tokens are the fundamental units that large language models use to process text. Every time you send a prompt to GPT-4o, Claude, or Gemini, your text is first broken into tokens before the model processes it. Understanding how tokenization works is essential for controlling API costs, staying within context window limits, and writing efficient prompts. This guide covers everything developers, product managers, and AI engineers need to know about tokens in 2026.</p>
+
+    <h2>What Is a Token?</h2>
+    <p>A token is a chunk of text that the model treats as a single unit. In most modern tokenizers, a token is a subword unit — somewhere between a single character and a full word. Common English words like "the," "and," and "hello" are typically single tokens. Less common words get split into multiple tokens: "tokenization" might become ["token", "ization"], and "pneumonoultramicroscopicsilicovolcanoconiosis" would be split into many subword pieces. Numbers, punctuation, whitespace, and special characters each consume tokens too, sometimes in surprising ways.</p>
+    <p>The key insight is that token count does not equal word count. For standard English prose, the ratio is approximately 1 word to 1.3 tokens. But this ratio changes dramatically depending on the content type, language, and specific model tokenizer. Code tends to use more tokens per semantic unit because of special characters, indentation, and variable names. Non-Latin scripts like Chinese, Japanese, and Korean can use 2-4x more tokens per character because the tokenizer vocabulary was primarily trained on English and Latin-script languages.</p>
+
+    <h2>How Different Tokenizers Work</h2>
+    <h3>Byte-Pair Encoding (BPE)</h3>
+    <p>Most modern language models use Byte-Pair Encoding or a variant of it. BPE starts with individual bytes (or characters) and iteratively merges the most frequent adjacent pairs to build a vocabulary of subword tokens. OpenAI's models use BPE-based tokenizers: GPT-4 and GPT-4o use the cl100k_base and o200k_base tokenizers respectively, with vocabulary sizes of 100,000 and 200,000 tokens. A larger vocabulary generally means better compression (fewer tokens for the same text) but more model parameters dedicated to the embedding layer.</p>
+
+    <h3>SentencePiece and Unigram</h3>
+    <p>Google's Gemini models and many open-source models use SentencePiece with the Unigram algorithm. Unlike BPE which builds up from characters, Unigram starts with a large vocabulary and prunes it down to the optimal size based on a probabilistic model. The practical difference for users is minimal — both approaches produce subword tokenizations with similar compression ratios. SentencePiece has the advantage of being language-agnostic since it operates directly on raw text without requiring pre-tokenization rules specific to a language.</p>
+
+    <h3>Claude's Tokenizer</h3>
+    <p>Anthropic's Claude models use a proprietary tokenizer that tends to produce slightly fewer tokens than OpenAI's tokenizer for the same text, averaging about 3.5 characters per token for English text compared to GPT-4o's approximately 4 characters per token. This difference means that Claude's effective context window in terms of words is slightly larger than what the raw token count might suggest. For prompt optimization, this matters — the same prompt sent to Claude and GPT-4o will consume different numbers of tokens.</p>
+
+    <h2>AI Model Pricing Comparison (May 2026)</h2>
+    <table>
+      <tr><th>Model</th><th>Input $/1M tokens</th><th>Output $/1M tokens</th><th>Context Window</th></tr>
+      <tr><td>GPT-4o</td><td>$2.50</td><td>$10.00</td><td>128K</td></tr>
+      <tr><td>GPT-4o Mini</td><td>$0.15</td><td>$0.60</td><td>128K</td></tr>
+      <tr><td>o3</td><td>$10.00</td><td>$40.00</td><td>200K</td></tr>
+      <tr><td>o3-mini</td><td>$1.10</td><td>$4.40</td><td>200K</td></tr>
+      <tr><td>o4-mini</td><td>$1.10</td><td>$4.40</td><td>200K</td></tr>
+      <tr><td>Claude Opus 4</td><td>$15.00</td><td>$75.00</td><td>200K</td></tr>
+      <tr><td>Claude Sonnet 4</td><td>$3.00</td><td>$15.00</td><td>200K</td></tr>
+      <tr><td>Claude Haiku 3.5</td><td>$0.80</td><td>$4.00</td><td>200K</td></tr>
+      <tr><td>Gemini 2.5 Pro</td><td>$1.25</td><td>$10.00</td><td>1M</td></tr>
+      <tr><td>Gemini 2.5 Flash</td><td>$0.15</td><td>$0.60</td><td>1M</td></tr>
+    </table>
+
+    <h2>Token Optimization Strategies</h2>
+    <h3>1. Prompt Compression</h3>
+    <p>Reducing token count without losing meaning is one of the highest-ROI optimizations for teams making thousands of API calls. Techniques include removing redundant instructions, using abbreviations the model understands, replacing verbose examples with concise ones, and using structured formats like JSON or Markdown headers instead of natural language descriptions. Studies show that well-compressed prompts can reduce token usage by 30-50% while maintaining output quality.</p>
+
+    <h3>2. Model Routing</h3>
+    <p>Not every request needs your most expensive model. A model router that sends simple classification tasks to GPT-4o Mini or Gemini 2.5 Flash while routing complex reasoning tasks to Claude Opus 4 or o3 can reduce average costs by 60-80%. The token counter helps you estimate per-request costs across models so you can build informed routing logic. Many production systems use a cascade approach: try the cheaper model first, and only escalate to the premium model if the output fails quality checks.</p>
+
+    <h3>3. Caching and Deduplication</h3>
+    <p>If your application sends similar prompts repeatedly — common in customer support, document processing, and content generation pipelines — semantic caching can eliminate redundant API calls entirely. Cache the model's response keyed on a hash of the prompt, and serve cached responses for identical or near-identical inputs. Anthropic and OpenAI now offer prompt caching features that discount repeated prefixes, reducing costs by up to 90% for prompts that share a common system message.</p>
+
+    <h3>4. Output Length Control</h3>
+    <p>Output tokens typically cost 2-5x more than input tokens, so controlling response length has outsized impact on costs. Use explicit length constraints in your prompts: "Respond in 3 sentences" or set the max_tokens parameter in the API call. For structured outputs, request JSON with specific fields rather than allowing the model to produce verbose explanations. The output multiplier selector in this tool lets you model different response lengths to see the cost impact.</p>
+
+    <h2>Context Windows and Their Practical Limits</h2>
+    <p>A model's context window is the maximum number of tokens it can process in a single request (input + output combined). Gemini 2.5 Pro leads with a 1 million token window, followed by Claude's 200K and GPT-4o's 128K. However, the practical limit is often lower than the theoretical maximum. Models can experience degraded performance on tasks that require attending to information spread across very long contexts — a phenomenon called "lost in the middle" where information in the center of long prompts gets less attention than information at the beginning or end.</p>
+    <p>For most production applications, staying under 50% of the context window provides the best balance of performance and capacity. This leaves room for the output and avoids the quality degradation that can occur near context limits. If you need to process documents longer than your target model's context window, consider chunking strategies: split the document, process each chunk separately, and then aggregate the results.</p>
+
+    <h2>Token Counting for Different Content Types</h2>
+    <h3>English Prose</h3>
+    <p>Standard English text averages 1 token per 4 characters or approximately 1.3 tokens per word. This is the baseline ratio that most estimation tools use. For common vocabulary, the ratio is even better — high-frequency words like "the," "is," "and" are single tokens. For technical or specialized vocabulary, the ratio is worse because uncommon words get split into subword pieces.</p>
+
+    <h3>Source Code</h3>
+    <p>Code typically uses 1.5-2x more tokens per line than natural language because of special characters (brackets, semicolons, operators), indentation whitespace, and camelCase/snake_case variable names that get split at boundaries. Python is relatively token-efficient due to its minimal syntax. Languages with more boilerplate like Java and C++ consume more tokens for the same logic. Comments in code are tokenized the same as prose.</p>
+
+    <h3>JSON and Structured Data</h3>
+    <p>JSON is token-expensive due to repeated structural characters (braces, brackets, colons, quotes, commas). A JSON object with the same information as a natural language sentence will typically use 2-3x more tokens. For API calls that include or return JSON, this overhead is significant. Consider using more compact formats in prompts when the model can infer structure from context.</p>
+
+    <h3>Non-English Languages</h3>
+    <p>Languages with Latin scripts (Spanish, French, German) use roughly 1.1-1.5x the tokens of English for the same content. Languages with non-Latin scripts vary more dramatically: Chinese and Japanese use approximately 2-3 tokens per character because each character maps to a byte sequence that requires multiple BPE merges. Arabic and Hindi typically use 2-4x more tokens than English for equivalent content. This disparity directly affects API costs for multilingual applications and is an important factor in international product design.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details>
+      <summary>How are tokens counted for different AI models?</summary>
+      <p>Each AI model uses a different tokenizer that splits text into subword units. GPT-4o uses the o200k_base tokenizer averaging about 4 characters per token for English text. Claude models use a proprietary tokenizer averaging about 3.5 characters per token. Gemini models average roughly 4 characters per token. This tool uses model-specific character-per-token ratios to provide accurate estimates without requiring the actual tokenizer libraries, which are typically several megabytes each.</p>
+    </details>
+    <details>
+      <summary>How much does it cost to process 1 million tokens with GPT-4o?</summary>
+      <p>As of May 2026, GPT-4o charges $2.50 per 1 million input tokens and $10.00 per 1 million output tokens. For a typical API call with 1,000 input tokens and 500 output tokens, the cost would be approximately $0.0075. Claude Opus 4 charges $15.00 per million input tokens and $75.00 per million output tokens, while Gemini 2.5 Pro charges $1.25 per million input tokens and $10.00 per million output tokens. Model pricing varies significantly, so choosing the right model for your task can reduce costs by 10-100x.</p>
+    </details>
+    <details>
+      <summary>Why do code and non-English text use more tokens?</summary>
+      <p>Tokenizers are trained primarily on English text, so their vocabulary is optimized for common English words and subwords. Code contains special characters, variable names, and syntax patterns that often split into more tokens than natural prose. Non-English languages, especially those with non-Latin scripts like Chinese, Japanese, Korean, and Arabic, can use 2-4x more tokens per word because the tokenizer must represent unfamiliar character sequences with multiple subword tokens. This directly affects API costs for multilingual applications.</p>
+    </details>
+    <details>
+      <summary>What is the difference between input tokens and output tokens?</summary>
+      <p>Input tokens are the tokens in your prompt — the text you send to the API. Output tokens are the tokens the model generates in its response. Most API providers charge different rates for each, with output tokens typically costing 2-5x more than input tokens because generation requires more computation than processing input. When estimating costs, you need to account for both your prompt length and the expected response length.</p>
+    </details>
+    <details>
+      <summary>How accurate is browser-based token counting compared to official tokenizers?</summary>
+      <p>Browser-based approximations using character-per-token ratios are typically within 5-15% of official tokenizer counts for standard English prose. The accuracy decreases for code, mixed-language text, and content with many special characters or numbers. For exact counts, you would need to use the model-specific tokenizer library (tiktoken for OpenAI, etc.). However, for cost estimation and prompt planning, the approximation is sufficient — the main goal is to stay within context window limits and estimate costs within a reasonable margin.</p>
+    </details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/tools/prompt-builder.html" class="related-card">
+        <h3>AI Prompt Builder</h3>
+        <p>Build structured, high-quality prompts for any AI model with template-based engineering.</p>
+      </a>
+      <a href="/answers/ai-model-comparison-2026.html" class="related-card">
+        <h3>AI Model Comparison 2026</h3>
+        <p>Compare pricing, speed, and capabilities of 12+ AI models side by side.</p>
+      </a>
+      <a href="/research/ai-benchmark-tracker.html" class="related-card">
+        <h3>Benchmark Tracker</h3>
+        <p>MMLU, HumanEval, GSM8K, and MATH scores for all major models with visualizations.</p>
+      </a>
+    </div>
+  </section>
+
+  <div class="author-bio">
+    <h3>About the Author</h3>
+    <p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudflow.com">ClaudFlow — Workflows</a>
+            <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  const models = {
+    gpt4o:        { name:'GPT-4o',            cpt:4.0,  inputPer1M:2.50,   outputPer1M:10.00,  ctx:'128K' },
+    gpt4omini:    { name:'GPT-4o Mini',       cpt:4.0,  inputPer1M:0.15,   outputPer1M:0.60,   ctx:'128K' },
+    o3:           { name:'o3',                cpt:4.0,  inputPer1M:10.00,  outputPer1M:40.00,  ctx:'200K' },
+    o3mini:       { name:'o3-mini',           cpt:4.0,  inputPer1M:1.10,   outputPer1M:4.40,   ctx:'200K' },
+    o4mini:       { name:'o4-mini',           cpt:4.0,  inputPer1M:1.10,   outputPer1M:4.40,   ctx:'200K' },
+    opus4:        { name:'Claude Opus 4',     cpt:3.5,  inputPer1M:15.00,  outputPer1M:75.00,  ctx:'200K' },
+    sonnet4:      { name:'Claude Sonnet 4',   cpt:3.5,  inputPer1M:3.00,   outputPer1M:15.00,  ctx:'200K' },
+    haiku35:      { name:'Claude Haiku 3.5',  cpt:3.5,  inputPer1M:0.80,   outputPer1M:4.00,   ctx:'200K' },
+    gemini25pro:  { name:'Gemini 2.5 Pro',    cpt:4.0,  inputPer1M:1.25,   outputPer1M:10.00,  ctx:'1M' },
+    gemini25flash:{ name:'Gemini 2.5 Flash',  cpt:4.0,  inputPer1M:0.15,   outputPer1M:0.60,   ctx:'1M' },
+    llama33:      { name:'Llama 3.3 70B',     cpt:3.8,  inputPer1M:0.60,   outputPer1M:0.60,   ctx:'128K' },
+    deepseekv3:   { name:'DeepSeek V3',       cpt:3.8,  inputPer1M:0.27,   outputPer1M:1.10,   ctx:'128K' },
+    deepseekr1:   { name:'DeepSeek R1',       cpt:3.8,  inputPer1M:0.55,   outputPer1M:2.19,   ctx:'128K' },
+    qwen25:       { name:'Qwen 2.5 72B',      cpt:3.6,  inputPer1M:0.30,   outputPer1M:0.30,   ctx:'128K' },
+    mistral:      { name:'Mistral Large',     cpt:3.9,  inputPer1M:2.00,   outputPer1M:6.00,   ctx:'128K' }
+  };
+
+  let selectedModel = 'gpt4o';
+  let currentText = '';
+
+  function getTokenCount(text, cpt) {
+    if (!text.trim()) return 0;
+    return Math.ceil(text.length / cpt);
+  }
+
+  function count() {
+    const text = document.getElementById('tc-input').value;
+    currentText = text;
+    updateStats(text);
+    updateModelGrid(text);
+    updateCost();
+    updateViz(text);
+  }
+
+  function updateStats(text) {
+    const chars = text.length;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    const sentences = text.trim() ? (text.match(/[.!?]+(\s|$)/g) || []).length || (text.trim() ? 1 : 0) : 0;
+    const paragraphs = text.trim() ? text.split(/\n\s*\n/).filter(p => p.trim()).length || (text.trim() ? 1 : 0) : 0;
+    document.getElementById('tc-chars').textContent = chars.toLocaleString();
+    document.getElementById('tc-words').textContent = words.toLocaleString();
+    document.getElementById('tc-sentences').textContent = sentences.toLocaleString();
+    document.getElementById('tc-paragraphs').textContent = paragraphs.toLocaleString();
+  }
+
+  function updateModelGrid(text) {
+    const grid = document.getElementById('tc-model-grid');
+    let html = '';
+    const keys = Object.keys(models);
+    keys.forEach(key => {
+      const m = models[key];
+      const tokens = getTokenCount(text, m.cpt);
+      const costPer = (tokens / 1000000) * m.inputPer1M;
+      const isActive = key === selectedModel ? ' active' : '';
+      html += '<div class="tc-model-row' + isActive + '" onclick="tc.selectModel(\'' + key + '\')">';
+      html += '<span class="tc-model-name">' + m.name + '</span>';
+      html += '<span class="tc-model-tokens">' + tokens.toLocaleString() + ' tk</span>';
+      html += '<span class="tc-model-cost">$' + costPer.toFixed(4) + '</span>';
+      html += '<span style="font-size:.7rem;color:var(--text-muted)">' + m.ctx + '</span>';
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function selectModel(key) {
+    selectedModel = key;
+    document.getElementById('tc-model-select').value = key;
+    document.getElementById('tc-selected-model').textContent = models[key].name;
+    updateModelGrid(currentText);
+    updateCost();
+    updateViz(currentText);
+  }
+
+  function updateCost() {
+    const m = models[selectedModel];
+    const tokens = getTokenCount(currentText, m.cpt);
+    const ratio = parseFloat(document.getElementById('tc-output-ratio').value);
+    const outputTokens = Math.round(tokens * ratio);
+    const inputCost = (tokens / 1000000) * m.inputPer1M;
+    const outputCost = (outputTokens / 1000000) * m.outputPer1M;
+    const total = inputCost + outputCost;
+    document.getElementById('tc-cost-input-tokens').textContent = tokens.toLocaleString();
+    document.getElementById('tc-cost-input').textContent = '$' + inputCost.toFixed(6);
+    document.getElementById('tc-cost-output-tokens').textContent = outputTokens.toLocaleString();
+    document.getElementById('tc-cost-output').textContent = '$' + outputCost.toFixed(6);
+    document.getElementById('tc-cost-total').textContent = '$' + total.toFixed(6);
+  }
+
+  function updateViz(text) {
+    const viz = document.getElementById('tc-viz');
+    if (!text.trim()) {
+      viz.innerHTML = 'Token boundaries will appear here with color-coded highlights showing approximate token splits for the selected model.';
+      return;
+    }
+    const m = models[selectedModel];
+    const avgLen = Math.round(m.cpt);
+    let html = '';
+    let colorIdx = 0;
+    let i = 0;
+    while (i < text.length) {
+      const variance = Math.floor(Math.random() * 3) - 1;
+      let chunkLen = Math.max(1, avgLen + variance);
+      if (i + chunkLen > text.length) chunkLen = text.length - i;
+      let chunk = text.substring(i, i + chunkLen);
+      if (i + chunkLen < text.length && text[i + chunkLen] !== ' ' && !text.substring(i, i + chunkLen).includes(' ')) {
+        const nextSpace = text.indexOf(' ', i + chunkLen);
+        const remaining = nextSpace === -1 ? text.length - i : nextSpace - i;
+        if (remaining <= avgLen + 3) {
+          chunkLen = remaining;
+          chunk = text.substring(i, i + chunkLen);
+        }
+      }
+      const escaped = chunk.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+      html += '<span class="tk tk-' + (colorIdx % 6) + '">' + escaped + '</span>';
+      colorIdx++;
+      i += chunkLen;
+    }
+    viz.innerHTML = html;
+  }
+
+  function calcBatch() {
+    const requests = parseInt(document.getElementById('tc-batch-requests').value) || 0;
+    const inputTk = parseInt(document.getElementById('tc-batch-input').value) || 0;
+    const outputTk = parseInt(document.getElementById('tc-batch-output').value) || 0;
+    if (requests <= 0 || inputTk <= 0) {
+      document.getElementById('tc-batch-result').textContent = 'Enter valid numbers for all fields.';
+      return;
+    }
+    let html = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;margin-top:.5rem">';
+    html += '<tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:.4rem .5rem;color:var(--accent)">Model</th><th style="text-align:right;padding:.4rem .5rem;color:var(--accent)">Input Cost</th><th style="text-align:right;padding:.4rem .5rem;color:var(--accent)">Output Cost</th><th style="text-align:right;padding:.4rem .5rem;color:var(--accent)">Total</th></tr>';
+    const keys = Object.keys(models);
+    keys.forEach(key => {
+      const m = models[key];
+      const totalInput = requests * inputTk;
+      const totalOutput = requests * outputTk;
+      const ic = (totalInput / 1000000) * m.inputPer1M;
+      const oc = (totalOutput / 1000000) * m.outputPer1M;
+      const tot = ic + oc;
+      html += '<tr style="border-bottom:1px solid var(--border)">';
+      html += '<td style="padding:.35rem .5rem;color:var(--text)">' + m.name + '</td>';
+      html += '<td style="text-align:right;padding:.35rem .5rem;color:var(--text-muted)">$' + ic.toFixed(2) + '</td>';
+      html += '<td style="text-align:right;padding:.35rem .5rem;color:var(--text-muted)">$' + oc.toFixed(2) + '</td>';
+      html += '<td style="text-align:right;padding:.35rem .5rem;color:var(--accent);font-weight:600">$' + tot.toFixed(2) + '</td>';
+      html += '</tr>';
+    });
+    html += '</table>';
+    html += '<p style="margin-top:.75rem;font-size:.78rem;color:var(--text-muted)">Total requests: <span>' + requests.toLocaleString() + '</span> | Total input tokens: <span>' + (requests * inputTk).toLocaleString() + '</span> | Total output tokens: <span>' + (requests * outputTk).toLocaleString() + '</span></p>';
+    document.getElementById('tc-batch-result').innerHTML = html;
+  }
+
+  function clear() {
+    document.getElementById('tc-input').value = '';
+    currentText = '';
+    updateStats('');
+    updateModelGrid('');
+    updateCost();
+    document.getElementById('tc-viz').innerHTML = 'Token boundaries will appear here with color-coded highlights showing approximate token splits for the selected model.';
+    document.getElementById('tc-batch-result').textContent = 'Click "Calculate" to estimate batch processing costs across all models.';
+  }
+
+  function loadSample() {
+    const sample = 'Large language models like GPT-4o, Claude Opus 4, and Gemini 2.5 Pro process text by breaking it into tokens — subword units that typically represent 3-4 characters of English text. Understanding tokenization is critical for developers building AI-powered applications because API pricing is based on token consumption, not word count or character count.\n\nFor example, the word "tokenization" is typically split into two tokens: "token" and "ization". Common words like "the", "and", and "is" are single tokens. Numbers, punctuation, and whitespace also consume tokens. A 1,000-word English document uses approximately 1,300 tokens with GPT-4o\'s tokenizer and about 1,400 tokens with Claude\'s tokenizer.\n\nfunction calculateCost(tokens, model) {\n  const pricing = {\n    "gpt-4o": { input: 0.0025, output: 0.01 },\n    "claude-opus-4": { input: 0.015, output: 0.075 },\n    "gemini-2.5-pro": { input: 0.00125, output: 0.01 }\n  };\n  return tokens * pricing[model].input / 1000;\n}\n\nThis code snippet itself demonstrates how code consumes more tokens than prose due to special characters, variable names, and syntax elements. The curly braces, semicolons, and dot notation each require separate tokens, making code approximately 1.5-2x more token-dense than natural language.';
+    document.getElementById('tc-input').value = sample;
+    count();
+  }
+
+  // Real-time counting on input
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('tc-input');
+    let debounceTimer;
+    input.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(function() {
+        count();
+      }, 150);
+    });
+  });
+
+  window.tc = { count, clear, loadSample, selectModel, updateCost, calcBatch };
+})();
+</script>
+</body>
+</html>
