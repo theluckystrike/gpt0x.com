@@ -92,4 +92,88 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/answers/ai-api-rate-limits.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/answers/embedding-model-comparison.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/answers/llm-context-window-comparison.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/blog/index.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/guides/fine-tuning-cost-calculator.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/guides/rag-pipeline-builder.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/index.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/research/ai-safety-benchmark.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/research/open-source-llm-leaderboard.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/tools/ai-cost-estimator.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/tools/ai-prompt-debugger.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/tools/system-prompt-library.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
