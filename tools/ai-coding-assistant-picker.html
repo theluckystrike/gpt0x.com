@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Coding Assistant Picker — Find Your Best Tool in 2026 | GPT0X</title>
+<meta name="description" content="5-question wizard recommends the best AI coding assistant for your stack. Copilot, Cursor, Claude Code, Cody, or Windsurf — get a personalized recommendation based on language, team size, budget, IDE, and use case.">
+<meta name="keywords" content="AI coding assistant picker, best AI coding tool 2026, Cursor vs Copilot, Claude Code vs Cursor, AI pair programmer comparison, coding assistant recommendation, Windsurf vs Cursor, Cody vs Copilot">
+<link rel="canonical" href="https://gpt0x.com/tools/ai-coding-assistant-picker.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/tools/ai-coding-assistant-picker.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/tools/ai-coding-assistant-picker.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Coding Assistant Picker — Find Your Best Tool in 2026">
+<meta property="og:description" content="5-question wizard: get a personalized AI coding assistant recommendation based on language, team size, budget, IDE, and use case.">
+<meta property="og:url" content="https://gpt0x.com/tools/ai-coding-assistant-picker.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Coding Assistant Picker — Find Your Best Tool in 2026">
+<meta name="twitter:description" content="5-question wizard: personalized AI coding assistant recommendation based on your preferences.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Coding Assistant Picker","url":"https://gpt0x.com/tools/ai-coding-assistant-picker.html","description":"5-question wizard that recommends the best AI coding assistant based on language, team size, budget, IDE, and use case.","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"},"publisher":{"@type":"Organization","name":"GPT0X","url":"https://gpt0x.com"},"datePublished":"2026-05-28","dateModified":"2026-05-28","featureList":["5-question personalized wizard","Recommends from Copilot, Cursor, Claude Code, Cody, Windsurf","Full feature matrix comparison","Scoring breakdown with reasoning","Start over and explore alternatives"]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"What is the best AI coding assistant in 2026?","acceptedAnswer":{"@type":"Answer","text":"The best AI coding assistant depends on your workflow. Cursor is the best all-around AI IDE for individual developers — it combines VS Code compatibility with Claude-powered agentic editing. Claude Code (Anthropic's CLI) is best for autonomous multi-file tasks and complex refactors without leaving the terminal. GitHub Copilot is best for teams already using GitHub Enterprise with its native review and pull request integration. Windsurf is the best free option with a generous free tier and strong context awareness. Cody is best for large enterprise codebases where full-repo indexing matters."}},
+{"@type":"Question","name":"Is Cursor better than GitHub Copilot?","acceptedAnswer":{"@type":"Answer","text":"Cursor outperforms GitHub Copilot on complex, multi-file tasks. Copilot excels at single-line and single-function completions integrated directly into your existing editor. Cursor's Composer mode can make coordinated changes across a dozen files simultaneously — something Copilot cannot do. For teams on GitHub Enterprise, Copilot's pull request summaries, review assistance, and native GitHub integration tip the scales. For individual developers or teams prioritizing coding quality over ecosystem integration, Cursor is the better choice."}},
+{"@type":"Question","name":"What is Claude Code and how does it compare to other AI coding tools?","acceptedAnswer":{"@type":"Answer","text":"Claude Code is Anthropic's terminal-based AI coding CLI. Unlike IDE-integrated tools, it runs in your terminal, reads your entire project context, and can make changes across multiple files autonomously. It uses Claude Sonnet 4, which leads SWE-bench at 72.7%. Claude Code is best for complex refactors, test generation, debugging sessions, and tasks that span many files. Its weakness is that it operates outside your editor, so you lose inline completion suggestions. Many developers combine Claude Code for complex tasks with a lighter completion tool (Copilot or Supermaven) for inline completions."}},
+{"@type":"Question","name":"Which AI coding assistant works best with VS Code?","acceptedAnswer":{"@type":"Answer","text":"GitHub Copilot has the deepest VS Code integration — it was built by Microsoft (which owns GitHub) and is the officially recommended extension. Cursor is a VS Code fork and supports all VS Code extensions natively. Cody has a solid VS Code extension. Windsurf has a VS Code extension that is lighter weight. For VS Code users who want to keep their exact setup, Copilot is the easiest integration. For users willing to switch to a VS Code-compatible app, Cursor provides significantly more power."}},
+{"@type":"Question","name":"Which AI coding assistant is best for large teams?","acceptedAnswer":{"@type":"Answer","text":"GitHub Copilot Enterprise is the best choice for large teams, primarily due to its GitHub integration for PR reviews, code review summaries, security scanning, and centralized admin controls. Cody Enterprise is the best option for teams with massive proprietary codebases — it indexes your entire codebase and provides organization-wide context. For teams prioritizing output quality over ecosystem, Cursor Business provides team-level licensing with shared configuration."}}
+]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://gpt0x.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://gpt0x.com/tools/"},{"@type":"ListItem","position":3,"name":"AI Coding Assistant Picker","item":"https://gpt0x.com/tools/ai-coding-assistant-picker.html"}]}
+</script>
+<style>
+.tool-container{max-width:900px;margin:0 auto;padding:2rem 1rem}
+.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}
+.tool-hero h1 span{color:var(--accent)}
+.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:1rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+
+/* Wizard */
+.wizard-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:2rem}
+.wizard-progress{display:flex;gap:.4rem;margin-bottom:2rem;align-items:center}
+.wiz-step{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background .3s}
+.wiz-step.done{background:var(--accent)}
+.wiz-step.current{background:var(--accent);opacity:.5}
+.wiz-progress-label{font-size:.75rem;color:var(--text-muted);margin-left:.5rem;white-space:nowrap}
+.wiz-q{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:.4rem;font-family:var(--font-display)}
+.wiz-sub{font-size:.85rem;color:var(--text-muted);margin-bottom:1.25rem}
+.wiz-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem}
+.wiz-opt{background:var(--bg);border:2px solid var(--border);border-radius:var(--radius);padding:.85rem 1rem;cursor:pointer;transition:all .15s;text-align:left}
+.wiz-opt:hover{border-color:var(--accent);background:var(--bg-hover)}
+.wiz-opt.selected{border-color:var(--accent);background:rgba(34,197,94,.07)}
+.wiz-opt-label{font-size:.88rem;font-weight:600;color:var(--text);display:block;margin-bottom:.2rem}
+.wiz-opt-sub{font-size:.75rem;color:var(--text-muted)}
+.wiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem}
+.wiz-btn{padding:9px 22px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:700;cursor:pointer;transition:opacity .2s}
+.wiz-btn-primary{background:var(--accent);color:#000}.wiz-btn-primary:hover{opacity:.85}
+.wiz-btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.wiz-btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-muted)}.wiz-btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+
+/* Result */
+.result-wrap{display:none}
+.result-hero{background:linear-gradient(135deg,rgba(34,197,94,.08) 0%,var(--bg-card) 100%);border:2px solid var(--accent);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem}
+.result-label{font-size:.72rem;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:.4rem}
+.result-name{font-size:2rem;font-weight:800;color:var(--text);font-family:var(--font-display);margin-bottom:.25rem}
+.result-tagline{font-size:.95rem;color:var(--text-muted);margin-bottom:1.25rem}
+.result-scores{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.result-score-item{text-align:center}
+.result-score-val{font-size:1.3rem;font-weight:700;color:var(--accent);font-family:var(--font-display)}
+.result-score-label{font-size:.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px}
+.result-reasons{list-style:none;padding:0;margin:0}
+.result-reasons li{display:flex;gap:.6rem;align-items:flex-start;font-size:.85rem;color:var(--text-muted);margin-bottom:.5rem}
+.result-reasons li::before{content:"✓";color:var(--accent);font-weight:700;flex-shrink:0}
+.result-alt-label{font-size:.88rem;color:var(--text-muted);margin-bottom:.75rem}
+.result-alts{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.alt-chip{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:.5rem 1rem;font-size:.8rem;color:var(--text-muted);cursor:pointer;transition:all .15s}
+.alt-chip:hover{border-color:var(--accent);color:var(--accent)}
+.result-restart{background:transparent;border:1px solid var(--border);border-radius:var(--radius);padding:8px 18px;font-family:var(--font-body);font-size:.82rem;color:var(--text-muted);cursor:pointer;transition:all .15s}
+.result-restart:hover{border-color:var(--accent);color:var(--text)}
+
+/* Feature matrix */
+.matrix-section{margin-bottom:2rem}
+.matrix-section h3{font-size:1rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.matrix-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius)}
+.matrix-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.matrix-table thead th{text-align:center;padding:9px 10px;border-bottom:2px solid var(--border);color:var(--accent);font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.4px;background:var(--bg-card);white-space:nowrap}
+.matrix-table thead th:first-child{text-align:left}
+.matrix-table tbody tr{border-bottom:1px solid var(--border)}
+.matrix-table tbody tr:hover{background:var(--bg-hover)}
+.matrix-table tbody td{padding:8px 10px;text-align:center;color:var(--text-muted)}
+.matrix-table tbody td:first-child{text-align:left;font-weight:600;color:var(--text)}
+.matrix-table .highlight-col{background:rgba(34,197,94,.04)}
+.mx-yes{color:#22c55e;font-weight:700}
+.mx-no{color:#444}
+.mx-partial{color:#f59e0b;font-weight:600}
+
+/* Explainer */
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}
+.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}
+.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}
+.explainer p{color:var(--text-muted);margin-bottom:1rem}
+.explainer ul{color:var(--text-muted);margin:0 0 1rem 1.5rem}
+.explainer li{margin-bottom:.4rem}
+.faq-section{max-width:780px;margin:2.5rem auto}
+.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}
+.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}
+.faq-section summary:hover{color:var(--accent)}
+.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}
+.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}
+.related-card:hover{border-color:var(--accent);text-decoration:none}
+.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}
+.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}
+.author-bio a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="/" class="logo">gpt0x</a>
+    <nav>
+      <a href="/">Database</a>
+      <a href="/research/">Research</a>
+      <a href="/tools/">Tools</a>
+      <a href="/answers/">Answers</a>
+      <a href="/blog/">Blog</a>
+      <a href="/about.html">About</a>
+      <div class="nav-right">
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+        <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-container">
+  <div class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Tools</a> &rsaquo; AI Coding Assistant Picker
+  </div>
+
+  <div class="tool-hero">
+    <h1>AI Coding <span>Assistant</span> Picker</h1>
+    <p>Answer 5 questions about your language, team size, budget, IDE, and primary use case. Get a personalized recommendation from Copilot, Cursor, Claude Code, Cody, and Windsurf — plus a full feature matrix comparison.</p>
+    <div class="tool-privacy">No data leaves your browser</div>
+  </div>
+
+  <!-- WIZARD -->
+  <div class="wizard-wrap" id="wizard-wrap">
+    <div class="wizard-progress">
+      <div class="wiz-step current" id="step-ind-0"></div>
+      <div class="wiz-step" id="step-ind-1"></div>
+      <div class="wiz-step" id="step-ind-2"></div>
+      <div class="wiz-step" id="step-ind-3"></div>
+      <div class="wiz-step" id="step-ind-4"></div>
+      <span class="wiz-progress-label" id="wiz-prog-label">Question 1 of 5</span>
+    </div>
+    <div id="wiz-question-wrap"></div>
+    <div class="wiz-nav">
+      <button class="wiz-btn wiz-btn-ghost" id="wiz-back" onclick="wiz.back()" style="display:none">Back</button>
+      <button class="wiz-btn wiz-btn-primary" id="wiz-next" onclick="wiz.next()" disabled>Next</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-wrap" id="result-wrap">
+    <div class="result-hero" id="result-hero"></div>
+
+    <div style="margin-bottom:1.5rem">
+      <div class="result-alt-label">Also consider:</div>
+      <div class="result-alts" id="result-alts"></div>
+      <button class="result-restart" onclick="wiz.restart()">Start over</button>
+    </div>
+
+    <div class="matrix-section">
+      <h3>Full Feature Matrix</h3>
+      <div class="matrix-wrap">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th style="min-width:160px">Feature</th>
+              <th id="mh-copilot">Copilot</th>
+              <th id="mh-cursor">Cursor</th>
+              <th id="mh-claudecode">Claude Code</th>
+              <th id="mh-cody">Cody</th>
+              <th id="mh-windsurf">Windsurf</th>
+            </tr>
+          </thead>
+          <tbody id="matrix-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <section class="explainer">
+    <h2>The AI Coding Assistant Landscape in 2026</h2>
+    <p>The AI coding assistant market has matured significantly since GitHub Copilot launched in 2021. There are now five distinct tools with meaningful differentiators, and the right choice depends heavily on your workflow, team structure, and what "coding assistance" means to you. The era of one-size-fits-all is over — specialists are beating generalists in each niche.</p>
+
+    <h2>The Five Major Tools</h2>
+    <h3>GitHub Copilot — The Enterprise Standard</h3>
+    <p>GitHub Copilot remains the market leader by install count, backed by Microsoft and deeply integrated into the GitHub ecosystem. Copilot Individual costs $10/month. Copilot Business is $19/user/month. Copilot Enterprise (which includes PR summaries, codebase-aware chat, and security scanning) is $39/user/month.</p>
+    <p>Copilot's strongest feature is its native GitHub integration — it reviews pull requests, generates PR descriptions, flags security vulnerabilities, and surfaces relevant issues. For teams that live in GitHub, this workflow integration is worth the premium over alternatives. Its AI engine uses GPT-4o and Claude for different tasks.</p>
+
+    <h3>Cursor — The Power User's IDE</h3>
+    <p>Cursor is a VS Code fork with Claude-powered agentic editing built in. Its Composer mode allows multi-file coordinated changes: you describe what you want, Cursor plans the changes, shows diffs across all affected files, and you approve or modify. Cursor Pro costs $20/month.</p>
+    <p>Cursor is the fastest-growing AI coding tool among professional developers in 2026. Its autocomplete is powered by a custom model optimized for code completion speed, while Composer uses Claude Sonnet 4 for complex reasoning tasks. It supports all VS Code extensions, making migration seamless. Weakness: it is a full IDE switch, not a plugin — teams need buy-in for the transition.</p>
+
+    <h3>Claude Code — The Terminal Power Tool</h3>
+    <p>Claude Code is Anthropic's official CLI, using Claude Sonnet 4 (SWE-bench leader at 72.7%). It runs in your terminal, reads your entire project, and can autonomously make changes across dozens of files, run tests, and iterate. Pricing: Claude API costs apply, typically $0.003-0.05 per task depending on complexity. With Claude Max ($100/month), you get high usage limits.</p>
+    <p>Claude Code is best for developers who prefer their existing editor and want AI assistance for complex tasks without switching IDEs. It excels at refactoring large codebases, writing comprehensive test suites, debugging gnarly issues across files, and explaining unfamiliar code. It does not provide inline completions — for that, combine with a lightweight completion tool.</p>
+
+    <h3>Cody — The Enterprise Codebase Tool</h3>
+    <p>Sourcegraph's Cody indexes your entire codebase (not just the open files) and provides context-aware completions and chat. Cody Free tier is available. Cody Pro is $9/month. Cody Enterprise (with full codebase indexing) starts at $19/user/month.</p>
+    <p>Cody's differentiator is whole-codebase awareness — it can answer questions about code that is not even open in your editor, find all usages of a function across a 1M+ line codebase, and suggest changes that maintain consistency with your existing patterns. Best for large organizations with massive internal codebases and many developers.</p>
+
+    <h3>Windsurf — The Best Free Option</h3>
+    <p>Codeium's Windsurf is a VS Code-compatible AI IDE with a generous free tier: unlimited completions and 10 agentic "flows" per month for free. Windsurf Pro is $15/month. It uses a mix of models depending on the task (GPT-4o, Claude Sonnet, and proprietary Codeium models for fast completions).</p>
+    <p>Windsurf is the best entry point for individual developers exploring AI-assisted coding without a budget commitment. Its Cascade agentic mode can make multi-file changes similar to Cursor's Composer. Quality is slightly behind Cursor and Claude Code on complex tasks, but the free tier and UI polish make it an excellent starting point.</p>
+
+    <h2>Choosing Based on Team Size</h2>
+    <p>Solo developers benefit most from Cursor or Claude Code — both optimize for individual developer productivity without enterprise overhead. Small teams (2-10 people) can use Cursor Business or Copilot Team. Medium teams (10-50 people) should evaluate Copilot Business vs Cursor Business based on GitHub dependency. Enterprise (50+ people) typically needs Copilot Enterprise or Cody Enterprise for admin controls, SSO, and compliance features.</p>
+
+    <h2>IDE Compatibility</h2>
+    <p>If you cannot switch IDEs, your options narrow: GitHub Copilot supports VS Code, JetBrains IDEs, Neovim, and more. Cody supports VS Code and JetBrains. Cursor and Windsurf are standalone apps (VS Code forks). Claude Code works from any terminal regardless of editor. JetBrains users have the fewest options — Copilot and Cody are the primary choices.</p>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details>
+      <summary>What is the best AI coding assistant in 2026?</summary>
+      <p>For individuals: Cursor (best all-around AI IDE) or Claude Code (best for complex autonomous tasks). For teams on GitHub: Copilot Enterprise. For large codebases: Cody Enterprise. For free: Windsurf. The "best" depends on your specific workflow.</p>
+    </details>
+    <details>
+      <summary>Is Cursor better than GitHub Copilot?</summary>
+      <p>Cursor beats Copilot on complex multi-file tasks via Composer mode. Copilot beats Cursor on GitHub integration (PR reviews, security scanning). For individual developers focused on coding quality, Cursor wins. For GitHub-native teams, Copilot is more integrated.</p>
+    </details>
+    <details>
+      <summary>What is Claude Code and how does it compare?</summary>
+      <p>Claude Code is Anthropic's terminal CLI using Claude Sonnet 4 (SWE-bench leader, 72.7%). It makes autonomous multi-file changes from your terminal. Unlike Cursor/Copilot, it has no inline completions — it handles complete tasks autonomously. Best combined with a lightweight completion tool for inline suggestions.</p>
+    </details>
+    <details>
+      <summary>Which AI coding assistant works best with VS Code?</summary>
+      <p>GitHub Copilot has the deepest native VS Code integration. Cursor is a VS Code fork with full extension compatibility. Cody and Windsurf also have solid VS Code extensions. For staying in VS Code without switching apps, Copilot is the most seamless choice.</p>
+    </details>
+    <details>
+      <summary>Which AI coding assistant is best for large teams?</summary>
+      <p>GitHub Copilot Enterprise for GitHub-centric teams. Cody Enterprise for teams with massive proprietary codebases needing full-repo indexing. Both offer SSO, admin controls, usage analytics, and compliance features required at enterprise scale.</p>
+    </details>
+  </section>
+
+  <section class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a href="/answers/claude-vs-gpt-2026.html" class="related-card">
+        <h3>Claude vs GPT-4o 2026</h3>
+        <p>Full comparison of flagship models with radar chart and sortable spec table.</p>
+      </a>
+      <a href="/answers/ai-model-comparison-2026.html" class="related-card">
+        <h3>AI Model Comparison 2026</h3>
+        <p>Compare 12 models including open-source alternatives with pricing calculator.</p>
+      </a>
+      <a href="/tools/ai-cost-estimator.html" class="related-card">
+        <h3>AI Cost Estimator</h3>
+        <p>Project monthly API spend across providers based on your usage volume.</p>
+      </a>
+    </div>
+  </section>
+
+  <div class="author-bio">
+    <h3>About the Author</h3>
+    <p>Built by <a href="https://zovo.one">Michael Lip</a> — solo developer with 10+ years experience. 140+ PRs merged into open source projects including Google Chrome and Axios. Creator of 20+ developer tools across the Zovo network. No tracking, no ads, no data collection.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=gpt0x.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudflow.com">ClaudFlow — Workflows</a>
+            <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  // ---- DATA ----
+  const questions = [
+    {
+      id: 'language',
+      q: 'What is your primary programming language?',
+      sub: 'We use this to weight language-specific integrations and completion quality.',
+      options: [
+        { value:'js', label:'JavaScript / TypeScript', sub:'React, Node, Next.js, etc.' },
+        { value:'python', label:'Python', sub:'ML, data science, web, scripting' },
+        { value:'java', label:'Java / Kotlin', sub:'JVM ecosystem, Android, Spring' },
+        { value:'cs', label:'C# / .NET', sub:'Azure, Unity, enterprise apps' },
+        { value:'cpp', label:'C / C++ / Rust', sub:'Systems, embedded, performance' },
+        { value:'other', label:'Other / Multiple', sub:'Ruby, Go, PHP, Swift, etc.' },
+      ]
+    },
+    {
+      id: 'teamsize',
+      q: 'How large is your team?',
+      sub: 'Team size affects which licensing, admin, and collaboration features matter most.',
+      options: [
+        { value:'solo', label:'Just me', sub:'Solo developer or freelancer' },
+        { value:'small', label:'2–10 people', sub:'Small team or startup' },
+        { value:'medium', label:'11–50 people', sub:'Growing team' },
+        { value:'large', label:'50+ people', sub:'Enterprise or large organization' },
+      ]
+    },
+    {
+      id: 'budget',
+      q: 'What is your monthly budget per developer?',
+      sub: 'Per-seat cost for the coding assistant subscription.',
+      options: [
+        { value:'free', label:'Free only', sub:'No budget for coding tools' },
+        { value:'low', label:'Up to $15/mo', sub:'Budget-conscious' },
+        { value:'mid', label:'Up to $30/mo', sub:'Standard professional budget' },
+        { value:'high', label:'$30+/mo', sub:'Budget is not the primary factor' },
+      ]
+    },
+    {
+      id: 'ide',
+      q: 'Which editor or IDE do you use?',
+      sub: 'Some tools are plugins; others require switching to a new app.',
+      options: [
+        { value:'vscode', label:'VS Code', sub:'Microsoft Visual Studio Code' },
+        { value:'jetbrains', label:'JetBrains IDE', sub:'IntelliJ, PyCharm, WebStorm, etc.' },
+        { value:'neovim', label:'Neovim / Vim', sub:'Terminal-based editors' },
+        { value:'flexible', label:'Open to switching', sub:'Will adopt the best tool available' },
+      ]
+    },
+    {
+      id: 'usecase',
+      q: 'What is your primary use case for AI assistance?',
+      sub: 'What do you want AI to help with most?',
+      options: [
+        { value:'completion', label:'Fast inline completions', sub:'Autocomplete while typing, minimal friction' },
+        { value:'agentic', label:'Autonomous multi-file tasks', sub:'Refactors, new features spanning many files' },
+        { value:'chat', label:'Chat + code explanation', sub:'Ask questions, understand unfamiliar code' },
+        { value:'review', label:'Code review + PR workflow', sub:'PR summaries, security scanning, review comments' },
+        { value:'enterprise', label:'Whole codebase context', sub:'Answers about code I have not opened' },
+      ]
+    }
+  ];
+
+  // Tool definitions
+  const tools = {
+    copilot: {
+      name: 'GitHub Copilot',
+      tagline: 'Best GitHub integration and enterprise PR workflow',
+      price: '$10–39/mo',
+      sweBench: '—',
+      ide: 'VS Code, JetBrains, Neovim',
+      freetier: 'Yes (limited)',
+      url: 'https://github.com/features/copilot',
+      reasons: {
+        language_js:   'Excellent JS/TS completions, trained on massive GitHub JS corpus',
+        language_python:'Strong Python support via GitHub Codespaces integration',
+        language_java: 'Strong JetBrains plugin, native JVM support',
+        language_cs:   'Best .NET/C# support — Microsoft owns both GitHub and .NET',
+        teamsize_large:'Enterprise tier ($39/user) includes SSO, policy controls, audit logs',
+        teamsize_medium:'Copilot Business ($19/user) with team dashboards',
+        budget_low:    'Individual plan at $10/month is the most affordable mainstream option',
+        ide_jetbrains: 'Best JetBrains support among all tools — native plugin',
+        ide_neovim:    'Official Neovim plugin maintained by GitHub team',
+        usecase_review:'PR summaries, review comments, security scanning — unmatched GitHub integration',
+        usecase_completion:'Inline completions pioneered by Copilot — highly refined over 3+ years',
+      },
+      // Scoring weights per answer
+      weights: {
+        language_js:5, language_python:5, language_java:8, language_cs:10, language_cpp:4, language_other:5,
+        teamsize_solo:4, teamsize_small:6, teamsize_medium:8, teamsize_large:10,
+        budget_free:2, budget_low:8, budget_mid:7, budget_high:6,
+        ide_vscode:7, ide_jetbrains:10, ide_neovim:8, ide_flexible:6,
+        usecase_completion:8, usecase_agentic:4, usecase_chat:6, usecase_review:10, usecase_enterprise:5,
+      }
+    },
+    cursor: {
+      name: 'Cursor',
+      tagline: 'Best AI IDE for individual developers and power users',
+      price: '$20/mo',
+      sweBench: '72.7% (Claude Sonnet 4)',
+      ide: 'Standalone (VS Code fork)',
+      freeterm: 'Yes (limited free tier)',
+      url: 'https://cursor.sh',
+      reasons: {
+        language_js:   'Excellent JS/TS support with Composer for multi-file React/Next.js changes',
+        language_python:'Strong Python support, great for ML workflow file changes',
+        ide_vscode:    'VS Code fork — migrate in minutes with all your extensions intact',
+        ide_flexible:  'Best standalone AI IDE — all VS Code extensions supported',
+        usecase_agentic:'Composer mode handles multi-file autonomous changes natively',
+        usecase_chat:  'Inline chat with full codebase context via @-mentions',
+        teamsize_solo: 'Individual plan ($20/mo) optimized for solo developer productivity',
+        teamsize_small:'Cursor Business supports team licensing with shared settings',
+        budget_mid:    '$20/month is the primary plan — competitive for the quality offered',
+        budget_high:   'Business tier for teams with premium features',
+      },
+      weights: {
+        language_js:9, language_python:8, language_java:5, language_cs:5, language_cpp:6, language_other:7,
+        teamsize_solo:10, teamsize_small:9, teamsize_medium:7, teamsize_large:5,
+        budget_free:3, budget_low:5, budget_mid:10, budget_high:8,
+        ide_vscode:10, ide_jetbrains:1, ide_neovim:1, ide_flexible:10,
+        usecase_completion:8, usecase_agentic:10, usecase_chat:9, usecase_review:4, usecase_enterprise:5,
+      }
+    },
+    claudecode: {
+      name: 'Claude Code',
+      tagline: 'Best for autonomous complex tasks from the terminal',
+      price: 'API costs (~$0-100/mo)',
+      sweBench: '72.7% (best in class)',
+      ide: 'Any (terminal-based)',
+      freeterm: 'No',
+      url: 'https://claude.ai/code',
+      reasons: {
+        language_cpp:  'Handles C/C++ and Rust well — strong on systems-level code understanding',
+        language_other:'Language-agnostic — Claude is trained across all major languages',
+        ide_neovim:    'Terminal-based — works perfectly alongside Neovim without friction',
+        ide_flexible:  'Keep your editor, use Claude Code for complex tasks in terminal',
+        usecase_agentic:'Autonomous multi-file changes, test generation, debugging — core use case',
+        usecase_chat:  'Best conversational code understanding — can explain entire file trees',
+        teamsize_solo: 'Ideal for solo developers who want maximum AI capability without IDE switch',
+        budget_high:   'API pricing scales with usage — high-quality tasks at fair cost',
+        language_python:'Exceptional Python — data pipelines, ML code, complex refactors',
+      },
+      weights: {
+        language_js:7, language_python:9, language_java:6, language_cs:6, language_cpp:8, language_other:8,
+        teamsize_solo:10, teamsize_small:8, teamsize_medium:6, teamsize_large:4,
+        budget_free:1, budget_low:3, budget_mid:7, budget_high:10,
+        ide_vscode:7, ide_jetbrains:6, ide_neovim:10, ide_flexible:10,
+        usecase_completion:1, usecase_agentic:10, usecase_chat:9, usecase_review:5, usecase_enterprise:6,
+      }
+    },
+    cody: {
+      name: 'Sourcegraph Cody',
+      tagline: 'Best for large enterprise codebases with full-repo indexing',
+      price: '$0–19/user/mo',
+      sweBench: '—',
+      ide: 'VS Code, JetBrains',
+      freeterm: 'Yes',
+      url: 'https://sourcegraph.com/cody',
+      reasons: {
+        teamsize_large: 'Enterprise tier with full codebase indexing, SSO, admin dashboards',
+        teamsize_medium:'Mid-size teams benefit from cross-file context awareness',
+        usecase_enterprise:'Whole-codebase context is Cody\'s defining feature — answers about any file',
+        usecase_chat:   'Chat about code you haven\'t opened — unique capability at scale',
+        ide_vscode:     'Solid VS Code extension with deep integration',
+        ide_jetbrains:  'Strong JetBrains plugin, competitive with Copilot',
+        budget_free:    'Free tier available with no credit card required',
+        budget_low:     'Pro tier at $9/month is one of the most affordable options',
+        language_java:  'Particularly strong on Java — built by Sourcegraph which indexes massive Java codebases',
+      },
+      weights: {
+        language_js:5, language_python:5, language_java:8, language_cs:5, language_cpp:5, language_other:6,
+        teamsize_solo:5, teamsize_small:6, teamsize_medium:8, teamsize_large:10,
+        budget_free:9, budget_low:9, budget_mid:7, budget_high:7,
+        ide_vscode:8, ide_jetbrains:8, ide_neovim:2, ide_flexible:6,
+        usecase_completion:5, usecase_agentic:5, usecase_chat:9, usecase_review:6, usecase_enterprise:10,
+      }
+    },
+    windsurf: {
+      name: 'Windsurf',
+      tagline: 'Best free AI IDE — generous free tier, strong agentic mode',
+      price: '$0–15/mo',
+      sweBench: '—',
+      ide: 'Standalone (VS Code fork)',
+      freeterm: 'Yes (generous)',
+      url: 'https://codeium.com/windsurf',
+      reasons: {
+        budget_free:    'Most generous free tier — unlimited completions, 10 agentic flows/month',
+        budget_low:     'Pro at $15/month is the most affordable full-featured AI IDE',
+        ide_vscode:     'VS Code fork — your extensions work, migration is instant',
+        ide_flexible:   'Excellent entry point for developers new to AI coding assistants',
+        teamsize_solo:  'Free tier designed for individual developers',
+        teamsize_small: 'Team plans available with shared billing',
+        usecase_agentic:'Cascade mode for multi-file changes — competitive with Cursor at lower price',
+        usecase_completion:'Fast completions powered by Codeium\'s in-house model',
+        language_js:    'Strong JavaScript/TypeScript support from Codeium\'s training data',
+      },
+      weights: {
+        language_js:8, language_python:7, language_java:5, language_cs:5, language_cpp:5, language_other:6,
+        teamsize_solo:9, teamsize_small:8, teamsize_medium:6, teamsize_large:4,
+        budget_free:10, budget_low:10, budget_mid:8, budget_high:5,
+        ide_vscode:9, ide_jetbrains:2, ide_neovim:2, ide_flexible:9,
+        usecase_completion:9, usecase_agentic:8, usecase_chat:7, usecase_review:3, usecase_enterprise:4,
+      }
+    }
+  };
+
+  // Feature matrix data
+  const matrixRows = [
+    { feature:'Inline completions',     copilot:'yes', cursor:'yes',    claudecode:'no',      cody:'yes',  windsurf:'yes' },
+    { feature:'Agentic multi-file',     copilot:'partial', cursor:'yes', claudecode:'yes',    cody:'partial', windsurf:'yes' },
+    { feature:'Free tier',              copilot:'partial', cursor:'partial', claudecode:'no', cody:'yes',  windsurf:'yes' },
+    { feature:'VS Code native',         copilot:'yes', cursor:'fork',   claudecode:'any',     cody:'yes',  windsurf:'fork' },
+    { feature:'JetBrains support',      copilot:'yes', cursor:'no',     claudecode:'any',     cody:'yes',  windsurf:'no' },
+    { feature:'Terminal / Neovim',      copilot:'yes', cursor:'no',     claudecode:'yes',     cody:'partial', windsurf:'no' },
+    { feature:'GitHub PR integration',  copilot:'yes', cursor:'no',     claudecode:'partial', cody:'partial', windsurf:'no' },
+    { feature:'Full codebase index',    copilot:'partial', cursor:'partial', claudecode:'yes', cody:'yes', windsurf:'partial' },
+    { feature:'Enterprise SSO',         copilot:'yes', cursor:'yes',    claudecode:'no',      cody:'yes',  windsurf:'yes' },
+    { feature:'Context window',         copilot:'128K', cursor:'200K',  claudecode:'200K',    cody:'100K', windsurf:'128K' },
+    { feature:'Underlying model',       copilot:'GPT-4o + Claude', cursor:'Claude Sonnet 4', claudecode:'Claude Sonnet 4', cody:'Multiple', windsurf:'Multiple' },
+    { feature:'Monthly price (solo)',   copilot:'$10', cursor:'$20',    claudecode:'$0-100',  cody:'$9',   windsurf:'$15' },
+    { feature:'Best for',               copilot:'Teams on GitHub', cursor:'Power users', claudecode:'Complex tasks', cody:'Large codebases', windsurf:'Budget/free' },
+  ];
+
+  // ---- WIZARD STATE ----
+  let currentQ = 0;
+  const answers = {};
+
+  function renderQuestion(idx) {
+    const q = questions[idx];
+    const wrap = document.getElementById('wiz-question-wrap');
+    wrap.innerHTML =
+      '<div class="wiz-q">' + q.q + '</div>' +
+      '<div class="wiz-sub">' + q.sub + '</div>' +
+      '<div class="wiz-options">' +
+      q.options.map(opt =>
+        '<button class="wiz-opt' + (answers[q.id] === opt.value ? ' selected' : '') + '" onclick="wiz.select(\'' + q.id + '\',\'' + opt.value + '\',this)">' +
+        '<span class="wiz-opt-label">' + opt.label + '</span>' +
+        '<span class="wiz-opt-sub">' + opt.sub + '</span>' +
+        '</button>'
+      ).join('') +
+      '</div>';
+
+    // Update progress
+    for (let i = 0; i < 5; i++) {
+      const el = document.getElementById('step-ind-' + i);
+      el.className = 'wiz-step' + (i < idx ? ' done' : i === idx ? ' current' : '');
+    }
+    document.getElementById('wiz-prog-label').textContent = 'Question ' + (idx + 1) + ' of 5';
+
+    // Next button state
+    const nextBtn = document.getElementById('wiz-next');
+    nextBtn.disabled = !answers[q.id];
+    nextBtn.textContent = idx === 4 ? 'Get Recommendation' : 'Next';
+    document.getElementById('wiz-back').style.display = idx > 0 ? '' : 'none';
+  }
+
+  function select(qid, val, btn) {
+    answers[qid] = val;
+    document.querySelectorAll('.wiz-opt').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('wiz-next').disabled = false;
+  }
+
+  function next() {
+    const q = questions[currentQ];
+    if (!answers[q.id]) return;
+    if (currentQ < 4) {
+      currentQ++;
+      renderQuestion(currentQ);
+    } else {
+      showResult();
+    }
+  }
+
+  function back() {
+    if (currentQ > 0) {
+      currentQ--;
+      renderQuestion(currentQ);
+    }
+  }
+
+  function restart() {
+    Object.keys(answers).forEach(k => delete answers[k]);
+    currentQ = 0;
+    document.getElementById('wizard-wrap').style.display = '';
+    document.getElementById('result-wrap').style.display = 'none';
+    renderQuestion(0);
+    // scroll to wizard
+    document.getElementById('wizard-wrap').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  function showResult() {
+    // Score each tool
+    const scores = {};
+    Object.keys(tools).forEach(key => {
+      let score = 0;
+      const tool = tools[key];
+      Object.entries(answers).forEach(([qid, val]) => {
+        const wkey = qid + '_' + val;
+        score += tool.weights[wkey] || 0;
+      });
+      scores[key] = score;
+    });
+
+    const ranked = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+    const winner = ranked[0];
+    const alts = ranked.slice(1, 4);
+    const winnerTool = tools[winner];
+
+    // Build reasons
+    const winnerReasonKeys = Object.entries(answers).map(([qid, val]) => qid + '_' + val);
+    const winnerReasons = winnerReasonKeys
+      .filter(k => winnerTool.reasons[k])
+      .map(k => winnerTool.reasons[k])
+      .slice(0, 4);
+    if (winnerReasons.length === 0) winnerReasons.push('Strong match for your configuration');
+
+    // Render result hero
+    const heroEl = document.getElementById('result-hero');
+    heroEl.innerHTML =
+      '<div class="result-label">Your recommended tool</div>' +
+      '<div class="result-name">' + winnerTool.name + '</div>' +
+      '<div class="result-tagline">' + winnerTool.tagline + '</div>' +
+      '<div class="result-scores">' +
+        ranked.map((key, i) => i < 3 ?
+          '<div class="result-score-item"><div class="result-score-val">' + scores[key] + '</div><div class="result-score-label">' + tools[key].name.split(' ')[0] + '</div></div>'
+          : '').join('') +
+      '</div>' +
+      '<ul class="result-reasons">' + winnerReasons.map(r => '<li>' + r + '</li>').join('') + '</ul>' +
+      '<div style="margin-top:1rem;font-size:.82rem;color:var(--text-muted)">Price: <strong style="color:var(--accent)">' + winnerTool.price + '</strong> &nbsp;&bull;&nbsp; Best IDE: ' + winnerTool.ide + ' &nbsp;&bull;&nbsp; SWE-bench: ' + (winnerTool.sweBench || 'N/A') + '</div>';
+
+    // Alts
+    const altsEl = document.getElementById('result-alts');
+    altsEl.innerHTML = alts.map(key =>
+      '<div class="alt-chip" title="Score: ' + scores[key] + '">' + tools[key].name + ' (' + scores[key] + ' pts)</div>'
+    ).join('');
+
+    // Highlight winner column in matrix
+    document.querySelectorAll('.matrix-table thead th').forEach(th => {
+      th.style.background = '';
+      th.style.color = '';
+    });
+    const winnerHeader = document.getElementById('mh-' + winner);
+    if (winnerHeader) {
+      winnerHeader.style.background = 'rgba(34,197,94,.1)';
+      winnerHeader.style.color = '#22c55e';
+    }
+
+    // Render matrix
+    const tbody = document.getElementById('matrix-tbody');
+    tbody.innerHTML = matrixRows.map(row => {
+      const cols = ['copilot','cursor','claudecode','cody','windsurf'];
+      return '<tr>' +
+        '<td>' + row.feature + '</td>' +
+        cols.map((col, ci) => {
+          const v = row[col];
+          let cls = '', display = v;
+          if (v === 'yes') { cls = 'mx-yes'; display = 'Yes'; }
+          else if (v === 'no') { cls = 'mx-no'; display = '—'; }
+          else if (v === 'partial') { cls = 'mx-partial'; display = 'Partial'; }
+          const isWinner = col === winner;
+          return '<td class="' + cls + (isWinner ? ' highlight-col' : '') + '">' + display + '</td>';
+        }).join('') +
+        '</tr>';
+    }).join('');
+
+    document.getElementById('wizard-wrap').style.display = 'none';
+    const rw = document.getElementById('result-wrap');
+    rw.style.display = '';
+    rw.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  window.wiz = { select, next, back, restart };
+  renderQuestion(0);
+})();
+</script>
+</body>
+</html>

@@ -176,4 +176,18 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <!-- Sprint 8 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/answers/claude-vs-gpt-2026.html</loc>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- Sprint 8 Auto-Added -->
+  <url>
+    <loc>https://gpt0x.com/tools/ai-coding-assistant-picker.html</loc>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
