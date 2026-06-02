@@ -27,4 +27,16 @@
   <url><loc>https://gpt0x.com/tools/prompt-builder.html</loc></url>
   <url><loc>https://gpt0x.com/tools/system-prompt-library.html</loc></url>
   <url><loc>https://gpt0x.com/tools/token-counter.html</loc></url>
+  <url>
+    <loc>https://gpt0x.com/tools/ai-model-release-timeline-every-major-llm-launch</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gpt0x.com/tools/prompt-engineering-cheat-sheet-30-techniques-that-work</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
