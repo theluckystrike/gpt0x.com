@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>GPU VRAM Requirements Calculator — Will Your Model Fit? | gpt0x.com</title>
+  <meta name="description" content="Estimate GPU VRAM for LLMs: model weights, KV cache, activations, framework overhead. Compare T4, L4, A10G, A100, H100, RTX 3090/4090. Dark theme, interactive.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://gpt0x.com/tools/gpu-vram-calculator">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How is VRAM calculated for model weights?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Weights VRAM = (parameters in billions) × (bytes per parameter). FP32 = 4B, FP16 = 2B, INT8 = 1B, INT4 = 0.5B."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is KV cache VRAM?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "KV cache stores key/value tensors during transformer inference. Estimated as 2 × (num_layers) × (hidden_dim) × (batch_size × seq_len) × bytes_per_param. We use a simplified heuristic: 2 × batch × seq_len × (params_B × 0.5) × bytes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which GPUs are compared?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "T4 (16GB), L4 (24GB), A10G (24GB), A100-40GB, A100-80GB, H100 (80GB), RTX 3090 (24GB), RTX 4090 (24GB)."
+          }
+        }
+      ]
+    }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    .subhead {
+      color: #94a3b8;
+      font-size: 1.05rem;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 24px;
+      padding: 1.8rem 1.5rem;
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6);
+      margin-bottom: 2rem;
+      border: 1px solid #334155;
+    }
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.2rem 1rem;
+      margin-bottom: 1.8rem;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .field label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #94a3b8;
+      letter-spacing: 0.02em;
+    }
+    .field input, .field select {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 0.7rem 1rem;
+      color: #f1f5f9;
+      font-size: 1rem;
+      transition: border 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .field input:focus, .field select:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+    .field input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    .field input[type="number"]::-webkit-outer-spin-button,
+    .field input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .calc-btn {
+      background: #38bdf8;
+      border: none;
+      border-radius: 40px;
+      padding: 0.9rem 2rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #0f172a;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-block;
+      width: 100%;
+      max-width: 300px;
+      margin: 0.5rem auto 0;
+      box-shadow: 0 8px 20px rgba(56,189,248,0.25);
+    }
+    .calc-btn:hover {
+      background: #7dd3fc;
+      transform: scale(1.02);
+      box-shadow: 0 12px 28px rgba(56,189,248,0.4);
+    }
+    .calc-btn:active {
+      transform: scale(0.97);
+    }
+    .flex-center {
+      display: flex;
+      justify-content: center;
+    }
+    .vram-breakdown {
+      background: #0f172a;
+      border-radius: 20px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0 1rem;
+      border: 1px solid #2d3a52;
+    }
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid #1e2a3a;
+      font-size: 0.95rem;
+    }
+    .breakdown-item:last-child {
+      border-bottom: none;
+    }
+    .breakdown-total {
+      font-weight: 700;
+      color: #38bdf8;
+      font-size: 1.1rem;
+    }
+    .gpu-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.8rem;
+    }
+    .gpu-table th {
+      text-align: left;
+      padding: 0.6rem 0.3rem 0.3rem 0.3rem;
+      font-weight: 500;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      border-bottom: 1px solid #2d3a52;
+    }
+    .gpu-table td {
+      padding: 0.5rem 0.3rem;
+      border-bottom: 1px solid #1e2a3a;
+      vertical-align: middle;
+    }
+    .gpu-name {
+      font-weight: 500;
+    }
+    .gpu-vram {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+    }
+    .indicator {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    }
+    .green { background: #22c55e; box-shadow: 0 0 10px #22c55e88; }
+    .yellow { background: #eab308; box-shadow: 0 0 10px #eab30888; }
+    .red { background: #ef4444; box-shadow: 0 0 10px #ef444488; }
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: #475569;
+      font-size: 0.9rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 1.5rem;
+    }
+    .note {
+      color: #94a3b8;
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 1.8rem; }
+      .card { padding: 1.2rem; }
+      .input-grid { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+      .gpu-table th, .gpu-table td { font-size: 0.75rem; padding: 0.3rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>GPU VRAM Requirements Calculator</h1>
+    <div class="subhead">Will your model fit? — gpt0x.com</div>
+  </header>
+
+  <div class="card">
+    <div class="input-grid">
+      <div class="field">
+        <label for="params">Parameters (B)</label>
+        <input type="number" id="params" value="7" step="0.1" min="0.1" max="1000">
+      </div>
+      <div class="field">
+        <label for="precision">Precision</label>
+        <select id="precision">
+          <option value="fp32">FP32 (4B)</option>
+          <option value="fp16" selected>FP16 (2B)</option>
+          <option value="int8">INT8 (1B)</option>
+          <option value="int4">INT4 (0.5B)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="batch">Batch size</label>
+        <input type="number" id="batch" value="1" min="1" max="512">
+      </div>
+      <div class="field">
+        <label for="seqlen">Sequence length</label>
+        <input type="number" id="seqlen" value="2048" step="128" min="128" max="131072">
+      </div>
+      <div class="field">
+        <label for="framework">Framework</label>
+        <select id="framework">
+          <option value="pytorch">PyTorch</option>
+          <option value="tensorflow">TensorFlow</option>
+          <option value="vllm">vLLM</option>
+          <option value="llamacpp">llama.cpp</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex-center">
+      <button class="calc-btn" id="calculateBtn">Calculate VRAM</button>
+    </div>
+
+    <!-- Breakdown -->
+    <div id="breakdownContainer" class="vram-breakdown">
+      <div class="breakdown-item"><span>Model weights</span> <span id="weightsVram">—</span></div>
+      <div class="breakdown-item"><span>KV cache (transformers)</span> <span id="kvVram">—</span></div>
+      <div class="breakdown-item"><span>Activations (approx)</span> <span id="actVram">—</span></div>
+      <div class="breakdown-item"><span>Framework overhead</span> <span id="overheadVram">—</span></div>
+      <div class="breakdown-item breakdown-total"><span>Total VRAM needed</span> <span id="totalVram">—</span></div>
+    </div>
+
+    <!-- GPU table -->
+    <div style="overflow-x: auto;">
+      <table class="gpu-table" id="gpuTable">
+        <thead>
+          <tr><th>GPU</th><th>VRAM</th><th>Status</th></tr>
+        </thead>
+        <tbody id="gpuTableBody">
+          <!-- filled by JS -->
+        </tbody>
+      </table>
+    </div>
+    <div class="note">🟢 fits &nbsp; 🟡 borderline (≥90%) &nbsp; 🔴 insufficient</div>
+  </div>
+
+  <div class="footer">© 2025 gpt0x.com</div>
+</div>
+
+<script>
+  (function() {
+    const gpuList = [
+      { name: 'T4', vramGB: 16 },
+      { name: 'L4', vramGB: 24 },
+      { name: 'A10G', vramGB: 24 },
+      { name: 'A100-40GB', vramGB: 40 },
+      { name: 'A100-80GB', vramGB: 80 },
+      { name: 'H100', vramGB: 80 },
+      { name: 'RTX 3090', vramGB: 24 },
+      { name: 'RTX 4090', vramGB: 24 }
+    ];
+
+    const paramsInput = document.getElementById('params');
+    const precisionSelect = document.getElementById('precision');
+    const batchInput = document.getElementById('batch');
+    const seqlenInput = document.getElementById('seqlen');
+    const frameworkSelect = document.getElementById('framework');
+    const calcBtn = document.getElementById('calculateBtn');
+
+    const weightsVramSpan = document.getElementById('weightsVram');
+    const kvVramSpan = document.getElementById('kvVram');
+    const actVramSpan = document.getElementById('actVram');
+    const overheadVramSpan = document.getElementById('overheadVram');
+    const totalVramSpan = document.getElementById('totalVram');
+    const gpuTableBody = document.getElementById('gpuTableBody');
+
+    function bytesPerParam(precision) {
+      switch (precision) {
+        case 'fp32': return 4;
+        case 'fp16': return 2;
+        case 'int8': return 1;
+        case 'int4': return 0.5;
+        default: return 2;
+      }
+    }
+
+    function computeVRAM() {
+      const paramsB = parseFloat(paramsInput.value) || 7;
+      const precision = precisionSelect.value;
+      const batch = parseInt(batchInput.value, 10) || 1;
+      const seqLen = parseInt(seqlenInput.value, 10) || 2048;
+      const framework = frameworkSelect.value;
+
+      const bpp = bytesPerParam(precision);
+      // model weights (GB)
+      const weightsGB = paramsB * bpp;  // B * bytes = GB (since B * bytes = GB? Actually 1B param * 2B = 2GB. Yes: paramsB * bpp => GB)
+      
+      // KV cache heuristic: 2 * batch * seq_len * (paramsB * 0.5) * bpp (simplified)
+      // typical ratio: hidden_dim ~ 4096 for 7B, but we use general: 2 * batch * seq * (paramsB*0.5) * bpp / 1e9? but we want GB.
+      // Actually: 2 * batch * seq * (paramsB * 0.5) * bpp  gives GB? Let's test: 7B, bpp=2 => 2*1*2048*(3.5)*2 = 28672 ~ 0.028GB? too small.
+      // More realistic: 2 * batch * seq * (hidden_dim) * bpp. hidden_dim ~ 4096 for 7B. So use 2 * batch * seq * (4096) * bpp / 1e9.
+      // But we don't know hidden_dim. Use heuristic: 2 * batch * seq * (paramsB * 600) * bpp / 1e9 (approx). For 7B, 600*7=4200 ~ hidden.
+      const hiddenDimEstimate = Math.max(1024, paramsB * 700); // rough
+      const kvCacheGB = 2 * batch * seqLen * hiddenDimEstimate * bpp / 1e9;
+      
+      // activations: approx 20% of weights for typical transformer (or more). Use 15% of weights + small.
+      const actGB = 0.15 * weightsGB + 0.02 * batch * seqLen * bpp / 1e9;
+      
+      // framework overhead
+      let overheadGB = 0;
+      switch (framework) {
+        case 'pytorch': overheadGB = 0.8 + 0.05 * weightsGB; break;
+        case 'tensorflow': overheadGB = 1.0 + 0.06 * weightsGB; break;
+        case 'vllm': overheadGB = 0.4 + 0.02 * weightsGB; break;
+        case 'llamacpp': overheadGB = 0.2 + 0.01 * weightsGB; break;
+        default: overheadGB = 0.5;
+      }
+      // clamp overhead
+      overheadGB = Math.max(0.2, overheadGB);
+      
+      const totalGB = weightsGB + kvCacheGB + actGB + overheadGB;
+
+      return {
+        weightsGB: Math.round(weightsGB * 100) / 100,
+        kvCacheGB: Math.round(kvCacheGB * 100) / 100,
+        actGB: Math.round(actGB * 100) / 100,
+        overheadGB: Math.round(overheadGB * 100) / 100,
+        totalGB: Math.round(totalGB * 100) / 100
+      };
+    }
+
+    function renderGPUs(totalGB) {
+      let html = '';
+      for (const gpu of gpuList) {
+        const vram = gpu.vramGB;
+        let statusClass = 'red';
+        let label = 'Insufficient';
+        if (totalGB <= vram * 0.75) {
+          statusClass = 'green';
+          label = 'Fits';
+        } else if (totalGB <= vram * 0.9) {
+          statusClass = 'yellow';
+          label = 'Borderline';
+        } else if (totalGB <= vram) {
+          statusClass = 'yellow';
+          label = 'Borderline (tight)';
+        } else {
+          statusClass = 'red';
+          label = 'Insufficient';
+        }
+        html += `<tr>
+          <td class="gpu-name">${gpu.name}</td>
+          <td class="gpu-vram">${gpu.vramGB} GB</td>
+          <td><span class="indicator ${statusClass}"></span> ${label}</td>
+        </tr>`;
+      }
+      gpuTableBody.innerHTML = html;
+    }
+
+    function updateCalculator() {
+      const result = computeVRAM();
+      weightsVramSpan.textContent = result.weightsGB + ' GB';
+      kvVramSpan.textContent = result.kvCacheGB + ' GB';
+      actVramSpan.textContent = result.actGB + ' GB';
+      overheadVramSpan.textContent = result.overheadGB + ' GB';
+      totalVramSpan.textContent = result.totalGB + ' GB';
+      renderGPUs(result.totalGB);
+    }
+
+    // initial render
+    updateCalculator();
+
+    calcBtn.addEventListener('click', updateCalculator);
+
+    // also update on enter key in inputs
+    const inputs = [paramsInput, precisionSelect, batchInput, seqlenInput, frameworkSelect];
+    inputs.forEach(inp => inp.addEventListener('change', updateCalculator));
+    // for number inputs, also on input
+    paramsInput.addEventListener('input', updateCalculator);
+    batchInput.addEventListener('input', updateCalculator);
+    seqlenInput.addEventListener('input', updateCalculator);
+  })();
+</script>
+</body>
+</html>

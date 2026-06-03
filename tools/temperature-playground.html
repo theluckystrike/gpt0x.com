@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Temperature & Top-P Playground — Visualize LLM Sampling Parameters | gpt0x.com</title>
+  <meta name="description" content="Interactive playground to adjust temperature, top-p, and top-k for LLM token sampling. See real-time probability distribution and output characteristics.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://gpt0x.com/tools/temperature-playground">
+  
+  <!-- JSON-LD FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does temperature do in LLM sampling?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Temperature controls randomness: low values (0.1–0.3) make output deterministic, high values (0.9–1.5) increase creativity and diversity."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is top-p (nucleus) sampling?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Top-p selects the smallest set of tokens whose cumulative probability exceeds p. It dynamically adjusts the number of candidates."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does top-k affect generation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Top-k limits sampling to the k most likely tokens. Lower k (e.g., 10) yields focused output, higher k (e.g., 100) allows more variety."
+        }
+      }
+    ]
+  }
+  </script>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1000px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    h1 small {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: #94a3b8;
+      margin-left: 0.2rem;
+    }
+    .subhead {
+      color: #94a3b8;
+      margin-bottom: 1.8rem;
+      border-left: 3px solid #38bdf8;
+      padding-left: 0.8rem;
+      font-size: 1rem;
+    }
+    .playground-card {
+      background: #1e293b;
+      border-radius: 24px;
+      padding: 1.8rem 1.5rem;
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6);
+      margin-bottom: 2rem;
+    }
+    .slider-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem 2.2rem;
+      margin-bottom: 2rem;
+    }
+    .slider-item {
+      flex: 1 1 180px;
+      min-width: 140px;
+    }
+    .slider-item label {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+    .slider-item label span:last-child {
+      color: #38bdf8;
+      font-weight: 600;
+      background: #0f172a;
+      padding: 0 8px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    input[type=range] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: #334155;
+      border-radius: 10px;
+      outline: none;
+      transition: background 0.2s;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #38bdf8;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 8px #38bdf8aa;
+      border: 2px solid #0f172a;
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: #38bdf8;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #0f172a;
+    }
+    .preset-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 0.8rem;
+      margin: 1.8rem 0 1.2rem;
+    }
+    .preset-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 0.5rem 1.1rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      flex: 0 1 auto;
+    }
+    .preset-btn:hover {
+      background: #2d3a4f;
+      border-color: #38bdf8;
+      color: #f1f5f9;
+    }
+    .preset-btn:active {
+      transform: scale(0.96);
+    }
+    .preset-btn.active-preset {
+      background: #38bdf8;
+      border-color: #38bdf8;
+      color: #0f172a;
+      font-weight: 600;
+    }
+    .chart-wrapper {
+      background: #0f172a;
+      border-radius: 18px;
+      padding: 1rem 0.5rem 0.3rem 0.5rem;
+      margin: 1.2rem 0 1.5rem;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: transparent;
+      border-radius: 12px;
+      aspect-ratio: 16 / 5;
+      min-height: 140px;
+    }
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.8rem 1.2rem;
+      background: #0f172a;
+      padding: 0.8rem 1.2rem;
+      border-radius: 40px;
+      margin: 1.2rem 0 0.8rem;
+      font-size: 0.9rem;
+    }
+    .stats-row span {
+      background: #1e293b;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      border: 1px solid #2d3a4f;
+    }
+    .characteristics {
+      background: #0f172a;
+      border-radius: 20px;
+      padding: 1rem 1.4rem;
+      margin: 1.2rem 0 0.5rem;
+      border-left: 4px solid #38bdf8;
+    }
+    .characteristics p {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #e2e8f0;
+    }
+    .characteristics strong {
+      color: #38bdf8;
+    }
+    footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 1.8rem;
+      width: 100%;
+    }
+    @media (max-width: 600px) {
+      body { padding: 1rem 0.8rem; }
+      h1 { font-size: 1.6rem; }
+      .playground-card { padding: 1.2rem 1rem; }
+      .slider-item { flex: 1 1 100%; }
+      .preset-btn { font-size: 0.8rem; padding: 0.4rem 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🎛️ Temperature & Top‑P Playground <small>gpt0x.com</small></h1>
+    <div class="subhead">Visualize LLM token sampling · softmax with temperature · top‑p · top‑k</div>
+  </header>
+
+  <div class="playground-card">
+    <!-- sliders -->
+    <div class="slider-grid">
+      <div class="slider-item">
+        <label>🌡️ Temperature <span id="tempValue">0.7</span></label>
+        <input type="range" id="tempSlider" min="0.0" max="2.0" step="0.01" value="0.7">
+      </div>
+      <div class="slider-item">
+        <label>🎯 Top‑P <span id="pValue">0.90</span></label>
+        <input type="range" id="pSlider" min="0.0" max="1.0" step="0.01" value="0.90">
+      </div>
+      <div class="slider-item">
+        <label>📊 Top‑K <span id="kValue">40</span></label>
+        <input type="range" id="kSlider" min="1" max="100" step="1" value="40">
+      </div>
+    </div>
+
+    <!-- presets -->
+    <div class="preset-group">
+      <button class="preset-btn" data-temp="0.9" data-p="0.95" data-k="60">✨ Creative Writing</button>
+      <button class="preset-btn" data-temp="0.2" data-p="0.1" data-k="10">💻 Code Generation</button>
+      <button class="preset-btn" data-temp="0.0" data-p="1.0" data-k="100">📘 Factual Q&A</button>
+      <button class="preset-btn" data-temp="1.2" data-p="0.95" data-k="80">🧠 Brainstorming</button>
+    </div>
+
+    <!-- canvas -->
+    <div class="chart-wrapper">
+      <canvas id="distCanvas" width="800" height="250"></canvas>
+    </div>
+
+    <!-- stats & characteristics -->
+    <div class="stats-row">
+      <span>🔥 entropy: <span id="entropyDisplay">2.14</span></span>
+      <span>🎲 active tokens: <span id="activeTokens">40</span></span>
+      <span>⚡ top‑1 prob: <span id="top1Prob">0.21</span></span>
+    </div>
+
+    <div class="characteristics" id="charBox">
+      <p><strong>⚖️ Balanced</strong> — moderate randomness, suitable for general chat & creative tasks.</p>
+    </div>
+  </div>
+
+  <footer>© 2025 gpt0x.com</footer>
+</div>
+
+<script>
+  (function() {
+    const canvas = document.getElementById('distCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // DOM elements
+    const tempSlider = document.getElementById('tempSlider');
+    const pSlider = document.getElementById('pSlider');
+    const kSlider = document.getElementById('kSlider');
+    const tempValue = document.getElementById('tempValue');
+    const pValue = document.getElementById('pValue');
+    const kValue = document.getElementById('kValue');
+    const entropyDisplay = document.getElementById('entropyDisplay');
+    const activeTokens = document.getElementById('activeTokens');
+    const top1Prob = document.getElementById('top1Prob');
+    const charBox = document.getElementById('charBox');
+
+    // preset buttons
+    const presetBtns = document.querySelectorAll('.preset-btn');
+
+    // ----- internal state -----
+    const NUM_LOGITS = 80; // number of tokens to simulate
+    let baseLogits = new Float32Array(NUM_LOGITS);
+    // generate random-ish base logits (fixed seed for consistency)
+    function generateBaseLogits() {
+      let seed = 42;
+      for (let i = 0; i < NUM_LOGITS; i++) {
+        seed = (seed * 16807) % 2147483647;
+        let val = (seed % 1000) / 1000; // 0..1
+        // create a few peaks
+        if (i % 7 === 0) val = 0.7 + 0.3 * Math.sin(i);
+        else if (i % 11 === 0) val = 0.9 + 0.1 * Math.cos(i*2);
+        else val = 0.1 + 0.6 * val;
+        baseLogits[i] = Math.max(0.01, val);
+      }
+      // make first few tokens more likely (simulate common tokens)
+      for (let i = 0; i < 5; i++) baseLogits[i] = 0.8 + 0.4 * (1 - i/5);
+    }
+    generateBaseLogits();
+
+    // ----- helpers -----
+    function softmaxWithTemp(logits, temperature) {
+      const arr = new Float32Array(logits.length);
+      const t = Math.max(temperature, 0.001); // avoid division by zero
+      let maxL = -Infinity;
+      for (let i = 0; i < logits.length; i++) {
+        const scaled = logits[i] / t;
+        arr[i] = scaled;
+        if (scaled > maxL) maxL = scaled;
+      }
+      let sum = 0;
+      for (let i = 0; i < arr.length; i++) {
+        arr[i] = Math.exp(arr[i] - maxL);
+        sum += arr[i];
+      }
+      if (sum > 0) {
+        for (let i = 0; i < arr.length; i++) arr[i] /= sum;
+      }
+      return arr;
+    }
+
+    // top-p filtering (nucleus) + top-k combined
+    function applyTopKTopP(probs, topK, topP) {
+      const indices = Array.from(probs.keys());
+      indices.sort((a, b) => probs[b] - probs[a]);
+      
+      let k = Math.min(topK, probs.length);
+      let cumulative = 0;
+      let cutoffIdx = indices.length;
+      for (let i = 0; i < indices.length; i++) {
+        if (i >= k) { cutoffIdx = i; break; }
+        cumulative += probs[indices[i]];
+        if (cumulative >= topP && i >= 1) { cutoffIdx = i+1; break; }
+      }
+      // zero out others
+      const filtered = new Float32Array(probs.length);
+      let sum = 0;
+      for (let i = 0; i < cutoffIdx && i < indices.length; i++) {
+        const idx = indices[i];
+        filtered[idx] = probs[idx];
+        sum += filtered[idx];
+      }
+      if (sum > 0) {
+        for (let i = 0; i < filtered.length; i++) filtered[i] /= sum;
+      }
+      return filtered;
+    }
+
+    // compute entropy (natts)
+    function computeEntropy(probs) {
+      let ent = 0;
+      for (let i = 0; i < probs.length; i++) {
+        if (probs[i] > 1e-10) ent -= probs[i] * Math.log(probs[i]);
+      }
+      return ent;
+    }
+
+    // ----- render -----
+    function render(temperature, topP, topK) {
+      // softmax with temperature
+      let probs = softmaxWithTemp(baseLogits, temperature);
+      // apply top-p & top-k
+      probs = applyTopKTopP(probs, topK, topP);
+      
+      // count active (non-zero)
+      let activeCount = 0;
+      let maxProb = 0;
+      for (let i = 0; i < probs.length; i++) {
+        if (probs[i] > 1e-9) activeCount++;
+        if (probs[i] > maxProb) maxProb = probs[i];
+      }
+      
+      // entropy
+      const ent = computeEntropy(probs);
+      entropyDisplay.textContent = ent.toFixed(2);
+      activeTokens.textContent = activeCount;
+      top1Prob.textContent = maxProb.toFixed(3);
+
+      // draw canvas
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      
+      const barWidth = Math.max(2, (w - 20) / NUM_LOGITS);
+      const padding = 10;
+      const chartHeight = h - 30;
+      const maxBarHeight = chartHeight - 10;
+      
+      // find max prob for scaling
+      let maxP = 0;
+      for (let i = 0; i < probs.length; i++) {
+        if (probs[i] > maxP) maxP = probs[i];
+      }
+      if (maxP < 0.01) maxP = 0.01;
+      
+      // draw bars
+      for (let i = 0; i < NUM_LOGITS; i++) {
+        const prob = probs[i];
+        const barHeight = (prob / maxP) * maxBarHeight;
+        const x = padding + i * barWidth;
+        const y = chartHeight - barHeight + 5;
+        
+        // color gradient: high prob -> accent, low -> dim
+        const intensity = Math.min(1, prob / (maxP + 0.001));
+        const r = Math.round(56 + 100 * intensity);
+        const g = Math.round(189 + 30 * intensity);
+        const b = Math.round(248 - 50 * intensity);
+        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.fillRect(x, y, Math.max(1, barWidth - 1), barHeight);
+      }
+      
+      // baseline
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padding, chartHeight + 5);
+      ctx.lineTo(w - padding, chartHeight + 5);
+      ctx.stroke();
+
+      // update characteristics
+      updateCharacteristics(temperature, topP, topK);
+    }
+
+    function updateCharacteristics(temp, p, k) {
+      let label = '⚖️ Balanced';
+      let desc = 'moderate randomness, suitable for general chat & creative tasks.';
+      if (temp < 0.3 && p < 0.3) {
+        label = '🎯 Deterministic';
+        desc = 'low temperature & top-p: very focused, repetitive, safe for code & facts.';
+      } else if (temp < 0.4) {
+        label = '📘 Factual / Precise';
+        desc = 'low temperature: predictable, conservative output. Good for Q&A.';
+      } else if (temp > 1.1 && p > 0.8) {
+        label = '🌀 Creative / Wild';
+        desc = 'high temperature & top-p: diverse, surprising, may hallucinate.';
+      } else if (temp > 0.8 && p > 0.8) {
+        label = '✨ Creative';
+        desc = 'elevated randomness, suitable for storytelling, brainstorming.';
+      } else if (temp > 0.6 && p > 0.6) {
+        label = '⚖️ Balanced';
+        desc = 'moderate randomness, suitable for general chat & creative tasks.';
+      } else if (temp < 0.3 && p > 0.9) {
+        label = '📘 Factual (high top-p)';
+        desc = 'low temperature but wide pool: mostly deterministic but allows variety.';
+      }
+      charBox.innerHTML = `<p><strong>${label}</strong> — ${desc}</p>`;
+    }
+
+    // ----- update from sliders -----
+    function updateFromSliders() {
+      const t = parseFloat(tempSlider.value);
+      const p = parseFloat(pSlider.value);
+      const k = parseInt(kSlider.value, 10);
+      tempValue.textContent = t.toFixed(2);
+      pValue.textContent = p.toFixed(2);
+      kValue.textContent = k;
+      render(t, p, k);
+    }
+
+    // ----- preset handler -----
+    function applyPreset(temp, p, k) {
+      tempSlider.value = temp;
+      pSlider.value = p;
+      kSlider.value = k;
+      tempValue.textContent = temp.toFixed(2);
+      pValue.textContent = p.toFixed(2);
+      kValue.textContent = k;
+      // remove active class
+      presetBtns.forEach(btn => btn.classList.remove('active-preset'));
+      // highlight matching preset (optional)
+      render(temp, p, k);
+    }
+
+    // preset click
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const temp = parseFloat(this.dataset.temp);
+        const p = parseFloat(this.dataset.p);
+        const k = parseInt(this.dataset.k, 10);
+        applyPreset(temp, p, k);
+        // visual active
+        presetBtns.forEach(b => b.classList.remove('active-preset'));
+        this.classList.add('active-preset');
+      });
+    });
+
+    // slider events
+    tempSlider.addEventListener('input', updateFromSliders);
+    pSlider.addEventListener('input', updateFromSliders);
+    kSlider.addEventListener('input', updateFromSliders);
+
+    // initial render
+    updateFromSliders();
+
+    // responsive canvas: keep aspect ratio
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      // canvas size already set via css aspect-ratio, but we keep resolution fixed
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // re-draw on dark mode / visibility if needed
+  })();
+</script>
+</body>
+</html>

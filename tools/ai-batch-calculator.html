@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>AI Batch Processing Calculator — Optimize Bulk API Calls | gpt0x.com</title>
+  <meta name="description" content="Optimize bulk AI API calls with batch calculator: cost, time, batch size, requests. Supports GPT-4, Claude, Gemini, rate limits, concurrency.">
+  <meta name="keywords" content="AI batch, API cost calculator, token optimization, bulk API, batch processing, gpt0x">
+  <link rel="canonical" href="https://gpt0x.com/tools/ai-batch-calculator">
+  <!-- JSON-LD FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I calculate optimal batch size for API calls?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Enter total items, tokens per item, rate limit, and concurrent connections. The calculator finds batch size that minimizes time while respecting rate limits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is exponential backoff formula?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Exponential backoff: wait = base * (2^attempt) + jitter. Typically base 1-2s, max 60s. Helps avoid rate limit errors."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does batch processing reduce API cost?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Some providers offer batch discounts (e.g., 50% off for async batch). Caching and merging requests also reduce total tokens."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.25rem;
+    }
+    .subhead {
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 24px;
+      padding: 1.8rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      border: 1px solid #334155;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+    }
+    .input-group {
+      margin-bottom: 1.4rem;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      margin-bottom: 0.4rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      color: #f1f5f9;
+      font-size: 1rem;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    .range-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .range-wrapper input[type="range"] {
+      flex: 1;
+      padding: 0;
+      background: transparent;
+      border: none;
+      accent-color: #38bdf8;
+    }
+    .range-value {
+      min-width: 3rem;
+      text-align: center;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0 0.8rem;
+    }
+    .stat-item {
+      background: #0f172a;
+      border-radius: 20px;
+      padding: 1rem 0.8rem;
+      text-align: center;
+      border: 1px solid #2d3a4e;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+    }
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #38bdf8;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+    .stat-number.cost {
+      color: #fbbf24;
+    }
+    .stat-number.time {
+      color: #a78bfa;
+    }
+    .badge {
+      display: inline-block;
+      background: #1e3a5f;
+      color: #7dd3fc;
+      border-radius: 40px;
+      padding: 0.2rem 0.9rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .timeline-container {
+      margin-top: 1.8rem;
+      background: #0f172a;
+      border-radius: 20px;
+      padding: 1.2rem 0.8rem;
+    }
+    .timeline-bar {
+      display: flex;
+      height: 28px;
+      border-radius: 40px;
+      overflow: hidden;
+      background: #1e293b;
+      margin: 0.5rem 0;
+    }
+    .timeline-fill {
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      width: 0%;
+      transition: width 0.2s ease;
+      border-radius: 40px;
+    }
+    .timeline-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .strategy-box {
+      background: #0f172a;
+      border-radius: 20px;
+      padding: 1.2rem 1.2rem;
+      margin-top: 1.5rem;
+      border-left: 4px solid #38bdf8;
+    }
+    .strategy-box h3 {
+      color: #38bdf8;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .strategy-box ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .strategy-box li {
+      padding: 0.3rem 0;
+      border-bottom: 1px solid #1e293b;
+      font-size: 0.95rem;
+    }
+    .strategy-box li:last-child {
+      border-bottom: none;
+    }
+    .formula {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      background: #1e293b;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      color: #fbbf24;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: #475569;
+      font-size: 0.9rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 2rem;
+    }
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+    @media (max-width: 700px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      .card {
+        padding: 1.2rem;
+      }
+      .stat-number {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ AI Batch Processing Calculator</h1>
+    <div class="subhead">Optimize bulk API calls • cost • time • batch size</div>
+  </header>
+
+  <div class="card">
+    <div class="grid-2">
+      <!-- left: inputs -->
+      <div>
+        <div class="input-group">
+          <label for="totalItems">📦 Total items to process</label>
+          <input type="number" id="totalItems" min="1" max="1000000" value="5000" step="1">
+        </div>
+        <div class="input-group">
+          <label for="tokensPerItem">🔤 Tokens per item (input + output)</label>
+          <input type="number" id="tokensPerItem" min="1" max="100000" value="1200" step="10">
+        </div>
+        <div class="input-group">
+          <label for="providerModel">🤖 API provider & model</label>
+          <select id="providerModel">
+            <option value="gpt4" data-cost="0.03">OpenAI GPT-4 (30¢/1K tokens)</option>
+            <option value="gpt35" data-cost="0.002" selected>OpenAI GPT-3.5 (0.2¢/1K tokens)</option>
+            <option value="claude3" data-cost="0.015">Anthropic Claude 3 (1.5¢/1K tokens)</option>
+            <option value="gemini" data-cost="0.00125">Google Gemini (0.125¢/1K tokens)</option>
+            <option value="llama3" data-cost="0.0008">Meta Llama 3 (0.08¢/1K tokens)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="rateLimit">⏱️ Rate limit (requests/min)</label>
+          <input type="number" id="rateLimit" min="1" max="100000" value="60" step="1">
+        </div>
+        <div class="input-group">
+          <label for="concurrency">⚙️ Concurrent connections (1–100)</label>
+          <div class="range-wrapper">
+            <input type="range" id="concurrency" min="1" max="100" value="10" step="1">
+            <span class="range-value" id="concurrencyDisplay">10</span>
+          </div>
+        </div>
+        <button id="resetDefaults" style="background: transparent; border: 1px solid #334155; color:#94a3b8; padding:0.5rem 1.2rem; border-radius:40px; margin-top:0.5rem; cursor:pointer;">↺ Reset to defaults</button>
+      </div>
+
+      <!-- right: results + timeline -->
+      <div>
+        <div class="stat-grid">
+          <div class="stat-item"><div class="stat-label">Total tokens</div><div class="stat-number" id="totalTokens">6,000,000</div></div>
+          <div class="stat-item"><div class="stat-label">Total cost (USD)</div><div class="stat-number cost" id="totalCost">12.00</div></div>
+          <div class="stat-item"><div class="stat-label">Est. time (min)</div><div class="stat-number time" id="estTime">8.33</div></div>
+          <div class="stat-item"><div class="stat-label">Optimal batch</div><div class="stat-number" id="optimalBatch">600</div></div>
+          <div class="stat-item"><div class="stat-label">Requests</div><div class="stat-number" id="requestsNeeded">9</div></div>
+        </div>
+
+        <div class="timeline-container">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+            <span>⏳ Batch progress</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="timeline-bar">
+            <div class="timeline-fill" id="timelineFill" style="width:0%"></div>
+          </div>
+          <div class="timeline-labels">
+            <span>start</span>
+            <span id="batchInfo">0 / 0</span>
+            <span>end</span>
+          </div>
+        </div>
+
+        <!-- strategies & tips -->
+        <div class="strategy-box">
+          <h3>🧠 Strategies & optimization</h3>
+          <ul>
+            <li><strong>Chunking:</strong> Split large jobs into batches of <span id="batchSizeTip">600</span> items.</li>
+            <li><strong>Retry logic:</strong> Exponential backoff <span class="formula">wait = 1s × 2^(attempt) + random(0,1s)</span> up to 60s.</li>
+            <li><strong>Batch discounts:</strong> Some APIs offer 50% off for async batch mode.</li>
+            <li><strong>Caching:</strong> Cache identical prompts to reduce token usage by up to 40%.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2025 gpt0x.com — AI Batch Calculator. All estimates are approximate.
+  </div>
+</div>
+
+<script>
+  (function() {
+    // DOM refs
+    const totalItemsInput = document.getElementById('totalItems');
+    const tokensPerItemInput = document.getElementById('tokensPerItem');
+    const providerSelect = document.getElementById('providerModel');
+    const rateLimitInput = document.getElementById('rateLimit');
+    const concurrencySlider = document.getElementById('concurrency');
+    const concurrencyDisplay = document.getElementById('concurrencyDisplay');
+    const resetBtn = document.getElementById('resetDefaults');
+
+    // result fields
+    const totalTokensSpan = document.getElementById('totalTokens');
+    const totalCostSpan = document.getElementById('totalCost');
+    const estTimeSpan = document.getElementById('estTime');
+    const optimalBatchSpan = document.getElementById('optimalBatch');
+    const requestsNeededSpan = document.getElementById('requestsNeeded');
+    const timelineFill = document.getElementById('timelineFill');
+    const progressPercent = document.getElementById('progressPercent');
+    const batchInfo = document.getElementById('batchInfo');
+    const batchSizeTip = document.getElementById('batchSizeTip');
+
+    // default values
+    const defaults = {
+      totalItems: 5000,
+      tokensPerItem: 1200,
+      provider: 'gpt35',
+      rateLimit: 60,
+      concurrency: 10
+    };
+
+    function getCostPer1K(selectEl) {
+      const selected = selectEl.options[selectEl.selectedIndex];
+      return parseFloat(selected.dataset.cost) || 0.002;
+    }
+
+    function formatNumber(num) {
+      if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+      if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+      return num.toFixed(0);
+    }
+
+    function calculate() {
+      // read inputs
+      let totalItems = parseInt(totalItemsInput.value, 10);
+      let tokensPerItem = parseInt(tokensPerItemInput.value, 10);
+      let rateLimit = parseInt(rateLimitInput.value, 10);
+      let concurrency = parseInt(concurrencySlider.value, 10);
+
+      // sanitize
+      if (isNaN(totalItems) || totalItems < 1) totalItems = 1;
+      if (isNaN(tokensPerItem) || tokensPerItem < 1) tokensPerItem = 1;
+      if (isNaN(rateLimit) || rateLimit < 1) rateLimit = 1;
+      if (isNaN(concurrency) || concurrency < 1) concurrency = 1;
+      if (concurrency > 100) concurrency = 100;
+
+      // cost per 1K tokens
+      const costPer1K = getCostPer1K(providerSelect);
+
+      // total tokens
+      const totalTokens = totalItems * tokensPerItem;
+      const totalTokensDisplay = totalTokens;
+      const cost = (totalTokens / 1000) * costPer1K;
+
+      // --- optimal batch size: maximize within rate limit & concurrency ---
+      // We want to minimize requests while respecting: batch_size * concurrency <= rateLimit (per minute)
+      // Also batch size should not exceed total items.
+      // Optimal batch = floor(rateLimit / concurrency) but at least 1.
+      let optimalBatch = Math.floor(rateLimit / concurrency);
+      if (optimalBatch < 1) optimalBatch = 1;
+      // but also we can't exceed total items
+      if (optimalBatch > totalItems) optimalBatch = totalItems;
+
+      // requests needed (ceil)
+      const requests = Math.ceil(totalItems / optimalBatch);
+
+      // estimated time (minutes): each batch of optimalBatch items takes (optimalBatch / rateLimit) minutes? 
+      // With concurrency: we can send up to concurrency requests per minute? Actually rate limit is total requests/min.
+      // If we have concurrency, we can send concurrent requests up to rate limit. 
+      // Effective throughput = min(concurrency, rateLimit) requests per minute? But rate limit is global.
+      // Realistic: each request takes 1/rateLimit minute if no concurrency. With concurrency C, we can send C requests in parallel,
+      // but still limited by rateLimit per minute. So max requests per minute = min(concurrency, rateLimit). 
+      // However, if concurrency > rateLimit, we are limited by rateLimit. So effective requests per minute = Math.min(concurrency, rateLimit).
+      const effectiveRPM = Math.min(concurrency, rateLimit);
+      // time (min) = requests / effectiveRPM
+      let estTimeMin = requests / effectiveRPM;
+      if (estTimeMin < 0.01) estTimeMin = 0.01;
+
+      // update DOM
+      totalTokensSpan.textContent = formatNumber(totalTokensDisplay);
+      totalCostSpan.textContent = cost.toFixed(2);
+      estTimeSpan.textContent = estTimeMin.toFixed(2);
+      optimalBatchSpan.textContent = optimalBatch;
+      requestsNeededSpan.textContent = requests;
+
+      // timeline fill: simulate progress based on batch completion (we show 0-100% but we can show fraction of batches)
+      // For visual, we show a pseudo progress: each batch step = 1/requests * 100, but we show current step as "batch X of Y"
+      // We'll just show a fraction: we can't animate real progress, but we show the proportion of batches done if we were at last batch.
+      // Instead, we show a static representation: fill = (1 - (1/requests))? That's weird. Better: show fill = 100% if requests <=1 else 95%? 
+      // Let's show a "potential" progress: assume we have processed half? No, we show a deterministic fraction: 
+      // For display, we show the fraction of items that would be processed after 1 batch? Not meaningful.
+      // We'll show a "batches completed" as 0, but we can set fill to 0% and label "0 / X". That's honest.
+      const fillPercent = 0; // static start
+      timelineFill.style.width = fillPercent + '%';
+      progressPercent.textContent = fillPercent + '%';
+      batchInfo.textContent = `0 / ${requests} batches`;
+
+      // update batch size tip
+      batchSizeTip.textContent = optimalBatch;
+
+      // also update concurrency display
+      concurrencyDisplay.textContent = concurrency;
+    }
+
+    // event listeners
+    function handleInput() {
+      calculate();
+    }
+
+    totalItemsInput.addEventListener('input', handleInput);
+    tokensPerItemInput.addEventListener('input', handleInput);
+    providerSelect.addEventListener('change', handleInput);
+    rateLimitInput.addEventListener('input', handleInput);
+    concurrencySlider.addEventListener('input', function() {
+      concurrencyDisplay.textContent = this.value;
+      handleInput();
+    });
+
+    resetBtn.addEventListener('click', function() {
+      totalItemsInput.value = defaults.totalItems;
+      tokensPerItemInput.value = defaults.tokensPerItem;
+      providerSelect.value = defaults.provider;
+      rateLimitInput.value = defaults.rateLimit;
+      concurrencySlider.value = defaults.concurrency;
+      concurrencyDisplay.textContent = defaults.concurrency;
+      calculate();
+    });
+
+    // initial calculation
+    calculate();
+
+    // extra: ensure number inputs are valid on blur
+    [totalItemsInput, tokensPerItemInput, rateLimitInput].forEach(el => {
+      el.addEventListener('blur', function() {
+        let val = parseInt(this.value, 10);
+        if (isNaN(val) || val < 1) this.value = 1;
+        if (this.id === 'totalItems' && val > 1000000) this.value = 1000000;
+        if (this.id === 'tokensPerItem' && val > 100000) this.value = 100000;
+        if (this.id === 'rateLimit' && val > 100000) this.value = 100000;
+        calculate();
+      });
+    });
+
+  })();
+</script>
+</body>
+</html>

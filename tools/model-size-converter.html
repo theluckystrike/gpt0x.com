@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+  <title>Model Size Converter — Parameters to GB Calculator | gpt0x.com</title>
+  <meta name="description" content="Interactive model size converter: estimate GPU VRAM for LLMs based on parameters, precision, optimizer states & gradients. Instant GB/TB results.">
+  <meta name="keywords" content="model size, parameters to GB, LLM memory, GPU VRAM calculator, FP16, INT8, Adam optimizer, training memory">
+  <link rel="canonical" href="https://gpt0x.com/tools/model-size-converter">
+  <!-- JSON-LD FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do you calculate model weight size?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Weight size = number of parameters × bytes per parameter (based on precision)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is optimizer memory?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Optimizer states (e.g., Adam) require extra memory per parameter: typically 12 bytes for Adam, 8 bytes for SGD."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why include gradients?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Gradients occupy the same memory as model weights (same precision). Toggle to add them for training estimation."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1000px;
+      width: 100%;
+    }
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.25rem;
+    }
+    header p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 24px;
+      padding: 1.8rem 1.5rem;
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6);
+      margin-bottom: 2rem;
+      border: 1px solid #334155;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem 1.2rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      letter-spacing: 0.01em;
+    }
+    .form-group .hint {
+      font-size: 0.7rem;
+      color: #64748b;
+      margin-top: 0.1rem;
+    }
+    input, select {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 0.7rem 1rem;
+      color: #f1f5f9;
+      font-size: 1rem;
+      transition: border 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.8rem 1.5rem;
+      background: #0f172a;
+      padding: 0.8rem 1.2rem;
+      border-radius: 18px;
+      border: 1px solid #2d3a4e;
+    }
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .toggle-item label {
+      font-size: 0.9rem;
+      color: #e2e8f0;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #e2e8f0;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #38bdf8;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    .results {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    .result-item {
+      background: #0f172a;
+      border-radius: 18px;
+      padding: 1rem 0.8rem;
+      text-align: center;
+      border: 1px solid #2a374c;
+    }
+    .result-item .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #38bdf8;
+      word-break: break-word;
+    }
+    .result-item .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+      margin-top: 0.2rem;
+    }
+    .result-item.accent {
+      border-color: #38bdf8;
+      background: #0f1a2e;
+    }
+    .quick-ref {
+      margin-top: 2rem;
+    }
+    .quick-ref h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.8rem;
+      color: #e2e8f0;
+      border-left: 4px solid #38bdf8;
+      padding-left: 0.8rem;
+    }
+    .ref-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .ref-table th {
+      text-align: left;
+      padding: 0.6rem 0.4rem;
+      color: #94a3b8;
+      font-weight: 500;
+      border-bottom: 1px solid #2a374c;
+    }
+    .ref-table td {
+      padding: 0.5rem 0.4rem;
+      border-bottom: 1px solid #1e2a3a;
+    }
+    .ref-table tr:last-child td {
+      border-bottom: none;
+    }
+    .ref-table td:first-child {
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .unit-toggle {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .unit-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 0.3rem 0.9rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .unit-btn.active {
+      background: #38bdf8;
+      border-color: #38bdf8;
+      color: #0f172a;
+      font-weight: 600;
+    }
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: #475569;
+      font-size: 0.85rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 1.5rem;
+      width: 100%;
+    }
+    @media (max-width: 640px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .toggle-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      header h1 {
+        font-size: 1.6rem;
+      }
+      .results {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ Model Size Converter</h1>
+    <p>Parameters → GB · training memory estimator</p>
+  </header>
+
+  <div class="card">
+    <div class="grid-2">
+      <div class="form-group">
+        <label for="params">Model parameters</label>
+        <div style="display: flex; gap: 0.4rem;">
+          <input type="number" id="params" value="7" step="0.1" min="0.001" style="flex:2;">
+          <select id="paramUnit" style="flex:1; max-width: 80px;">
+            <option value="B" selected>B</option>
+            <option value="M">M</option>
+          </select>
+        </div>
+        <span class="hint">e.g., 7B, 0.5B, 405B</span>
+      </div>
+
+      <div class="form-group">
+        <label for="precision">Precision (bytes/param)</label>
+        <select id="precision">
+          <option value="4">FP32 (4 bytes)</option>
+          <option value="2" selected>FP16 / BF16 (2 bytes)</option>
+          <option value="1">INT8 (1 byte)</option>
+          <option value="0.5">INT4 (0.5 bytes)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- toggles -->
+    <div class="toggle-row" style="margin-top: 1.2rem;">
+      <div class="toggle-item">
+        <span style="font-size:0.9rem;">Optimizer</span>
+        <select id="optimizerType" style="width:auto; padding:0.4rem 0.8rem; border-radius:30px; background:#0f172a; border:1px solid #334155; color:#e2e8f0;">
+          <option value="adam">Adam (12 B/param)</option>
+          <option value="sgd">SGD (8 B/param)</option>
+        </select>
+      </div>
+      <div class="toggle-item">
+        <label class="switch">
+          <input type="checkbox" id="includeOptimizer" checked>
+          <span class="slider"></span>
+        </label>
+        <label for="includeOptimizer">Include optimizer states</label>
+      </div>
+      <div class="toggle-item">
+        <label class="switch">
+          <input type="checkbox" id="includeGradients" checked>
+          <span class="slider"></span>
+        </label>
+        <label for="includeGradients">Include gradients</label>
+      </div>
+    </div>
+
+    <!-- unit display toggle (cosmetic) -->
+    <div class="unit-toggle">
+      <span style="color:#94a3b8; font-size:0.8rem; margin-right:0.5rem;">Display unit:</span>
+      <button class="unit-btn active" data-unit="GB">GB</button>
+      <button class="unit-btn" data-unit="MB">MB</button>
+      <button class="unit-btn" data-unit="TB">TB</button>
+    </div>
+
+    <!-- results -->
+    <div class="results" id="resultsContainer">
+      <div class="result-item"><div class="value" id="weightSize">14.00 GB</div><div class="label">Model weights</div></div>
+      <div class="result-item"><div class="value" id="optimMemory">84.00 GB</div><div class="label">Optimizer memory</div></div>
+      <div class="result-item"><div class="value" id="gradMemory">14.00 GB</div><div class="label">Gradient memory</div></div>
+      <div class="result-item accent"><div class="value" id="totalMemory">112.00 GB</div><div class="label">Total training</div></div>
+      <div class="result-item"><div class="value" id="minVRAM">112.00 GB</div><div class="label">Min GPU VRAM</div></div>
+      <div class="result-item"><div class="value" id="recommendedGPU">H100 80GB ×2</div><div class="label">Recommended GPU</div></div>
+    </div>
+  </div>
+
+  <!-- quick reference table -->
+  <div class="card quick-ref">
+    <h3>📊 Quick reference — common model sizes (FP16, Adam, gradients)</h3>
+    <div style="overflow-x:auto;">
+      <table class="ref-table" id="refTable">
+        <thead><tr><th>Parameters</th><th>Weights</th><th>Optimizer</th><th>Gradients</th><th>Total train</th><th>Min VRAM</th></tr></thead>
+        <tbody id="refBody"></tbody>
+      </table>
+    </div>
+    <p style="font-size:0.7rem; color:#64748b; margin-top:0.8rem;">* Assumes FP16 (2B), Adam optimizer, gradients included. Values in GB.</p>
+  </div>
+
+  <footer>© 2025 gpt0x.com</footer>
+</div>
+
+<script>
+  (function() {
+    // DOM refs
+    const paramsInput = document.getElementById('params');
+    const paramUnit = document.getElementById('paramUnit');
+    const precisionSelect = document.getElementById('precision');
+    const optimizerType = document.getElementById('optimizerType');
+    const includeOptimizer = document.getElementById('includeOptimizer');
+    const includeGradients = document.getElementById('includeGradients');
+
+    const weightSizeEl = document.getElementById('weightSize');
+    const optimMemoryEl = document.getElementById('optimMemory');
+    const gradMemoryEl = document.getElementById('gradMemory');
+    const totalMemoryEl = document.getElementById('totalMemory');
+    const minVRAMEl = document.getElementById('minVRAM');
+    const recommendedEl = document.getElementById('recommendedGPU');
+
+    const refBody = document.getElementById('refBody');
+
+    // unit buttons
+    let currentUnit = 'GB'; // GB, MB, TB
+    document.querySelectorAll('.unit-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentUnit = this.dataset.unit;
+        updateAll();
+      });
+    });
+
+    // helper: format bytes to selected unit
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      let value;
+      let suffix;
+      switch (currentUnit) {
+        case 'TB':
+          value = bytes / (1024**4);
+          suffix = 'TB';
+          break;
+        case 'MB':
+          value = bytes / (1024**2);
+          suffix = 'MB';
+          break;
+        case 'GB':
+        default:
+          value = bytes / (1024**3);
+          suffix = 'GB';
+          break;
+      }
+      return value.toFixed(2) + ' ' + suffix;
+    }
+
+    // core calculation
+    function compute() {
+      const raw = parseFloat(paramsInput.value);
+      const unit = paramUnit.value;
+      let params = (unit === 'B') ? raw : raw / 1000; // convert M to B
+      if (isNaN(params) || params <= 0) params = 0;
+
+      const precisionBytes = parseFloat(precisionSelect.value);
+      const weightBytes = params * 1e9 * precisionBytes;
+
+      // optimizer
+      let optimBytes = 0;
+      if (includeOptimizer.checked) {
+        const optBytesPerParam = (optimizerType.value === 'adam') ? 12 : 8;
+        optimBytes = params * 1e9 * optBytesPerParam;
+      }
+
+      // gradients
+      let gradBytes = 0;
+      if (includeGradients.checked) {
+        gradBytes = params * 1e9 * precisionBytes; // same as weights
+      }
+
+      const total = weightBytes + optimBytes + gradBytes;
+      const minVRAM = total; // total training memory
+
+      // recommended GPU heuristic
+      let recommended = 'N/A';
+      const totalGB = total / (1024**3);
+      if (totalGB > 0) {
+        if (totalGB <= 24) recommended = 'RTX 3090/4090 (24GB)';
+        else if (totalGB <= 48) recommended = 'A6000 (48GB)';
+        else if (totalGB <= 80) recommended = 'H100 (80GB)';
+        else if (totalGB <= 160) recommended = 'H100 80GB ×2';
+        else if (totalGB <= 320) recommended = 'H100 80GB ×4';
+        else if (totalGB <= 640) recommended = 'H100 80GB ×8';
+        else recommended = 'Multi-node cluster';
+      }
+
+      return { weightBytes, optimBytes, gradBytes, total, minVRAM, recommended, totalGB };
+    }
+
+    function updateAll() {
+      const data = compute();
+      weightSizeEl.textContent = formatBytes(data.weightBytes);
+      optimMemoryEl.textContent = formatBytes(data.optimBytes);
+      gradMemoryEl.textContent = formatBytes(data.gradBytes);
+      totalMemoryEl.textContent = formatBytes(data.total);
+      minVRAMEl.textContent = formatBytes(data.minVRAM);
+      recommendedEl.textContent = data.recommended;
+
+      buildQuickRef();
+    }
+
+    // quick reference for common sizes (in B)
+    function buildQuickRef() {
+      const commonParams = [1, 3, 7, 13, 34, 70, 405];
+      const precision = 2; // FP16
+      const opt = 12; // Adam
+      const includeGrad = true;
+      const includeOpt = true;
+
+      let html = '';
+      commonParams.forEach(p => {
+        const weight = p * 1e9 * precision;
+        const optim = includeOpt ? p * 1e9 * opt : 0;
+        const grad = includeGrad ? p * 1e9 * precision : 0;
+        const total = weight + optim + grad;
+        const minV = total;
+        // store unit preference
+        const w = formatBytes(weight);
+        const o = formatBytes(optim);
+        const g = formatBytes(grad);
+        const t = formatBytes(total);
+        const m = formatBytes(minV);
+        html += `<tr><td>${p}B</td><td>${w}</td><td>${o}</td><td>${g}</td><td>${t}</td><td>${m}</td></tr>`;
+      });
+      refBody.innerHTML = html;
+    }
+
+    // event listeners
+    [paramsInput, paramUnit, precisionSelect, optimizerType, includeOptimizer, includeGradients].forEach(el => {
+      el.addEventListener('input', updateAll);
+      el.addEventListener('change', updateAll);
+    });
+
+    // initial render
+    updateAll();
+
+    // extra: keep params positive
+    paramsInput.addEventListener('blur', function() {
+      if (this.value <= 0 || isNaN(this.value)) this.value = 1;
+      updateAll();
+    });
+
+  })();
+</script>
+</body>
+</html>
