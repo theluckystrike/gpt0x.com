@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>AI Inference Cost Calculator — Compare Cloud GPU Pricing</title>
+  <meta name="description" content="Compare API vs self-hosted GPU inference costs. Calculate per-request, daily, monthly cost & break-even for GPT-4, GPT-3.5, Claude, open-source models.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://gpt0x.com/tools/ai-inference-cost-calculator">
+  <!-- JSON-LD FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How is inference cost calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For API models, cost = (input tokens * input price + output tokens * output price) * requests. For self-hosted, cost = GPU hourly rate / max throughput (requests per hour)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is break-even?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Break-even shows the number of requests per day where self-hosted total cost equals API cost. Above that, self-hosted may be cheaper."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+      color: #f1f5f9;
+    }
+    .subhead {
+      color: #94a3b8;
+      margin-bottom: 2rem;
+      border-left: 4px solid #38bdf8;
+      padding-left: 1rem;
+      font-size: 1rem;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 24px;
+      padding: 1.5rem 1.8rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      border: 1px solid #334155;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+    }
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      color: #cbd5e1;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      color: #f1f5f9;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.2);
+    }
+    .inline-hint {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: 0.2rem;
+    }
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin: 1.5rem 0 0.5rem;
+    }
+    .stat-card {
+      background: #0f172a;
+      border-radius: 18px;
+      padding: 0.8rem 1.2rem;
+      flex: 1 1 120px;
+      border: 1px solid #2d3a4e;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+    }
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-top: 0.2rem;
+    }
+    .stat-value small {
+      font-weight: 400;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .accent {
+      color: #38bdf8;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.2rem 0 0.5rem;
+      font-size: 0.9rem;
+    }
+    th {
+      text-align: left;
+      padding: 0.6rem 0.4rem;
+      color: #94a3b8;
+      font-weight: 500;
+      border-bottom: 1px solid #2d3a4e;
+    }
+    td {
+      padding: 0.6rem 0.4rem;
+      border-bottom: 1px solid #1e293b;
+    }
+    .highlight-row {
+      background: #1a2538;
+      border-radius: 12px;
+    }
+    .badge {
+      background: #2d3a4e;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #b9c7db;
+    }
+    .break-even-box {
+      background: #0f172a;
+      border-radius: 20px;
+      padding: 1rem 1.5rem;
+      margin-top: 1.2rem;
+      border: 1px solid #2d3a4e;
+    }
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: #475569;
+      font-size: 0.9rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 2rem;
+    }
+    @media (max-width: 700px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+      }
+      .card {
+        padding: 1.2rem;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+      .stat-row {
+        flex-direction: column;
+      }
+    }
+    .btn-link {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+    .mt-2 { margin-top: 1rem; }
+  </style>
+
+    <meta property="og:title" content="AI Inference Cost Calculator — Compare Cloud GPU Pricing">
+    <meta property="og:description" content="Compare API vs self-hosted GPU inference costs. Calculate per-request, daily, monthly cost & break-even for GPT-4, GPT-3.5, Claude, open-source models.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gpt0x.com/tools/ai-inference-cost-calculator">
+</head>
+<body>
+<div class="container">
+  <h1>⚡ AI Inference Cost Calculator</h1>
+  <div class="subhead">Compare cloud GPU pricing · API vs self‑hosted · break‑even analysis</div>
+
+  <!-- Inputs -->
+  <div class="card">
+    <div class="grid-2">
+      <div>
+        <div class="input-group">
+          <label for="requests">Requests per day</label>
+          <input type="number" id="requests" value="1000" min="1" step="1">
+          <div class="inline-hint">Total API calls / day</div>
+        </div>
+        <div class="input-group">
+          <label for="inputTokens">Avg input tokens / request</label>
+          <input type="number" id="inputTokens" value="500" min="1" step="10">
+        </div>
+        <div class="input-group">
+          <label for="outputTokens">Avg output tokens / request</label>
+          <input type="number" id="outputTokens" value="300" min="1" step="10">
+        </div>
+      </div>
+      <div>
+        <div class="input-group">
+          <label for="modelCategory">Model category</label>
+          <select id="modelCategory">
+            <option value="gpt4">GPT-4 class (API)</option>
+            <option value="gpt35">GPT-3.5 class (API)</option>
+            <option value="claudeOpus">Claude Opus class (API)</option>
+            <option value="claudeSonnet">Claude Sonnet class (API)</option>
+            <option value="opensource">Open‑source self‑hosted</option>
+          </select>
+        </div>
+        <div class="input-group" id="gpuSelectGroup" style="display: none;">
+          <label for="gpuType">GPU type (self‑hosted)</label>
+          <select id="gpuType">
+            <option value="A100-80">A100 80GB ($3.50/hr)</option>
+            <option value="H100">H100 ($4.50/hr)</option>
+            <option value="L40S">L40S ($2.80/hr)</option>
+            <option value="RTX4090">RTX 4090 ($1.20/hr)</option>
+          </select>
+          <div class="inline-hint">Estimated throughput depends on model size</div>
+        </div>
+        <div class="input-group" style="margin-top: 0.8rem;">
+          <label style="opacity:0.7;">Self‑hosted throughput (req/hr) <span id="throughputLabel">~900</span></label>
+          <div style="background:#0f172a; border-radius:16px; padding:0.5rem 1rem; border:1px solid #2d3a4e; color:#b9c7db;" id="throughputDisplay">900 req/hr (estimated)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results: per request, daily, monthly, per 1M tokens -->
+  <div class="card">
+    <h3 style="font-weight:500; margin-bottom:0.5rem;">📊 Cost summary</h3>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-label">Cost / request</div><div class="stat-value" id="costPerRequest">$0.0012</div></div>
+      <div class="stat-card"><div class="stat-label">Daily cost</div><div class="stat-value" id="dailyCost">$1.20</div></div>
+      <div class="stat-card"><div class="stat-label">Monthly cost (30d)</div><div class="stat-value" id="monthlyCost">$36.00</div></div>
+      <div class="stat-card"><div class="stat-label">Cost / 1M tokens</div><div class="stat-value" id="costPer1MTokens">$1.50</div></div>
+    </div>
+  </div>
+
+  <!-- Comparison table & break-even -->
+  <div class="card">
+    <h3 style="font-weight:500; margin-bottom:0.2rem;">📋 All options comparison</h3>
+    <div style="overflow-x: auto;">
+      <table id="comparisonTable">
+        <thead><tr><th>Model</th><th>Cost/req</th><th>Daily cost</th><th>Monthly</th><th>Cost/1M tok</th></tr></thead>
+        <tbody id="comparisonBody"></tbody>
+      </table>
+    </div>
+    <div class="break-even-box" id="breakEvenBox">
+      <span style="font-weight:500;">⚖️ Break‑even analysis (API vs self‑hosted): </span>
+      <span id="breakEvenText">At <strong>~2,100 requests/day</strong> self‑hosted matches API cost.</span>
+    </div>
+  </div>
+
+  <div class="footer">© 2025 gpt0x.com — <a href="https://gpt0x.com/tools/ai-inference-cost-calculator" class="btn-link">canonical</a></div>
+</div>
+
+<script>
+  (function() {
+    // ----- pricing definitions -----
+    const API_PRICING = {
+      gpt4: { input: 0.03, output: 0.06 },        // per 1K tokens
+      gpt35: { input: 0.0015, output: 0.002 },
+      claudeOpus: { input: 0.015, output: 0.075 },
+      claudeSonnet: { input: 0.003, output: 0.015 }
+    };
+
+    // GPU pricing & throughput (req/hr) for open-source self-hosted (approx)
+    const GPU_OPTIONS = {
+      'A100-80': { hourlyRate: 3.50, throughput: 1200, label: 'A100 80GB' },
+      'H100': { hourlyRate: 4.50, throughput: 1800, label: 'H100' },
+      'L40S': { hourlyRate: 2.80, throughput: 900, label: 'L40S' },
+      'RTX4090': { hourlyRate: 1.20, throughput: 400, label: 'RTX 4090' }
+    };
+
+    // DOM refs
+    const requestsInput = document.getElementById('requests');
+    const inputTokensInput = document.getElementById('inputTokens');
+    const outputTokensInput = document.getElementById('outputTokens');
+    const modelCategory = document.getElementById('modelCategory');
+    const gpuSelect = document.getElementById('gpuType');
+    const gpuSelectGroup = document.getElementById('gpuSelectGroup');
+    const throughputDisplay = document.getElementById('throughputDisplay');
+    const throughputLabel = document.getElementById('throughputLabel');
+
+    const costPerRequestEl = document.getElementById('costPerRequest');
+    const dailyCostEl = document.getElementById('dailyCost');
+    const monthlyCostEl = document.getElementById('monthlyCost');
+    const costPer1MTokensEl = document.getElementById('costPer1MTokens');
+    const comparisonBody = document.getElementById('comparisonBody');
+    const breakEvenText = document.getElementById('breakEvenText');
+
+    // helper: format currency
+    const fmt = (num) => {
+      if (Math.abs(num) < 0.0001) return '$0.0000';
+      if (Math.abs(num) < 0.01) return '$' + num.toFixed(4);
+      if (Math.abs(num) < 1) return '$' + num.toFixed(3);
+      return '$' + num.toFixed(2);
+    };
+
+    // compute cost for a given API config
+    function computeAPICost(inputPricePer1K, outputPricePer1K, inputTokens, outputTokens, requestsPerDay) {
+      const costPerReq = (inputTokens / 1000) * inputPricePer1K + (outputTokens / 1000) * outputPricePer1K;
+      const daily = costPerReq * requestsPerDay;
+      const monthly = daily * 30;
+      const totalTokensPerReq = inputTokens + outputTokens;
+      const costPer1M = (totalTokensPerReq > 0) ? (costPerReq / totalTokensPerReq) * 1_000_000 : 0;
+      return { costPerReq, daily, monthly, costPer1M };
+    }
+
+    // compute self-hosted
+    function computeSelfHosted(gpuKey, inputTokens, outputTokens, requestsPerDay) {
+      const gpu = GPU_OPTIONS[gpuKey];
+      if (!gpu) return null;
+      const throughput = gpu.throughput; // req/hr
+      const hourlyRate = gpu.hourlyRate;
+      const costPerReq = hourlyRate / throughput;
+      const daily = costPerReq * requestsPerDay;
+      const monthly = daily * 30;
+      const totalTokensPerReq = inputTokens + outputTokens;
+      const costPer1M = (totalTokensPerReq > 0) ? (costPerReq / totalTokensPerReq) * 1_000_000 : 0;
+      return { costPerReq, daily, monthly, costPer1M, throughput, hourlyRate };
+    }
+
+    // main update
+    function updateAll() {
+      const requests = parseInt(requestsInput.value, 10) || 0;
+      const inputTok = parseInt(inputTokensInput.value, 10) || 0;
+      const outputTok = parseInt(outputTokensInput.value, 10) || 0;
+      const category = modelCategory.value;
+      const isSelfHosted = (category === 'opensource');
+      let selectedGPU = gpuSelect.value;
+
+      // show/hide gpu selector
+      gpuSelectGroup.style.display = isSelfHosted ? 'block' : 'none';
+
+      // update throughput display if self-hosted
+      let currentThroughput = 900;
+      if (isSelfHosted) {
+        const gpuInfo = GPU_OPTIONS[selectedGPU];
+        if (gpuInfo) {
+          currentThroughput = gpuInfo.throughput;
+          throughputDisplay.innerText = `${currentThroughput} req/hr (${gpuInfo.label})`;
+          throughputLabel.innerText = `~${currentThroughput}`;
+        }
+      } else {
+        throughputDisplay.innerText = `— (API mode)`;
+        throughputLabel.innerText = '—';
+      }
+
+      // --- compute main selected model cost ---
+      let mainCost = null;
+      if (isSelfHosted) {
+        mainCost = computeSelfHosted(selectedGPU, inputTok, outputTok, requests);
+      } else {
+        const pricing = API_PRICING[category];
+        if (pricing) {
+          mainCost = computeAPICost(pricing.input, pricing.output, inputTok, outputTok, requests);
+        }
+      }
+
+      if (mainCost) {
+        costPerRequestEl.innerText = fmt(mainCost.costPerReq);
+        dailyCostEl.innerText = fmt(mainCost.daily);
+        monthlyCostEl.innerText = fmt(mainCost.monthly);
+        costPer1MTokensEl.innerText = fmt(mainCost.costPer1M);
+      } else {
+        costPerRequestEl.innerText = '$0.00';
+        dailyCostEl.innerText = '$0.00';
+        monthlyCostEl.innerText = '$0.00';
+        costPer1MTokensEl.innerText = '$0.00';
+      }
+
+      // --- build comparison table (all models) ---
+      const allModels = [
+        { key: 'gpt4', label: 'GPT-4 class' },
+        { key: 'gpt35', label: 'GPT-3.5 class' },
+        { key: 'claudeOpus', label: 'Claude Opus' },
+        { key: 'claudeSonnet', label: 'Claude Sonnet' },
+      ];
+      let rowsHtml = '';
+      // API models
+      for (const m of allModels) {
+        const p = API_PRICING[m.key];
+        const cost = computeAPICost(p.input, p.output, inputTok, outputTok, requests);
+        rowsHtml += `<tr><td>${m.label}</td><td>${fmt(cost.costPerReq)}</td><td>${fmt(cost.daily)}</td><td>${fmt(cost.monthly)}</td><td>${fmt(cost.costPer1M)}</td></tr>`;
+      }
+      // self-hosted options
+      for (const [gpuKey, gpu] of Object.entries(GPU_OPTIONS)) {
+        const cost = computeSelfHosted(gpuKey, inputTok, outputTok, requests);
+        if (cost) {
+          rowsHtml += `<tr><td>Self‑hosted ${gpu.label}</td><td>${fmt(cost.costPerReq)}</td><td>${fmt(cost.daily)}</td><td>${fmt(cost.monthly)}</td><td>${fmt(cost.costPer1M)}</td></tr>`;
+        }
+      }
+      comparisonBody.innerHTML = rowsHtml;
+
+      // --- break-even: find requests per day where self-hosted (best GPU) equals cheapest API (GPT-3.5) ---
+      // Use cheapest API: GPT-3.5
+      const cheapestAPI = API_PRICING.gpt35;
+      const costPerReqAPI = (inputTok / 1000) * cheapestAPI.input + (outputTok / 1000) * cheapestAPI.output;
+      // best self-hosted: pick highest throughput GPU (H100 typically) but we can compute break-even for each? Show for H100 as reference.
+      const bestGPU = GPU_OPTIONS['H100']; // high throughput
+      const costPerReqSelf = bestGPU.hourlyRate / bestGPU.throughput;
+      let breakEvenReq = 0;
+      if (costPerReqAPI > 0 && costPerReqSelf > 0) {
+        // break-even daily requests where daily cost equal: req * costPerReqAPI = req * costPerReqSelf + fixed? Actually self-hosted has no fixed cost in this simple model (hourly cost scales with hours? but we assume 24h usage? For fair comparison, we assume 24h usage for self-hosted. 
+        // daily cost self = (hourlyRate * 24) if we run 24h? But we compute daily cost as costPerReq * requests. That assumes we only pay for actual usage. For self-hosted, if we run 24h, cost = hourlyRate*24 regardless of requests. To make break-even meaningful, we compare: API daily = req * costPerReqAPI; Self daily = max(req * costPerReqSelf, hourlyRate*24?) Actually simpler: we compare per-request cost. Break-even requests where total cost equal if we assume we can scale down? We'll use the approach: self-hosted daily cost = max(requests * costPerReqSelf, hourlyRate * 24) but that's complex. Let's do standard: self-hosted cost per day = (requests / throughput) * hourlyRate (only pay for hours used). That's what we used in daily cost. So break-even: req * costPerReqAPI = req * costPerReqSelf => req cancels? That gives no break-even. So we need to incorporate fixed 24h? Many calculators assume 24/7. We'll assume self-hosted runs 24h, cost = 24 * hourlyRate. Then break-even req = (24 * hourlyRate) / (costPerReqAPI - costPerReqSelf). That is more realistic.
+        const selfFixedDaily = 24 * bestGPU.hourlyRate; // running 24h
+        const costPerReqSelfVar = bestGPU.hourlyRate / bestGPU.throughput; // variable if we only pay per hour used? But we already used that. For break-even with fixed cost: 
+        // If we run 24h, total self cost = 24 * hourlyRate, capacity = throughput * 24 requests max. So if requests <= capacity, cost = 24*hourlyRate. Then break-even: req * costPerReqAPI = 24*hourlyRate => req = (24*hourlyRate) / costPerReqAPI.
+        // That's more common. Let's implement that.
+        if (costPerReqAPI > 0) {
+          breakEvenReq = (24 * bestGPU.hourlyRate) / costPerReqAPI;
+        }
+      }
+      if (breakEvenReq > 0 && isFinite(breakEvenReq)) {
+        breakEvenText.innerHTML = `At <strong>~${Math.round(breakEvenReq)} requests/day</strong>, self‑hosted (H100, 24h) equals GPT‑3.5 API cost. Above that, self‑hosted may be cheaper (if throughput sufficient).`;
+      } else {
+        breakEvenText.innerHTML = `Break-even not available (check inputs).`;
+      }
+
+      // if self-hosted selected, highlight row? optional
+    }
+
+    // event listeners
+    [requestsInput, inputTokensInput, outputTokensInput, modelCategory, gpuSelect].forEach(el => {
+      el.addEventListener('input', updateAll);
+      el.addEventListener('change', updateAll);
+    });
+
+    // initial update
+    updateAll();
+  })();
+</script>
+</body>
+</html>
