@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>LLM Benchmark Score Normalizer · gpt0x</title>
+  <meta name="description" content="Normalize and compare LLM benchmark scores across MMLU, HumanEval, MATH, GSM8K, HellaSwag, ARC-Challenge, WinoGrande, BBH. Interactive radar, bar chart,...">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://gpt0x.com/tools/llm-benchmark-score-normalizer">
+  <meta property="og:title" content="LLM Benchmark Score Normalizer">
+  <meta property="og:description" content="Normalize, weight, and rank LLMs across 8 key benchmarks. Interactive radar, bar chart, heatmap.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gpt0x.com/tools/llm-benchmark-score-normalizer">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "LLM Benchmark Score Normalizer",
+        "url": "https://gpt0x.com/tools/llm-benchmark-score-normalizer",
+        "applicationCategory": "Data Visualization",
+        "operatingSystem": "All",
+        "browserRequirements": "JavaScript enabled",
+        "description": "Normalize and compare LLM benchmark scores across 8 benchmarks with adjustable weights, radar chart, bar chart, heatmap, and CSV export."
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does min-max normalization work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For each benchmark, the minimum raw score among entered models becomes 0, the maximum becomes 1. All scores are scaled linearly between 0 and 1."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I adjust benchmark weights?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, use the sliders below the grid. Weights are normalized to sum to 1.0 automatically. Default equal weights (0.125 each)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the composite score calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Composite = sum over benchmarks of (weight_i × normalized_score_i). Models are ranked by composite score descending."
+            }
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "gpt0x.com", "item": "https://gpt0x.com" },
+          { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools" },
+          { "@type": "ListItem", "position": 3, "name": "LLM Benchmark Score Normalizer", "item": "https://gpt0x.com/tools/llm-benchmark-score-normalizer" }
+        ]
+      }
+    ]
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #121212;
+      color: #e0e0e0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      padding: 1.5rem 1rem;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1, h2, h3 {
+      color: #c4b5fd;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .subhead {
+      color: #a78bfa;
+      margin-bottom: 2rem;
+      border-left: 4px solid #8b5cf6;
+      padding-left: 1rem;
+      font-size: 0.95rem;
+    }
+    .accent {
+      color: #8b5cf6;
+    }
+    .card {
+      background: #1e1e2a;
+      border-radius: 20px;
+      padding: 1.5rem 1.2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      border: 1px solid #2e2e3e;
+    }
+    .grid-wrapper {
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 600px;
+    }
+    th, td {
+      padding: 0.6rem 0.4rem;
+      text-align: center;
+      border-bottom: 1px solid #2e2e3e;
+    }
+    th {
+      background: #2a2a3c;
+      color: #c4b5fd;
+      font-weight: 500;
+    }
+    td input {
+      width: 70px;
+      padding: 0.3rem 0.2rem;
+      background: #121212;
+      border: 1px solid #3b3b52;
+      border-radius: 8px;
+      color: #f0f0f0;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    td input:focus {
+      outline: 2px solid #8b5cf6;
+      border-color: transparent;
+    }
+    .model-header {
+      background: #252538;
+    }
+    .weight-slider-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem 2rem;
+      justify-content: center;
+      margin: 1.5rem 0 0.5rem;
+    }
+    .weight-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 90px;
+    }
+    .weight-item label {
+      font-size: 0.7rem;
+      color: #a78bfa;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .weight-item input {
+      width: 100px;
+      accent-color: #8b5cf6;
+      background: #2a2a3c;
+    }
+    .weight-value {
+      font-size: 0.8rem;
+      color: #c4b5fd;
+      margin-top: 2px;
+    }
+    .chart-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+    }
+    .chart-box {
+      flex: 1 1 300px;
+      min-width: 280px;
+      background: #16161f;
+      border-radius: 16px;
+      padding: 1rem;
+    }
+    .chart-box h3 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      height: auto;
+      background: #16161f;
+      border-radius: 12px;
+    }
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: auto repeat(5, 1fr);
+      gap: 4px 8px;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      align-items: center;
+    }
+    .heatmap-header {
+      font-weight: 600;
+      color: #a78bfa;
+    }
+    .heatmap-cell {
+      padding: 6px 4px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1.5rem 0 0.5rem;
+      justify-content: center;
+    }
+    button {
+      background: #2a2a3c;
+      border: none;
+      border-radius: 40px;
+      padding: 0.6rem 1.8rem;
+      color: #e0e0f0;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #3b3b52;
+    }
+    button:hover {
+      background: #8b5cf6;
+      color: #0f0f1a;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 12px #8b5cf680;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: #6b6b80;
+      font-size: 0.85rem;
+      border-top: 1px solid #2e2e3e;
+      padding-top: 2rem;
+    }
+    .footer a {
+      color: #8b5cf6;
+      text-decoration: none;
+    }
+    .rank-badge {
+      display: inline-block;
+      background: #8b5cf6;
+      color: #0f0f1a;
+      border-radius: 40px;
+      padding: 0 12px;
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+    @media (max-width: 600px) {
+      body { padding: 0.8rem; }
+      .card { padding: 1rem; }
+      td input { width: 55px; font-size: 0.75rem; }
+      .weight-item input { width: 80px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🧪 LLM Benchmark Score Normalizer</h1>
+    <div class="subhead">gpt0x.com — normalize, weight, rank & visualize</div>
+  </header>
+
+  <!-- DATA ENTRY GRID -->
+  <section class="card" id="data-grid-section">
+    <h2>📊 Data Entry</h2>
+    <div class="grid-wrapper" id="grid-wrapper"></div>
+
+    <div class="weight-slider-container" id="weight-sliders"></div>
+
+    <div class="btn-group">
+      <button id="computeBtn">⚡ Compute & Visualize</button>
+      <button id="resetBtn">↺ Reset to example</button>
+      <button id="exportCsvBtn">⬇ Export CSV</button>
+    </div>
+  </section>
+
+  <!-- CHARTS: RADAR + BAR + HEATMAP -->
+  <section class="card">
+    <h2>📈 Normalized Scores & Rankings</h2>
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>🕸️ Radar (normalized)</h3>
+        <canvas id="radarCanvas" width="300" height="300"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>📊 Composite bar</h3>
+        <canvas id="barCanvas" width="300" height="300"></canvas>
+      </div>
+    </div>
+    <div style="margin-top: 1.5rem;">
+      <h3>🔥 Heatmap (raw scores)</h3>
+      <div id="heatmapContainer" style="overflow-x:auto;"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2025 <a href="https://gpt0x.com">gpt0x.com</a> — LLM Benchmark Score Normalizer</p>
+  </footer>
+</div>
+
+<script>
+  (function() {
+    // ----- CONFIG -----
+    const BENCHMARKS = ['MMLU','HumanEval','MATH','GSM8K','HellaSwag','ARC-Challenge','WinoGrande','BBH'];
+    const DEFAULT_MODELS = ['GPT-4o','Claude 3.5 Sonnet','Gemini 1.5 Pro','LLaMA-3-70B'];
+    // Plausible 2024 scores (0-100)
+    const DEFAULT_SCORES = [
+      [88, 92, 84, 78],   // MMLU
+      [90, 88, 79, 73],   // HumanEval
+      [76, 82, 71, 68],   // MATH
+      [94, 91, 88, 85],   // GSM8K
+      [87, 85, 82, 80],   // HellaSwag
+      [91, 89, 83, 77],   // ARC-Challenge
+      [84, 86, 80, 76],   // WinoGrande
+      [78, 81, 74, 70]    // BBH
+    ];
+
+    let models = [...DEFAULT_MODELS];
+    let scores = DEFAULT_SCORES.map(row => [...row]); // [bench][model]
+    let weights = new Array(BENCHMARKS.length).fill(1/BENCHMARKS.length);
+
+    // DOM refs
+    const gridWrapper = document.getElementById('grid-wrapper');
+    const weightSliders = document.getElementById('weight-sliders');
+    const radarCanvas = document.getElementById('radarCanvas');
+    const barCanvas = document.getElementById('barCanvas');
+    const heatmapContainer = document.getElementById('heatmapContainer');
+
+    // ----- RENDER GRID + WEIGHTS -----
+    function renderGrid() {
+      let html = '<table><thead><tr><th>Benchmark</th>';
+      models.forEach((m, idx) => {
+        html += `<th class="model-header">${m} <span style="font-weight:normal;font-size:0.7rem;color:#8b5cf6;">[${idx+1}]</span></th>`;
+      });
+      html += '</tr></thead><tbody>';
+      BENCHMARKS.forEach((b, bIdx) => {
+        html += `<tr><td style="text-align:left;font-weight:500;">${b}</td>`;
+        models.forEach((_, mIdx) => {
+          const val = scores[bIdx]?.[mIdx] ?? 0;
+          html += `<td><input type="number" min="0" max="100" step="0.1" value="${val}" data-bench="${bIdx}" data-model="${mIdx}" class="score-input"></td>`;
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      gridWrapper.innerHTML = html;
+
+      // attach input events
+      document.querySelectorAll('.score-input').forEach(inp => {
+        inp.addEventListener('change', function() {
+          const b = parseInt(this.dataset.bench);
+          const m = parseInt(this.dataset.model);
+          let val = parseFloat(this.value);
+          if (isNaN(val)) val = 0;
+          if (val < 0) val = 0;
+          if (val > 100) val = 100;
+          this.value = val;
+          scores[b][m] = val;
+        });
+      });
+    }
+
+    function renderWeights() {
+      let html = '';
+      BENCHMARKS.forEach((b, idx) => {
+        html += `<div class="weight-item">
+          <label>${b}</label>
+          <input type="range" min="0" max="100" value="${Math.round(weights[idx]*100)}" data-widx="${idx}" class="weight-slider">
+          <span class="weight-value" id="wval-${idx}">${weights[idx].toFixed(3)}</span>
+        </div>`;
+      });
+      weightSliders.innerHTML = html;
+
+      document.querySelectorAll('.weight-slider').forEach(sl => {
+        sl.addEventListener('input', function() {
+          const idx = parseInt(this.dataset.widx);
+          let raw = parseFloat(this.value);
+          if (isNaN(raw)) raw = 0;
+          // update weights array: distribute proportionally
+          let newWeights = BENCHMARKS.map((_, i) => {
+            if (i === idx) return raw;
+            else return weights[i] * 100; // keep proportion
+          });
+          const sum = newWeights.reduce((a,b)=>a+b,0);
+          if (sum > 0) {
+            newWeights = newWeights.map(v => v / sum);
+          } else {
+            newWeights = BENCHMARKS.map(() => 1/BENCHMARKS.length);
+          }
+          weights = newWeights;
+          // update display
+          BENCHMARKS.forEach((_, i) => {
+            const span = document.getElementById(`wval-${i}`);
+            if (span) span.textContent = weights[i].toFixed(3);
+          });
+          // sync slider values
+          document.querySelectorAll('.weight-slider').forEach(s => {
+            const i = parseInt(s.dataset.widx);
+            s.value = Math.round(weights[i] * 100);
+          });
+        });
+      });
+    }
+
+    // ----- COMPUTE NORMALIZATION & RANKING -----
+    function computeNormalized() {
+      const nModels = models.length;
+      const nBench = BENCHMARKS.length;
+      // read scores from inputs
+      document.querySelectorAll('.score-input').forEach(inp => {
+        const b = parseInt(inp.dataset.bench);
+        const m = parseInt(inp.dataset.model);
+        let val = parseFloat(inp.value);
+        if (isNaN(val)) val = 0;
+        scores[b][m] = Math.min(100, Math.max(0, val));
+      });
+
+      // min-max per benchmark
+      const minVals = new Array(nBench).fill(Infinity);
+      const maxVals = new Array(nBench).fill(-Infinity);
+      for (let b=0; b<nBench; b++) {
+        for (let m=0; m<nModels; m++) {
+          const v = scores[b][m];
+          if (v < minVals[b]) minVals[b] = v;
+          if (v > maxVals[b]) maxVals[b] = v;
+        }
+      }
+      const normalized = Array.from({length: nBench}, () => new Array(nModels).fill(0));
+      for (let b=0; b<nBench; b++) {
+        const range = maxVals[b] - minVals[b];
+        for (let m=0; m<nModels; m++) {
+          if (range === 0) normalized[b][m] = 0.5; // edge case
+          else normalized[b][m] = (scores[b][m] - minVals[b]) / range;
+        }
+      }
+
+      // composite
+      const composite = new Array(nModels).fill(0);
+      for (let m=0; m<nModels; m++) {
+        let sum = 0;
+        for (let b=0; b<nBench; b++) {
+          sum += weights[b] * normalized[b][m];
+        }
+        composite[m] = sum;
+      }
+
+      // ranking
+      const indices = models.map((_, idx) => idx);
+      indices.sort((a,b) => composite[b] - composite[a]);
+      const ranks = new Array(nModels);
+      indices.forEach((idx, pos) => { ranks[idx] = pos + 1; });
+
+      return { normalized, composite, ranks, minVals, maxVals };
+    }
+
+    // ----- DRAW RADAR -----
+    function drawRadar(normalized) {
+      const ctx = radarCanvas.getContext('2d');
+      const W = radarCanvas.width, H = radarCanvas.height;
+      const cx = W/2, cy = H/2;
+      const radius = Math.min(W,H)*0.35;
+      ctx.clearRect(0,0,W,H);
+
+      const nAxes = BENCHMARKS.length;
+      const angleStep = (2*Math.PI)/nAxes;
+      const nModels = models.length;
+
+      // background grid
+      ctx.strokeStyle = '#3b3b52';
+      ctx.lineWidth = 0.5;
+      for (let ring=1; ring<=4; ring++) {
+        const r = radius * ring/4;
+        ctx.beginPath();
+        for (let i=0; i<=nAxes; i++) {
+          const angle = -Math.PI/2 + i*angleStep;
+          const x = cx + r*Math.cos(angle);
+          const y = cy + r*Math.sin(angle);
+          if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+      // axes
+      for (let i=0; i<nAxes; i++) {
+        const angle = -Math.PI/2 + i*angleStep;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.lineTo(cx+radius*Math.cos(angle), cy+radius*Math.sin(angle));
+        ctx.strokeStyle = '#3b3b52';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+        // label
+        const labR = radius+14;
+        ctx.fillStyle = '#a78bfa';
+        ctx.font = '9px system-ui';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(BENCHMARKS[i].substring(0,5), cx+labR*Math.cos(angle), cy+labR*Math.sin(angle));
+      }
+
+      // plot models
+      const colors = ['#8b5cf6','#f472b6','#34d399','#fbbf24','#60a5fa'];
+      for (let m=0; m<nModels; m++) {
+        ctx.beginPath();
+        for (let i=0; i<=nAxes; i++) {
+          const idx = i % nAxes;
+          const val = normalized[idx][m];
+          const r = radius * Math.min(1, Math.max(0, val));
+          const angle = -Math.PI/2 + idx*angleStep;
+          const x = cx + r*Math.cos(angle);
+          const y = cy + r*Math.sin(angle);
+          if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = colors[m % colors.length] + '40';
+        ctx.fill();
+        ctx.strokeStyle = colors[m % colors.length];
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // legend
+        ctx.fillStyle = colors[m % colors.length];
+        ctx.font = 'bold 10px system-ui';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(models[m], 8, 8 + m*16);
+      }
+    }
+
+    // ----- DRAW BAR CHART -----
+    function drawBarChart(composite, ranks) {
+      const ctx = barCanvas.getContext('2d');
+      const W = barCanvas.width, H = barCanvas.height;
+      ctx.clearRect(0,0,W,H);
+      const n = models.length;
+      if (n===0) return;
+      const colors = ['#8b5cf6','#f472b6','#34d399','#fbbf24','#60a5fa'];
+      const barWidth = Math.min(40, (W-60)/n);
+      const maxVal = Math.max(...composite, 0.01);
+      const padding = 40;
+      const chartH = H - padding - 20;
+      const chartW = W - padding - 10;
+
+      // bars
+      for (let i=0; i<n; i++) {
+        const x = padding + i * (chartW/n) + (chartW/n - barWidth)/2;
+        const h = (composite[i]/maxVal) * chartH;
+        const y = H - padding - h;
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillRect(x, y, barWidth, h);
+        // rank label
+        ctx.fillStyle = '#e0e0f0';
+        ctx.font = 'bold 11px system-ui';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(`#${ranks[i]}`, x+barWidth/2, y-4);
+        // model label
+        ctx.fillStyle = '#c4b5fd';
+        ctx.font = '8px system-ui';
+        ctx.textBaseline = 'top';
+        ctx.fillText(models[i].substring(0,10), x+barWidth/2, H-padding+4);
+        // value
+        ctx.fillStyle = '#f0f0f0';
+        ctx.font = '8px system-ui';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(composite[i].toFixed(3), x+barWidth/2, y-16);
+      }
+    }
+
+    // ----- HEATMAP -----
+    function renderHeatmap() {
+      const nModels = models.length;
+      let html = '<div class="heatmap-grid">';
+      html += '<div class="heatmap-header">Benchmark</div>';
+      models.forEach(m => { html += `<div class="heatmap-header">${m}</div>`; });
+      for (let b=0; b<BENCHMARKS.length; b++) {
+        html += `<div class="heatmap-header" style="text-align:left;">${BENCHMARKS[b]}</div>`;
+        for (let m=0; m<nModels; m++) {
+          const val = scores[b][m];
+          // green high, red low
+          const pct = val/100;
+          const r = Math.round(255 * (1-pct));
+          const g = Math.round(255 * pct);
+          const bCol = 50;
+          const bg = `rgb(${r}, ${g}, ${bCol})`;
+          html += `<div class="heatmap-cell" style="background:${bg};">${val.toFixed(1)}</div>`;
+        }
+      }
+      html += '</div>';
+      heatmapContainer.innerHTML = html;
+    }
+
+    // ----- FULL UPDATE -----
+    function fullUpdate() {
+      // read weights from sliders
+      document.querySelectorAll('.weight-slider').forEach(sl => {
+        const idx = parseInt(sl.dataset.widx);
+        let raw = parseFloat(sl.value);
+        if (isNaN(raw)) raw = 0;
+        weights[idx] = raw / 100;
+      });
+      // renormalize weights to sum 1
+      const sumW = weights.reduce((a,b)=>a+b,0);
+      if (sumW > 0) weights = weights.map(w => w/sumW);
+      else weights = BENCHMARKS.map(() => 1/BENCHMARKS.length);
+      // update weight display
+      BENCHMARKS.forEach((_, i) => {
+        const span = document.getElementById(`wval-${i}`);
+        if (span) span.textContent = weights[i].toFixed(3);
+      });
+
+      const result = computeNormalized();
+      drawRadar(result.normalized);
+      drawBarChart(result.composite, result.ranks);
+      renderHeatmap();
+    }
+
+    // ----- EXPORT CSV -----
+    function exportCSV() {
+      const nModels = models.length;
+      let csv = 'Benchmark,' + models.join(',') + '\n';
+      for (let b=0; b<BENCHMARKS.length; b++) {
+        csv += BENCHMARKS[b] + ',' + scores[b].map(v => v.toFixed(2)).join(',') + '\n';
+      }
+      csv += '\nWeights,' + weights.map(w => w.toFixed(3)).join(',') + '\n';
+      // composite
+      const res = computeNormalized();
+      csv += 'Composite,' + res.composite.map(c => c.toFixed(4)).join(',') + '\n';
+      csv += 'Rank,' + res.ranks.join(',') + '\n';
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'llm_benchmark_scores.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ----- RESET -----
+    function resetToExample() {
+      models = [...DEFAULT_MODELS];
+      scores = DEFAULT_SCORES.map(row => [...row]);
+      weights = new Array(BENCHMARKS.length).fill(1/BENCHMARKS.length);
+      renderGrid();
+      renderWeights();
+      fullUpdate();
+    }
+
+    // ----- INIT -----
+    function init() {
+      renderGrid();
+      renderWeights();
+      fullUpdate();
+
+      document.getElementById('computeBtn').addEventListener('click', fullUpdate);
+      document.getElementById('resetBtn').addEventListener('click', resetToExample);
+      document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
+    }
+
+    init();
+  })();
+</script>
+</body>
+</html>

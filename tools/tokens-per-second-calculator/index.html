@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>LLM Tokens Per Second Calculator · gpt0x</title>
+  <meta name="description" content="Interactive TPS calculator: latency to tokens/sec, throughput estimator with GPU memory bandwidth, batch scaling & Amdahl’s law. Dark theme, purple accent.">
+  <meta name="keywords" content="LLM, tokens per second, TPS, GPU bandwidth, batch throughput, Amdahl, inference calculator">
+  <link rel="canonical" href="https://gpt0x.com/tools/tokens-per-second-calculator">
+  <meta name="robots" content="index, follow">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #0b0b14;
+      color: #e2e0f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 1.2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    header, footer {
+      text-align: center;
+      padding: 1rem 0;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      background: linear-gradient(145deg, #b794f4, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+    header p {
+      color: #9b8ec4;
+      margin-top: 0.3rem;
+    }
+    .card-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      margin: 2rem 0;
+    }
+    .card {
+      background: #14141f;
+      border-radius: 28px;
+      padding: 1.8rem 1.5rem;
+      flex: 1 1 300px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+      border: 1px solid #2a2740;
+      transition: border 0.2s;
+    }
+    .card:hover {
+      border-color: #6d4fc7;
+    }
+    .card h2 {
+      font-size: 1.4rem;
+      font-weight: 500;
+      margin-bottom: 1.2rem;
+      color: #c8bcf0;
+      border-left: 4px solid #8b5cf6;
+      padding-left: 0.8rem;
+    }
+    .input-group {
+      margin-bottom: 1rem;
+    }
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: #b0a7d9;
+      margin-bottom: 0.25rem;
+      font-weight: 400;
+    }
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      background: #1e1d2b;
+      border: 1px solid #363151;
+      border-radius: 16px;
+      color: #f0edff;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+    .input-group input:focus, .input-group select:focus {
+      outline: 2px solid #8b5cf6;
+      border-color: #8b5cf6;
+    }
+    .input-group select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.2rem;
+    }
+    .btn {
+      background: #2a2545;
+      border: none;
+      color: #ddd6ff;
+      padding: 0.7rem 1.6rem;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid #4a3f7a;
+      margin-top: 0.5rem;
+      width: 100%;
+    }
+    .btn:hover {
+      background: #3f3570;
+      border-color: #8b5cf6;
+      color: white;
+    }
+    .result-box {
+      background: #10101c;
+      border-radius: 20px;
+      padding: 1rem 1.2rem;
+      margin-top: 1.2rem;
+      border-left: 4px solid #8b5cf6;
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+    .result-box strong {
+      color: #c6b6ff;
+    }
+    .badge {
+      display: inline-block;
+      background: #2d2650;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      color: #b6a6f0;
+      margin: 0.2rem 0;
+    }
+    .tps-interpretation {
+      margin-top: 2rem;
+      background: #14141f;
+      border-radius: 28px;
+      padding: 1.5rem;
+      border: 1px solid #2a2740;
+    }
+    .tps-interpretation table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    .tps-interpretation th, .tps-interpretation td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid #2f2a4a;
+    }
+    .tps-interpretation th {
+      color: #a990f0;
+      font-weight: 400;
+    }
+    .cost-table {
+      background: #0f0e1a;
+      border-radius: 20px;
+      padding: 0.8rem 1rem;
+      margin: 1rem 0;
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 400px;
+      background: #0b0b14;
+      border-radius: 20px;
+      margin: 1rem 0;
+      border: 1px solid #2d2745;
+    }
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+    footer {
+      margin-top: 3rem;
+      color: #6f6799;
+      font-size: 0.9rem;
+      border-top: 1px solid #252040;
+      padding-top: 2rem;
+      width: 100%;
+    }
+    @media (max-width: 640px) {
+      body { padding: 0.8rem; }
+      .card { padding: 1.2rem; }
+    }
+  </style>
+
+<meta property="og:title" content="LLM Tokens Per Second Calculator · gpt0x">
+<meta property="og:description" content="Interactive TPS calculator: latency to tokens/sec, throughput estimator with GPU memory bandwidth, batch scaling & Amdahl’s law. Dark theme, purple accent.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gpt0x.com/tools/tokens-per-second-calculator">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ LLM Tokens / sec</h1>
+    <p>latency · throughput · batch scaling</p>
+  </header>
+
+  <div class="card-grid">
+    <!-- MODE 1: Latency to TPS -->
+    <div class="card">
+      <h2>① Latency → TPS</h2>
+      <div class="input-group">
+        <label>Time to first token (TTFT) ms</label>
+        <input type="number" id="ttft" value="150" min="0" step="1">
+      </div>
+      <div class="input-group">
+        <label>Total generation time (ms)</label>
+        <input type="number" id="totalTime" value="3200" min="1" step="1">
+      </div>
+      <div class="input-group">
+        <label>Output tokens generated</label>
+        <input type="number" id="outTokens" value="512" min="1" step="1">
+      </div>
+      <button class="btn" id="calcLatency">Compute TPS & inter‑token latency</button>
+      <div class="result-box" id="latencyResult">
+        <strong>Tokens/sec</strong> — <span id="tpsValue">160.0</span><br>
+        <strong>Inter‑token latency</strong> <span id="itlValue">5.96 ms</span>
+      </div>
+    </div>
+
+    <!-- MODE 2: Throughput Estimator (memory bandwidth bound) -->
+    <div class="card">
+      <h2>② Throughput estimator</h2>
+      <div class="input-group">
+        <label>Model size (GB) e.g., 7B ~14GB</label>
+        <input type="number" id="modelSize" value="14" min="0.1" step="0.1">
+      </div>
+      <div class="input-group">
+        <label>GPU memory bandwidth</label>
+        <select id="gpuBandwidth">
+          <option value="2000">A100 (2 TB/s)</option>
+          <option value="3350" selected>H100 (3.35 TB/s)</option>
+          <option value="1000">RTX 4090 (1 TB/s)</option>
+          <option value="936">RTX 3090 (936 GB/s)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Batch size</label>
+        <input type="number" id="batchSize" value="4" min="1" step="1">
+      </div>
+      <div class="input-group">
+        <label>Precision (weight bits)</label>
+        <select id="precisionBits">
+          <option value="16">FP16 / BF16 (16-bit)</option>
+          <option value="8">FP8 (8-bit)</option>
+          <option value="4">INT4 (4-bit)</option>
+        </select>
+      </div>
+      <button class="btn" id="calcThroughput">Estimate bound TPS</button>
+      <div class="result-box" id="throughputResult">
+        <strong>Memory‑bandwidth bound TPS</strong> <span id="bwTps">957.1</span><br>
+        <span id="bottleneckMsg" class="badge">⚡ compute-bound if small batch</span>
+      </div>
+    </div>
+
+    <!-- MODE 3: Batch Throughput + Amdahl + curve -->
+    <div class="card">
+      <h2>③ Batch scaling</h2>
+      <div class="input-group">
+        <label>Single‑request TPS (baseline)</label>
+        <input type="number" id="singleTps" value="120" min="1" step="1">
+      </div>
+      <div class="input-group">
+        <label>Batch size</label>
+        <input type="number" id="batchSizeAmdahl" value="8" min="1" step="1">
+      </div>
+      <button class="btn" id="calcBatch">Compute throughput & efficiency</button>
+      <div class="result-box" id="batchResult">
+        <strong>Estimated batch TPS</strong> <span id="batchTps">384.0</span><br>
+        <strong>Efficiency</strong> <span id="efficiencyVal">40.0%</span>
+      </div>
+      <canvas id="efficiencyCurve" width="400" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Interpretation & cost table -->
+  <div class="tps-interpretation">
+    <h3 style="color:#b794f4; margin-bottom:0.5rem;">📊 TPS interpretation</h3>
+    <table>
+      <tr><th>Tokens/sec</th><th>Rating</th></tr>
+      <tr><td>&gt; 100</td><td>⚡ Excellent</td></tr>
+      <tr><td>30 – 100</td><td>✅ Good</td></tr>
+      <tr><td>10 – 30</td><td>⚠️ Acceptable</td></tr>
+      <tr><td>&lt; 10</td><td>🐢 Slow</td></tr>
+    </table>
+    <div class="cost-table">
+      <div style="display:flex; flex-wrap:wrap; gap:1.5rem; justify-content:space-between;">
+        <div><strong>Cost per 1M tokens</strong> (GPU $/h)</div>
+        <div><span id="costEx">@ 50 TPS: $0.56</span></div>
+        <div><span id="costGood">@ 150 TPS: $0.19</span></div>
+        <div><span id="costFast">@ 500 TPS: $0.06</span></div>
+      </div>
+      <p style="margin-top:0.6rem; font-size:0.8rem; color:#9a8ec9;">assumes $10/GPU-hr · cost = (1e6 / TPS) / 3600 * $10</p>
+    </div>
+  </div>
+
+  <footer>© 2025 gpt0x.com</footer>
+</div>
+
+<script>
+  (function() {
+    // ----- DOM refs -----
+    // Mode 1
+    const ttftInput = document.getElementById('ttft');
+    const totalTimeInput = document.getElementById('totalTime');
+    const outTokensInput = document.getElementById('outTokens');
+    const calcLatencyBtn = document.getElementById('calcLatency');
+    const tpsValue = document.getElementById('tpsValue');
+    const itlValue = document.getElementById('itlValue');
+
+    // Mode 2
+    const modelSizeInput = document.getElementById('modelSize');
+    const gpuSelect = document.getElementById('gpuBandwidth');
+    const batchSizeInput = document.getElementById('batchSize');
+    const precisionSelect = document.getElementById('precisionBits');
+    const calcThroughputBtn = document.getElementById('calcThroughput');
+    const bwTps = document.getElementById('bwTps');
+    const bottleneckMsg = document.getElementById('bottleneckMsg');
+
+    // Mode 3
+    const singleTpsInput = document.getElementById('singleTps');
+    const batchSizeAmdahlInput = document.getElementById('batchSizeAmdahl');
+    const calcBatchBtn = document.getElementById('calcBatch');
+    const batchTps = document.getElementById('batchTps');
+    const efficiencyVal = document.getElementById('efficiencyVal');
+    const canvas = document.getElementById('efficiencyCurve');
+    const ctx = canvas.getContext('2d');
+
+    // cost display
+    const costEx = document.getElementById('costEx');
+    const costGood = document.getElementById('costGood');
+    const costFast = document.getElementById('costFast');
+
+    // ---------- helper: compute cost per 1M tokens ----------
+    function updateCostDisplay() {
+      const gpuPricePerHour = 10; // $/hr
+      const tpsValues = [50, 150, 500];
+      const labels = [costEx, costGood, costFast];
+      tpsValues.forEach((tps, idx) => {
+        const secondsPerToken = 1 / tps;
+        const hoursPer1M = (1e6 * secondsPerToken) / 3600;
+        const cost = hoursPer1M * gpuPricePerHour;
+        labels[idx].textContent = `@ ${tps} TPS: $${cost.toFixed(2)}`;
+      });
+    }
+    updateCostDisplay();
+
+    // ---------- Mode 1: Latency ----------
+    function computeLatency() {
+      const ttft = parseFloat(ttftInput.value) || 0;
+      const totalMs = parseFloat(totalTimeInput.value) || 1;
+      const outTokens = parseFloat(outTokensInput.value) || 1;
+      if (totalMs <= 0 || outTokens <= 0) {
+        tpsValue.textContent = '—'; itlValue.textContent = '—';
+        return;
+      }
+      const totalSec = totalMs / 1000;
+      const tps = outTokens / totalSec;
+      const interTokenLatency = (totalMs - ttft) / outTokens;
+      tpsValue.textContent = tps.toFixed(1);
+      itlValue.textContent = (interTokenLatency > 0 ? interTokenLatency : 0).toFixed(2) + ' ms';
+    }
+    calcLatencyBtn.addEventListener('click', computeLatency);
+    computeLatency(); // initial
+
+    // ---------- Mode 2: Throughput estimator ----------
+    function computeThroughput() {
+      const modelGB = parseFloat(modelSizeInput.value) || 14;
+      const bandwidthGBs = parseFloat(gpuSelect.value); // already GB/s (TB/s *1000)
+      const batch = parseInt(batchSizeInput.value) || 1;
+      const precision = parseInt(precisionSelect.value) || 16;
+      // effective model size in GB (weight bits)
+      const effectiveModelGB = modelGB * (precision / 16); // 16-bit baseline
+      if (effectiveModelGB <= 0 || batch <= 0) {
+        bwTps.textContent = '—'; bottleneckMsg.textContent = 'invalid input';
+        return;
+      }
+      // memory bandwidth bound TPS = bandwidth_GBs / (model_GB / batch)
+      const boundTps = bandwidthGBs / (effectiveModelGB / batch);
+      bwTps.textContent = boundTps.toFixed(1);
+
+      // heuristic: if bound TPS > 2000, likely compute bound (small batch)
+      let msg = '';
+      if (boundTps > 2000) msg = '⚡ compute‑bound (small batch or high bandwidth)';
+      else if (boundTps > 800) msg = '⚠️ memory‑bound (high throughput)';
+      else msg = '🧠 memory‑bound (bandwidth limited)';
+      bottleneckMsg.textContent = msg;
+    }
+    calcThroughputBtn.addEventListener('click', computeThroughput);
+    computeThroughput();
+
+    // ---------- Mode 3: Batch scaling + Amdahl + curve ----------
+    function computeBatch() {
+      const singleTps = parseFloat(singleTpsInput.value) || 1;
+      const batch = parseInt(batchSizeAmdahlInput.value) || 1;
+      if (singleTps <= 0 || batch <= 0) {
+        batchTps.textContent = '—'; efficiencyVal.textContent = '—';
+        return;
+      }
+      // Amdahl's law: assume 5% serial fraction (typical for LLM decode)
+      const serialFraction = 0.05;
+      const parallelFraction = 1 - serialFraction;
+      // speedup = 1 / (serialFrac + parallelFrac / batch)
+      const speedup = 1 / (serialFraction + parallelFraction / batch);
+      const batchTpsVal = singleTps * speedup;
+      const efficiency = (batchTpsVal / (singleTps * batch)) * 100;
+      batchTps.textContent = batchTpsVal.toFixed(1);
+      efficiencyVal.textContent = efficiency.toFixed(1) + '%';
+
+      // draw efficiency curve (batch up to 32)
+      drawEfficiencyCurve(singleTps);
+    }
+
+    function drawEfficiencyCurve(baseTps) {
+      if (!ctx) return;
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.fillStyle = '#1f1b30';
+      ctx.fillRect(0, 0, w, h);
+      
+      const serialFrac = 0.05, parallelFrac = 0.95;
+      const maxBatch = 32;
+      const points = [];
+      for (let b = 1; b <= maxBatch; b++) {
+        const speedup = 1 / (serialFrac + parallelFrac / b);
+        const tps = baseTps * speedup;
+        const eff = (tps / (baseTps * b)) * 100;
+        points.push({ batch: b, efficiency: Math.min(eff, 100) });
+      }
+
+      // draw axes
+      ctx.beginPath();
+      ctx.strokeStyle = '#4a3f7a';
+      ctx.lineWidth = 1;
+      ctx.moveTo(30, 10);
+      ctx.lineTo(30, h-20);
+      ctx.lineTo(w-10, h-20);
+      ctx.stroke();
+
+      // plot efficiency
+      ctx.beginPath();
+      ctx.strokeStyle = '#b794f4';
+      ctx.lineWidth = 2.5;
+      const scaleX = (w - 50) / (maxBatch - 1);
+      const scaleY = (h - 40) / 100;
+      points.forEach((p, i) => {
+        const x = 30 + (p.batch - 1) * scaleX;
+        const y = h - 20 - (p.efficiency * scaleY);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // labels
+      ctx.fillStyle = '#b0a7d9';
+      ctx.font = '10px system-ui';
+      ctx.fillText('batch size', w/2-20, h-4);
+      ctx.fillText('efficiency %', 4, 16);
+      // highlight batch=8
+      const b8x = 30 + (7) * scaleX;
+      ctx.beginPath();
+      ctx.arc(b8x, h-20-(points[7]?.efficiency||40)*scaleY, 4, 0, 2*Math.PI);
+      ctx.fillStyle = '#8b5cf6';
+      ctx.fill();
+    }
+
+    calcBatchBtn.addEventListener('click', computeBatch);
+    // initial draw
+    setTimeout(() => {
+      computeBatch();
+    }, 50);
+
+    // also update cost when any TPS changes? keep static.
+    // re-calc cost on any change? we keep static based on default.
+    // but we can update cost display if needed.
+    // add listener to mode1/2/3 to update cost? not necessary.
+
+    // extra: update cost display on any TPS change? we keep static.
+    // but we can add a small recalculation for demonstration.
+    // we'll update cost display with fixed values.
+    // also update cost table based on TPS from mode1? not required.
+
+    // ensure canvas resize friendly
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      if (parent) {
+        const w = Math.min(400, parent.clientWidth - 20);
+        canvas.style.width = w + 'px';
+        canvas.style.height = (w * 0.5) + 'px';
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+  })();
+</script>
+
+<!-- JSON-LD Schema: WebApplication + FAQPage + BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "LLM Tokens Per Second Calculator",
+      "url": "https://gpt0x.com/tools/tokens-per-second-calculator",
+      "description": "Interactive tool to compute tokens per second from latency, estimate throughput with GPU bandwidth, and batch scaling with Amdahl's law.",
+      "applicationCategory": "Utility",
+      "operatingSystem": "All",
+      "browserRequirements": "JavaScript"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How is tokens per second calculated from latency?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "TPS = output_tokens / (total_generation_time_seconds). Inter-token latency = (total_time_ms - ttft_ms) / output_tokens."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is memory-bandwidth-bound TPS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It estimates the maximum throughput if the model is limited by GPU memory bandwidth: TPS = bandwidth_GBs / (model_size_GB / batch_size)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does batching affect throughput?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Batching improves throughput but with diminishing returns due to serial overhead (Amdahl's law). The tool estimates batch throughput and efficiency."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "gpt0x", "item": "https://gpt0x.com" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools" },
+        { "@type": "ListItem", "position": 3, "name": "Tokens Per Second Calculator", "item": "https://gpt0x.com/tools/tokens-per-second-calculator" }
+      ]
+    }
+  ]
+}
+</script>
+</body>
+</html>

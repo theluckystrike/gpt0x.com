@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>AI API Latency Budget Planner · gpt0x</title>
+  <meta name="description" content="Interactive tool to plan and visualize AI API latency budgets: SLA breakdown, LLM budget, TTFT, generation TPS, traffic light, model compatibility, P95...">
+  <meta name="keywords" content="AI latency, API budget, TTFT, TPS, LLM, SLA planner, gpt0x">
+  <link rel="canonical" href="https://gpt0x.com/tools/ai-api-latency-budget-planner">
+  <meta name="theme-color" content="#0f0f1a">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+    body {
+      background: #0f0f1a;
+      color: #e2e8f0;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.8rem;
+      border-bottom: 1px solid #2d2d44;
+      padding-bottom: 0.8rem;
+    }
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      background: linear-gradient(145deg, #c4b5fd, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+    .subhead {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+    .card {
+      background: #1a1a2e;
+      border-radius: 24px;
+      padding: 1.5rem 1.2rem;
+      margin-bottom: 1.8rem;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.7);
+      border: 1px solid #2e2e4a;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 700px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      h1 { font-size: 1.6rem; }
+    }
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+    label {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 500;
+      color: #cbd5e1;
+      margin-bottom: 0.25rem;
+    }
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      background: #2d2d44;
+      border-radius: 10px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #8b5cf6;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 0 3px #1a1a2e;
+    }
+    .range-value {
+      min-width: 3.2rem;
+      text-align: right;
+      font-weight: 500;
+      color: #a78bfa;
+    }
+    .sla-input {
+      background: #12121f;
+      border: 1px solid #3b3b5c;
+      color: #f1f5f9;
+      padding: 0.5rem 0.8rem;
+      border-radius: 16px;
+      width: 100%;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    .region-suggest {
+      margin-top: 0.3rem;
+      font-size: 0.8rem;
+      color: #8b8ba7;
+    }
+    .region-suggest select {
+      background: #12121f;
+      border: 1px solid #3b3b5c;
+      color: #e2e8f0;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      margin-left: 0.5rem;
+    }
+    .stat-block {
+      background: #14142b;
+      border-radius: 20px;
+      padding: 1rem 1.2rem;
+      margin: 0.8rem 0;
+    }
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .budget-highlight {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #a78bfa;
+    }
+    .traffic-light {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 0.5rem 0;
+    }
+    .light {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #2d2d44;
+      transition: 0.2s;
+    }
+    .light.green { background: #22c55e; box-shadow: 0 0 15px #22c55e88; }
+    .light.yellow { background: #eab308; box-shadow: 0 0 15px #eab30888; }
+    .light.red { background: #ef4444; box-shadow: 0 0 15px #ef444488; }
+    .bar-container {
+      margin: 1.2rem 0 0.8rem;
+    }
+    .stacked-bar {
+      display: flex;
+      height: 32px;
+      border-radius: 30px;
+      overflow: hidden;
+      background: #1e1e35;
+      width: 100%;
+    }
+    .bar-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: #0f0f1a;
+      transition: 0.2s;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem 1.5rem;
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+    }
+    .legend span::before {
+      content: "●";
+      margin-right: 0.3rem;
+      font-size: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    th {
+      text-align: left;
+      color: #94a3b8;
+      font-weight: 500;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid #2d2d44;
+    }
+    td {
+      padding: 0.5rem 0.2rem;
+      border-bottom: 1px solid #25253e;
+    }
+    .model-tag {
+      background: #2d2d4a;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    .btn {
+      background: #8b5cf6;
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.6rem 1.4rem;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px #8b5cf644;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #8b5cf6;
+      color: #c4b5fd;
+    }
+    .btn:hover { background: #7c3aed; transform: scale(0.97); }
+    .footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      color: #5f5f7a;
+      font-size: 0.85rem;
+      border-top: 1px solid #25253e;
+      padding-top: 1.5rem;
+    }
+    .schema-hidden { display: none; }
+    .inline-group {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .p95-badge {
+      background: #2e2e4a;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+    }
+  </style>
+
+<meta property="og:title" content="AI API Latency Budget Planner · gpt0x">
+<meta property="og:description" content="Interactive tool to plan and visualize AI API latency budgets: SLA breakdown, LLM budget, TTFT, generation TPS, traffic light, model compatibility, P95...">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gpt0x.com/tools/ai-api-latency-budget-planner">
+
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI API Latency Budget Planner \u00b7 gpt0x", "description": "Interactive tool to plan and visualize AI API latency budgets: SLA breakdown, LLM budget, TTFT, generation TPS, traffic light, model compatibility, P95...", "url": "https://gpt0x.com/tools/ai-api-latency-budget-planner", "applicationCategory": "UtilityApplication", "operatingSystem": "Web Browser", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⏱️ AI API Latency Budget Planner</h1>
+    <span class="subhead">gpt0x.com</span>
+  </header>
+
+  <!-- main tool -->
+  <div class="card">
+    <div class="grid-2">
+      <!-- left: inputs -->
+      <div>
+        <div class="input-group">
+          <label>Total user-facing SLA (ms)</label>
+          <input type="number" id="slaInput" class="sla-input" value="2000" min="300" max="10000" step="10">
+        </div>
+
+        <div class="input-group">
+          <label><span>Client-side processing</span> <span class="range-value" id="clientVal">50</span></label>
+          <input type="range" id="clientSlider" min="0" max="200" value="50" step="5">
+        </div>
+        <div class="input-group">
+          <label><span>Network RTT</span> <span class="range-value" id="rttVal">80</span></label>
+          <input type="range" id="rttSlider" min="10" max="500" value="80" step="5">
+          <div class="region-suggest">🌍 region preset: 
+            <select id="regionSelect">
+              <option value="80">US West ~80ms</option>
+              <option value="150">US East ~150ms</option>
+              <option value="250">Europe ~250ms</option>
+              <option value="350">Asia ~350ms</option>
+              <option value="120">Custom</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label><span>Auth / middleware</span> <span class="range-value" id="authVal">30</span></label>
+          <input type="range" id="authSlider" min="10" max="100" value="30" step="5">
+        </div>
+        <div class="input-group">
+          <label><span>Prompt construction</span> <span class="range-value" id="promptVal">20</span></label>
+          <input type="range" id="promptSlider" min="0" max="50" value="20" step="2">
+        </div>
+        <div class="input-group">
+          <label><span>Post‑processing / parsing</span> <span class="range-value" id="postVal">30</span></label>
+          <input type="range" id="postSlider" min="0" max="100" value="30" step="5">
+        </div>
+
+        <div class="stat-block" style="margin-top: 0.5rem;">
+          <div class="flex-between">
+            <span>🧠 LLM budget (after overheads)</span>
+            <strong id="llmBudgetDisplay" style="color:#c4b5fd;">1790 ms</strong>
+          </div>
+          <div class="flex-between" style="font-size:0.9rem; margin-top: 0.5rem;">
+            <span>🔹 TTFT % <input type="range" id="ttftPercent" min="10" max="80" value="40" style="width:100px; display:inline-block; vertical-align:middle;"></span>
+            <span id="ttftPercentLabel">40%</span>
+          </div>
+          <div class="flex-between" style="font-size:0.9rem;">
+            <span>Max TTFT: <strong id="maxTTFT">716 ms</strong></span>
+            <span>Gen TPS: <strong id="genTPS">—</strong></span>
+          </div>
+          <div style="font-size:0.8rem; color:#94a3b8; margin-top: 0.3rem;">
+            Output tokens budget: <input type="number" id="outputTokens" value="512" min="16" max="8192" style="width:80px; background:#12121f; border:1px solid #3b3b5c; color:white; border-radius:20px; padding:0.2rem 0.6rem;"> 
+          </div>
+        </div>
+        <div class="traffic-light">
+          <span>🚦 Feasibility: </span>
+          <span class="light" id="trafficLight"></span>
+          <span id="trafficLabel" style="font-weight:500;">GREEN</span>
+          <span class="p95-badge" id="p95Badge">P95 ×1.5</span>
+        </div>
+      </div>
+
+      <!-- right: bar + table -->
+      <div>
+        <div class="bar-container">
+          <div class="stacked-bar" id="stackedBar"></div>
+          <div class="legend" id="legendContainer"></div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <div class="flex-between">
+            <span style="font-weight:500;">📋 Compatible models (by TTFT)</span>
+            <span style="font-size:0.7rem; color:#8b8ba7;">LLM budget <span id="llmForModel">1790ms</span></span>
+          </div>
+          <table>
+            <thead><tr><th>Class</th><th>Models</th><th>TTFT range</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>⚡ Fast</td><td>Haiku, GPT-4o-mini, Gemini Flash</td><td>&lt;200ms</td><td id="fastStatus">✅</td></tr>
+              <tr><td>🔶 Medium</td><td>Sonnet, GPT-4o</td><td>200–500ms</td><td id="mediumStatus">✅</td></tr>
+              <tr><td>🐢 Slow</td><td>Opus, o1</td><td>&gt;500ms</td><td id="slowStatus">⚠️</td></tr>
+            </tbody>
+          </table>
+          <div style="font-size:0.75rem; color:#94a3b8; margin-top: 0.2rem;">* based on max TTFT from LLM budget & TTFT%</div>
+        </div>
+
+        <div style="display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1rem;">
+          <button class="btn" id="exportPdfBtn">📄 Export PDF summary</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- footer & schema -->
+  <div class="footer">© 2025 gpt0x.com</div>
+</div>
+
+<!-- JSON-LD schema -->
+<script type="application/ld+json" id="schemaJson">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "AI API Latency Budget Planner",
+      "url": "https://gpt0x.com/tools/ai-api-latency-budget-planner",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "description": "Interactive tool to plan AI API latency budgets, breakdown, TTFT, TPS, and model compatibility."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "What is LLM budget?", "acceptedAnswer": { "@type": "Answer", "text": "Remaining time after subtracting client, network, auth, prompt, and post-processing overheads from total SLA." } },
+        { "@type": "Question", "name": "How is TTFT calculated?", "acceptedAnswer": { "@type": "Answer", "text": "User sets TTFT percentage of LLM budget; max TTFT = LLM budget × TTFT%." } },
+        { "@type": "Question", "name": "What does traffic light mean?", "acceptedAnswer": { "@type": "Answer", "text": "Green: LLM budget >500ms, Yellow: 200-500ms, Red: <200ms (infeasible)." } }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Tools", "item": "https://gpt0x.com/tools" },
+        { "@type": "ListItem", "position": 2, "name": "AI API Latency Budget Planner", "item": "https://gpt0x.com/tools/ai-api-latency-budget-planner" }
+      ]
+    }
+  ]
+}
+</script>
+
+<script>
+  (function() {
+    // DOM refs
+    const slaInput = document.getElementById('slaInput');
+    const clientSlider = document.getElementById('clientSlider');
+    const rttSlider = document.getElementById('rttSlider');
+    const authSlider = document.getElementById('authSlider');
+    const promptSlider = document.getElementById('promptSlider');
+    const postSlider = document.getElementById('postSlider');
+    const regionSelect = document.getElementById('regionSelect');
+    const ttftPercent = document.getElementById('ttftPercent');
+    const outputTokens = document.getElementById('outputTokens');
+
+    const clientVal = document.getElementById('clientVal');
+    const rttVal = document.getElementById('rttVal');
+    const authVal = document.getElementById('authVal');
+    const promptVal = document.getElementById('promptVal');
+    const postVal = document.getElementById('postVal');
+    const ttftPercentLabel = document.getElementById('ttftPercentLabel');
+    const llmBudgetDisplay = document.getElementById('llmBudgetDisplay');
+    const maxTTFT = document.getElementById('maxTTFT');
+    const genTPS = document.getElementById('genTPS');
+    const trafficLight = document.getElementById('trafficLight');
+    const trafficLabel = document.getElementById('trafficLabel');
+    const stackedBar = document.getElementById('stackedBar');
+    const legendContainer = document.getElementById('legendContainer');
+    const llmForModel = document.getElementById('llmForModel');
+    const fastStatus = document.getElementById('fastStatus');
+    const mediumStatus = document.getElementById('mediumStatus');
+    const slowStatus = document.getElementById('slowStatus');
+    const p95Badge = document.getElementById('p95Badge');
+
+    function getValues() {
+      const sla = parseInt(slaInput.value) || 2000;
+      const client = parseInt(clientSlider.value) || 0;
+      const rtt = parseInt(rttSlider.value) || 10;
+      const auth = parseInt(authSlider.value) || 10;
+      const prompt = parseInt(promptSlider.value) || 0;
+      const post = parseInt(postSlider.value) || 0;
+      const ttftP = parseInt(ttftPercent.value) || 40;
+      const outTokens = parseInt(outputTokens.value) || 512;
+      return { sla, client, rtt, auth, prompt, post, ttftP, outTokens };
+    }
+
+    function updateAll() {
+      const v = getValues();
+      const overhead = v.client + v.rtt + v.auth + v.prompt + v.post;
+      let llmBudget = v.sla - overhead;
+      if (llmBudget < 0) llmBudget = 0;
+
+      // display values
+      clientVal.textContent = v.client;
+      rttVal.textContent = v.rtt;
+      authVal.textContent = v.auth;
+      promptVal.textContent = v.prompt;
+      postVal.textContent = v.post;
+      ttftPercentLabel.textContent = v.ttftP + '%';
+
+      const ttftMs = Math.round(llmBudget * (v.ttftP / 100));
+      const genMs = llmBudget - ttftMs;
+      let tps = 0;
+      if (genMs > 0 && v.outTokens > 0) {
+        tps = Math.round((v.outTokens / genMs) * 1000);
+      } else tps = 0;
+
+      llmBudgetDisplay.textContent = llmBudget + ' ms';
+      maxTTFT.textContent = ttftMs + ' ms';
+      genTPS.textContent = tps > 0 ? tps + ' tok/s' : '—';
+      llmForModel.textContent = llmBudget + 'ms';
+
+      // traffic light
+      const light = trafficLight;
+      light.className = 'light';
+      let label = '';
+      if (llmBudget > 500) { light.classList.add('green'); label = 'GREEN ✅'; }
+      else if (llmBudget >= 200) { light.classList.add('yellow'); label = 'YELLOW ⚠️'; }
+      else { light.classList.add('red'); label = 'RED ❌ infeasible'; }
+      trafficLabel.textContent = label;
+
+      // p95 badge
+      const p95 = Math.round(overhead * 1.5);
+      p95Badge.textContent = `P95 ×1.5: ${p95}ms overhead`;
+
+      // stacked bar (segments: client, rtt, auth, prompt, post, llm)
+      const total = v.sla || 1;
+      const segments = [
+        { label: 'Client', color: '#f97316', value: v.client },
+        { label: 'RTT', color: '#06b6d4', value: v.rtt },
+        { label: 'Auth', color: '#d946ef', value: v.auth },
+        { label: 'Prompt', color: '#10b981', value: v.prompt },
+        { label: 'Post', color: '#f59e0b', value: v.post },
+        { label: 'LLM', color: '#8b5cf6', value: llmBudget }
+      ];
+      // render bar
+      let htmlBar = '';
+      segments.forEach(seg => {
+        const pct = (seg.value / total) * 100;
+        if (pct > 0.5) {
+          htmlBar += `<div class="bar-segment" style="width:${pct}%; background:${seg.color};">${seg.value}ms</div>`;
+        } else {
+          htmlBar += `<div class="bar-segment" style="width:${Math.max(pct,0.3)}%; background:${seg.color}; font-size:0.4rem;"></div>`;
+        }
+      });
+      stackedBar.innerHTML = htmlBar;
+
+      // legend
+      let legendHtml = '';
+      segments.forEach(s => {
+        legendHtml += `<span style="color:${s.color}">${s.label} (${s.value}ms)</span>`;
+      });
+      legendContainer.innerHTML = legendHtml;
+
+      // model status
+      const fastOk = ttftMs < 200 ? '✅' : (ttftMs < 250 ? '⚠️' : '❌');
+      const medOk = (ttftMs >= 200 && ttftMs <= 500) ? '✅' : (ttftMs > 500 ? '⚠️' : '❌');
+      const slowOk = ttftMs > 500 ? '✅' : (ttftMs > 400 ? '⚠️' : '❌');
+      fastStatus.textContent = fastOk;
+      mediumStatus.textContent = medOk;
+      slowStatus.textContent = slowOk;
+    }
+
+    // region auto-suggest
+    regionSelect.addEventListener('change', function() {
+      const val = parseInt(this.value);
+      if (!isNaN(val) && val > 0) {
+        rttSlider.value = val;
+        rttVal.textContent = val;
+        updateAll();
+      }
+    });
+
+    // attach events
+    [slaInput, clientSlider, rttSlider, authSlider, promptSlider, postSlider, ttftPercent, outputTokens].forEach(el => {
+      el.addEventListener('input', updateAll);
+    });
+
+    // export PDF (simple print simulation)
+    document.getElementById('exportPdfBtn').addEventListener('click', function() {
+      const content = document.querySelector('.container').cloneNode(true);
+      // remove button from clone
+      const btnClone = content.querySelector('#exportPdfBtn');
+      if (btnClone) btnClone.remove();
+      const styles = document.querySelector('style').innerHTML;
+      const win = window.open('', '_blank', 'width=900,height=700');
+      win.document.write(`<html><head><style>${styles}</style><title>Latency Budget Summary</title>
+<meta property="og:title" content="AI API Latency Budget Planner · gpt0x">
+<meta property="og:description" content="Interactive tool to plan and visualize AI API latency budgets: SLA breakdown, LLM budget, TTFT, generation TPS, traffic light, model compatibility, P95...">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gpt0x.com/tools/ai-api-latency-budget-planner">
+
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI API Latency Budget Planner \u00b7 gpt0x", "description": "Interactive tool to plan and visualize AI API latency budgets: SLA breakdown, LLM budget, TTFT, generation TPS, traffic light, model compatibility, P95...", "url": "https://gpt0x.com/tools/ai-api-latency-budget-planner", "applicationCategory": "UtilityApplication", "operatingSystem": "Web Browser", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+</head><body><div class="container">${content.innerHTML}</div></body></html>`);
+      win.document.close();
+      win.focus();
+      win.print();
+    });
+
+    // initial update
+    updateAll();
+  })();
+</script>
+</body>
+</html>

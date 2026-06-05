@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Prompt Token Budget Optimizer · gpt0x</title>
+  <meta name="description" content="Interactive tool to allocate your LLM context window budget. Estimate tokens, visualize allocation, get smart recommendations, and compute cost per...">
+  <link rel="canonical" href="https://gpt0x.com/tools/prompt-token-budget-optimizer">
+  <meta name="theme-color" content="#0f0f1a">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      background: #0b0b14;
+      color: #e2e8f0;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1300px;
+      width: 100%;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #2d2d44;
+      padding-bottom: 0.75rem;
+    }
+    h1 {
+      font-weight: 600;
+      font-size: 1.9rem;
+      background: linear-gradient(145deg, #c4b5fd, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+    .subhead {
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 800px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+    .card {
+      background: #13131f;
+      border-radius: 24px;
+      padding: 1.5rem 1.2rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+      border: 1px solid #2a2a40;
+      transition: border 0.2s;
+    }
+    .card-title {
+      font-weight: 500;
+      font-size: 1.1rem;
+      margin-bottom: 1.2rem;
+      color: #a78bfa;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: #b9c7e0;
+      margin-bottom: 0.25rem;
+      font-weight: 450;
+    }
+    select, input[type="number"], textarea {
+      background: #1c1c2e;
+      border: 1px solid #35355a;
+      border-radius: 16px;
+      padding: 0.6rem 1rem;
+      color: #f1f5f9;
+      font-size: 0.95rem;
+      width: 100%;
+      outline: none;
+      transition: 0.2s;
+    }
+    select:focus, input:focus, textarea:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 2px rgba(139,92,246,0.3);
+    }
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .range-row input[type="range"] {
+      flex: 1;
+      min-width: 120px;
+      accent-color: #8b5cf6;
+      background: #2a2a44;
+      height: 6px;
+      border-radius: 8px;
+    }
+    .range-value {
+      min-width: 3.5rem;
+      background: #1e1e32;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      text-align: center;
+      font-size: 0.9rem;
+      border: 1px solid #3f3f68;
+    }
+    .inline-badge {
+      background: #2d2d4a;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      color: #b6c8ff;
+    }
+    .preset-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0 0.5rem;
+    }
+    .preset-btn {
+      background: #1f1f38;
+      border: 1px solid #3f3f6a;
+      color: #d6dff0;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .preset-btn:hover {
+      background: #8b5cf6;
+      border-color: #8b5cf6;
+      color: #fff;
+    }
+    .stat-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      margin: 1.2rem 0;
+    }
+    .stat-item {
+      background: #18182b;
+      border-radius: 20px;
+      padding: 0.6rem 1.2rem;
+      flex: 1 0 100px;
+      border-left: 3px solid #8b5cf6;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #9aa9c5;
+    }
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .bar-chart {
+      margin: 1.5rem 0 1rem;
+      background: #10101c;
+      border-radius: 30px;
+      padding: 0.3rem;
+      display: flex;
+      height: 38px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .bar-segment {
+      height: 100%;
+      transition: width 0.1s ease;
+      min-width: 2px;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem 1.5rem;
+      margin: 0.5rem 0 1rem;
+      font-size: 0.75rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+    }
+    .recommend-box {
+      background: #1a1a2f;
+      border-radius: 18px;
+      padding: 0.8rem 1.2rem;
+      margin: 0.8rem 0;
+      border-left: 4px solid #8b5cf6;
+    }
+    .efficiency-score {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #b6a0ff;
+    }
+    .cost-badge {
+      background: #1e293b;
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      display: inline-block;
+    }
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: #6b7a93;
+      font-size: 0.85rem;
+      border-top: 1px solid #252540;
+      padding-top: 1.5rem;
+    }
+    .remaining-indicator {
+      display: inline-block;
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      font-weight: 500;
+    }
+    .green { background: #14532d; color: #a7f3d0; }
+    .yellow { background: #5c4a0e; color: #fde68a; }
+    .red { background: #5f1f1f; color: #fca5a5; }
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    hr {
+      border: 0.5px solid #2a2a44;
+      margin: 1rem 0;
+    }
+  </style>
+
+<meta property="og:title" content="Prompt Token Budget Optimizer · gpt0x">
+<meta property="og:description" content="Interactive tool to allocate your LLM context window budget. Estimate tokens, visualize allocation, get smart recommendations, and compute cost per...">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gpt0x.com/tools/prompt-token-budget-optimizer">
+
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Prompt Token Budget Optimizer \u00b7 gpt0x", "description": "Interactive tool to allocate your LLM context window budget. Estimate tokens, visualize allocation, get smart recommendations, and compute cost per...", "url": "https://gpt0x.com/tools/prompt-token-budget-optimizer", "applicationCategory": "UtilityApplication", "operatingSystem": "Web Browser", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ Prompt Token Budget Optimizer</h1>
+    <span class="subhead">gpt0x.com · smart context allocation</span>
+  </header>
+
+  <!-- main grid -->
+  <div class="grid-2col">
+    <!-- left: inputs -->
+    <div class="card">
+      <div class="card-title">🧮 Budget & components</div>
+      
+      <div class="input-group">
+        <label>Total context window</label>
+        <select id="contextWindow">
+          <option value="4096">4K (4,096)</option>
+          <option value="8192">8K (8,192)</option>
+          <option value="16384">16K (16,384)</option>
+          <option value="32768" selected>32K (32,768)</option>
+          <option value="65536">64K (65,536)</option>
+          <option value="131072">128K (131,072)</option>
+          <option value="200000">200K (200,000)</option>
+          <option value="1000000">1M (1,000,000)</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>🔹 Reserve for output (tokens)</label>
+        <input type="number" id="outputReserve" value="1024" min="0" step="64">
+      </div>
+
+      <div class="input-group">
+        <label>📝 System prompt <span class="inline-badge">paste → auto count</span></label>
+        <textarea id="systemPrompt" placeholder="Paste your system prompt here...">You are a helpful assistant.</textarea>
+        <div style="font-size:0.8rem; margin-top:4px; color:#a5b4d0;">Token estimate: <span id="systemTokenEstimate">6</span> tokens</div>
+      </div>
+
+      <div class="input-group">
+        <label>📘 Few-shot examples</label>
+        <div class="range-row">
+          <span style="min-width:70px;">count</span>
+          <input type="range" id="fewShotCount" min="0" max="30" value="3" step="1">
+          <span class="range-value" id="fewShotCountVal">3</span>
+        </div>
+        <div class="range-row" style="margin-top:6px;">
+          <span style="min-width:70px;">tokens/example</span>
+          <input type="range" id="tokensPerExample" min="10" max="800" value="120" step="5">
+          <span class="range-value" id="tokensPerExampleVal">120</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>📚 Retrieved context chunks</label>
+        <div class="range-row">
+          <span style="min-width:70px;">chunks</span>
+          <input type="range" id="chunkCount" min="0" max="60" value="8" step="1">
+          <span class="range-value" id="chunkCountVal">8</span>
+        </div>
+        <div class="range-row" style="margin-top:6px;">
+          <span style="min-width:70px;">chunk size</span>
+          <input type="range" id="chunkSize" min="50" max="2000" value="300" step="10">
+          <span class="range-value" id="chunkSizeVal">300</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>💬 User message estimate</label>
+        <input type="number" id="userMessageTokens" value="180" min="0" step="10">
+      </div>
+
+      <div class="input-group">
+        <label>🗂️ Conversation history (tokens)</label>
+        <input type="number" id="historyTokens" value="0" min="0" step="50">
+      </div>
+
+      <div class="preset-group">
+        <span style="color:#a78bfa; font-size:0.8rem; width:100%;">⚡ presets</span>
+        <button class="preset-btn" data-preset="rag">RAG pipeline</button>
+        <button class="preset-btn" data-preset="chat">Chat assistant</button>
+        <button class="preset-btn" data-preset="code">Code review</button>
+        <button class="preset-btn" data-preset="doc">Document analysis</button>
+      </div>
+    </div>
+
+    <!-- right: visualization & stats -->
+    <div class="card">
+      <div class="card-title">📊 Allocation & efficiency</div>
+      <div class="flex-between">
+        <span>Remaining: <span id="remainingTokens" class="remaining-indicator green">27,432</span></span>
+        <span style="font-size:0.8rem; color:#a5b4d0;">used: <span id="usedTokens">5,336</span> / <span id="totalWindowDisplay">32,768</span></span>
+      </div>
+
+      <!-- stacked bar -->
+      <div class="bar-chart" id="barChart">
+        <div class="bar-segment" style="width:2%; background:#8b5cf6;" id="barSystem"></div>
+        <div class="bar-segment" style="width:2%; background:#f472b6;" id="barFewshot"></div>
+        <div class="bar-segment" style="width:2%; background:#38bdf8;" id="barChunks"></div>
+        <div class="bar-segment" style="width:2%; background:#fbbf24;" id="barUser"></div>
+        <div class="bar-segment" style="width:2%; background:#a78bfa;" id="barHistory"></div>
+        <div class="bar-segment" style="width:2%; background:#fb7185;" id="barOutput"></div>
+      </div>
+
+      <div class="legend">
+        <span class="legend-item"><span class="legend-color" style="background:#8b5cf6;"></span> system</span>
+        <span class="legend-item"><span class="legend-color" style="background:#f472b6;"></span> few-shot</span>
+        <span class="legend-item"><span class="legend-color" style="background:#38bdf8;"></span> chunks</span>
+        <span class="legend-item"><span class="legend-color" style="background:#fbbf24;"></span> user</span>
+        <span class="legend-item"><span class="legend-color" style="background:#a78bfa;"></span> history</span>
+        <span class="legend-item"><span class="legend-color" style="background:#fb7185;"></span> output</span>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-item"><div class="stat-label">efficiency (out/in)</div><div class="stat-number" id="efficiencyScore">0.19</div></div>
+        <div class="stat-item"><div class="stat-label">cost / request</div><div class="stat-number" id="costPerRequest">$0.008</div></div>
+      </div>
+
+      <div class="recommend-box" id="recommendationBox">
+        <span style="color:#b9c7e0;">💡 </span><span id="recommendationText">You can fit 12 more few-shot examples.</span>
+      </div>
+      <div style="font-size:0.75rem; color:#6f7c9a; margin-top:8px;">Model: gpt-4o · $5.00/1M input · $15.00/1M output</div>
+    </div>
+  </div>
+
+  <!-- schema & footer -->
+  <div class="footer">© 2025 gpt0x.com · Prompt Token Budget Optimizer</div>
+</div>
+
+<script>
+  (function() {
+    // DOM refs
+    const contextWindow = document.getElementById('contextWindow');
+    const outputReserve = document.getElementById('outputReserve');
+    const systemPrompt = document.getElementById('systemPrompt');
+    const systemTokenEstimate = document.getElementById('systemTokenEstimate');
+    const fewShotCount = document.getElementById('fewShotCount');
+    const fewShotCountVal = document.getElementById('fewShotCountVal');
+    const tokensPerExample = document.getElementById('tokensPerExample');
+    const tokensPerExampleVal = document.getElementById('tokensPerExampleVal');
+    const chunkCount = document.getElementById('chunkCount');
+    const chunkCountVal = document.getElementById('chunkCountVal');
+    const chunkSize = document.getElementById('chunkSize');
+    const chunkSizeVal = document.getElementById('chunkSizeVal');
+    const userMessageTokens = document.getElementById('userMessageTokens');
+    const historyTokens = document.getElementById('historyTokens');
+
+    // display
+    const remainingSpan = document.getElementById('remainingTokens');
+    const usedTokensSpan = document.getElementById('usedTokens');
+    const totalWindowDisplay = document.getElementById('totalWindowDisplay');
+    const efficiencyScore = document.getElementById('efficiencyScore');
+    const costPerRequest = document.getElementById('costPerRequest');
+    const recommendationText = document.getElementById('recommendationText');
+
+    // bars
+    const barSystem = document.getElementById('barSystem');
+    const barFewshot = document.getElementById('barFewshot');
+    const barChunks = document.getElementById('barChunks');
+    const barUser = document.getElementById('barUser');
+    const barHistory = document.getElementById('barHistory');
+    const barOutput = document.getElementById('barOutput');
+
+    // preset buttons
+    const presetBtns = document.querySelectorAll('[data-preset]');
+
+    // helper: count tokens (4 chars per token)
+    function countTokens(text) {
+      return Math.ceil(text.length / 4) || 0;
+    }
+
+    // update system token estimate
+    function updateSystemEstimate() {
+      const val = countTokens(systemPrompt.value);
+      systemTokenEstimate.textContent = val;
+    }
+    systemPrompt.addEventListener('input', updateSystemEstimate);
+    updateSystemEstimate();
+
+    // sync range displays
+    function syncRangeDisplay() {
+      fewShotCountVal.textContent = fewShotCount.value;
+      tokensPerExampleVal.textContent = tokensPerExample.value;
+      chunkCountVal.textContent = chunkCount.value;
+      chunkSizeVal.textContent = chunkSize.value;
+    }
+    [fewShotCount, tokensPerExample, chunkCount, chunkSize].forEach(el => el.addEventListener('input', syncRangeDisplay));
+    syncRangeDisplay();
+
+    // core compute
+    function computeAll() {
+      const total = parseInt(contextWindow.value, 10);
+      const output = parseInt(outputReserve.value, 10) || 0;
+      const systemTokens = countTokens(systemPrompt.value);
+      const fewCount = parseInt(fewShotCount.value, 10);
+      const tokensPerEx = parseInt(tokensPerExample.value, 10);
+      const fewTokens = fewCount * tokensPerEx;
+      const chCount = parseInt(chunkCount.value, 10);
+      const chSize = parseInt(chunkSize.value, 10);
+      const chunkTokens = chCount * chSize;
+      const userTokens = parseInt(userMessageTokens.value, 10) || 0;
+      const histTokens = parseInt(historyTokens.value, 10) || 0;
+
+      const inputTotal = systemTokens + fewTokens + chunkTokens + userTokens + histTokens;
+      const totalUsed = inputTotal + output;
+      const remaining = Math.max(0, total - totalUsed);
+
+      // update display numbers
+      totalWindowDisplay.textContent = total.toLocaleString();
+      usedTokensSpan.textContent = totalUsed.toLocaleString();
+
+      // remaining indicator
+      const ratio = total > 0 ? remaining / total : 0;
+      remainingSpan.textContent = remaining.toLocaleString();
+      remainingSpan.className = 'remaining-indicator ' + (ratio > 0.25 ? 'green' : ratio > 0.1 ? 'yellow' : 'red');
+
+      // bar widths (percentage)
+      const pct = (val) => Math.max(0.5, (val / total) * 100);
+      barSystem.style.width = pct(systemTokens) + '%';
+      barFewshot.style.width = pct(fewTokens) + '%';
+      barChunks.style.width = pct(chunkTokens) + '%';
+      barUser.style.width = pct(userTokens) + '%';
+      barHistory.style.width = pct(histTokens) + '%';
+      barOutput.style.width = pct(output) + '%';
+
+      // efficiency score (output / input)
+      const eff = inputTotal > 0 ? (output / inputTotal) : 0;
+      efficiencyScore.textContent = eff.toFixed(2);
+
+      // cost: gpt-4o pricing $5/1M input, $15/1M output
+      const inputCost = (inputTotal / 1_000_000) * 5.0;
+      const outputCost = (output / 1_000_000) * 15.0;
+      const totalCost = inputCost + outputCost;
+      costPerRequest.textContent = '$' + totalCost.toFixed(4);
+
+      // recommendations
+      let rec = '';
+      if (remaining > 0) {
+        const canFitFew = Math.floor(remaining / (tokensPerEx || 1));
+        if (canFitFew > 0) {
+          rec = `✅ You can fit ${canFitFew} more few-shot examples (or add ~${remaining} tokens).`;
+        } else {
+          rec = `⚖️ Buffer is tight (${remaining} tokens remain).`;
+        }
+        // suggest reduce chunks if remaining < 10%
+        if (ratio < 0.1 && chCount > 1) {
+          const reduceBy = Math.ceil((total * 0.15 - remaining) / (chSize || 1));
+          if (reduceBy > 0) rec += ` ⚠️ Reduce context chunks by ~${Math.min(reduceBy, chCount)} to fit comfortably.`;
+        }
+      } else {
+        rec = `❌ Over budget by ${Math.abs(remaining)} tokens. Reduce output reserve or context.`;
+      }
+      recommendationText.textContent = rec;
+    }
+
+    // attach events
+    const inputs = [contextWindow, outputReserve, systemPrompt, fewShotCount, tokensPerExample, chunkCount, chunkSize, userMessageTokens, historyTokens];
+    inputs.forEach(el => el.addEventListener('input', computeAll));
+    // also on change for number inputs
+    [outputReserve, userMessageTokens, historyTokens].forEach(el => el.addEventListener('change', computeAll));
+
+    // presets
+    function applyPreset(name) {
+      const p = presets[name];
+      if (!p) return;
+      contextWindow.value = p.window;
+      outputReserve.value = p.output;
+      systemPrompt.value = p.system;
+      fewShotCount.value = p.fewShotCount;
+      tokensPerExample.value = p.tokensPerEx;
+      chunkCount.value = p.chunkCount;
+      chunkSize.value = p.chunkSize;
+      userMessageTokens.value = p.userMsg;
+      historyTokens.value = p.history;
+      syncRangeDisplay();
+      updateSystemEstimate();
+      computeAll();
+    }
+
+    const presets = {
+      rag: {
+        window: 32768, output: 1024, system: 'You are a RAG assistant. Use retrieved context to answer accurately.',
+        fewShotCount: 2, tokensPerEx: 180, chunkCount: 12, chunkSize: 400, userMsg: 150, history: 0
+      },
+      chat: {
+        window: 16384, output: 2048, system: 'You are a helpful chatbot. Be concise and friendly.',
+        fewShotCount: 0, tokensPerEx: 100, chunkCount: 0, chunkSize: 200, userMsg: 200, history: 1200
+      },
+      code: {
+        window: 65536, output: 4096, system: 'Review the following code changes. Provide security and style feedback.',
+        fewShotCount: 3, tokensPerEx: 250, chunkCount: 5, chunkSize: 600, userMsg: 400, history: 0
+      },
+      doc: {
+        window: 200000, output: 2048, system: 'Analyze the document and summarize key points.',
+        fewShotCount: 1, tokensPerEx: 300, chunkCount: 20, chunkSize: 800, userMsg: 100, history: 0
+      }
+    };
+
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+    });
+
+    // initial compute
+    computeAll();
+
+    // JSON-LD schema
+    const schemaWebApp = {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Prompt Token Budget Optimizer",
+      "url": "https://gpt0x.com/tools/prompt-token-budget-optimizer",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "description": "Interactive tool to allocate LLM context window budget with visualization and cost estimation."
+    };
+    const schemaFAQ = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "How is token count estimated?", "acceptedAnswer": { "@type": "Answer", "text": "We use ~4 characters per token as a rough estimate for English text." } },
+        { "@type": "Question", "name": "Can I use this for any model?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, select the context window size and adjust pricing in the cost model." } },
+        { "@type": "Question", "name": "What is efficiency score?", "acceptedAnswer": { "@type": "Answer", "text": "It's the ratio of output tokens to total input tokens. Higher means more budget for output." } }
+      ]
+    };
+    const schemaBreadcrumb = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "gpt0x", "item": "https://gpt0x.com" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools" },
+        { "@type": "ListItem", "position": 3, "name": "Prompt Token Budget Optimizer", "item": "https://gpt0x.com/tools/prompt-token-budget-optimizer" }
+      ]
+    };
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.textContent = JSON.stringify(schemaWebApp);
+    document.head.appendChild(script1);
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.textContent = JSON.stringify(schemaFAQ);
+    document.head.appendChild(script2);
+    const script3 = document.createElement('script');
+    script3.type = 'application/ld+json';
+    script3.textContent = JSON.stringify(schemaBreadcrumb);
+    document.head.appendChild(script3);
+  })();
+</script>
+</body>
+</html>
