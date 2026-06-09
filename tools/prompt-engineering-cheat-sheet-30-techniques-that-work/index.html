@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Engineering Cheat Sheet — 30 Techniques That Work</title>
+  <meta name="description" content="30 proven prompt engineering techniques: Zero-shot, Few-shot, Chain-of-Thought, Self-consistency, Tree-of-Thought, ReAct, Reflexion, Role-based, Format control, Output structuring. Interactive reference.">
+  <link rel="canonical" href="https://www.gpt0x.com/prompt-engineering-cheat-sheet">
+  <meta name="theme-color" content="#0f0f1a">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0f0f1a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      padding: 2rem 1rem;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    /* breadcrumb */
+    .breadcrumb {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+    }
+    .breadcrumb a {
+      color: #8b5cf6;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    .breadcrumb .sep {
+      color: #475569;
+    }
+    /* header */
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #c4b5fd, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.25rem;
+      letter-spacing: -0.02em;
+    }
+    .subhead {
+      color: #94a3b8;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+      border-left: 4px solid #8b5cf6;
+      padding-left: 1rem;
+    }
+    /* filters */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 1.5rem;
+      background: #1e1e2f;
+      padding: 1.2rem 1.5rem;
+      border-radius: 24px;
+      margin-bottom: 2.5rem;
+      align-items: center;
+      border: 1px solid #2d2d44;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .filter-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #a5b4fc;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .filter-btn {
+      background: #2a2a40;
+      border: none;
+      color: #cbd5e1;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1px solid transparent;
+    }
+    .filter-btn.active {
+      background: #8b5cf6;
+      color: white;
+      border-color: #a78bfa;
+      box-shadow: 0 0 12px rgba(139,92,246,0.3);
+    }
+    .filter-btn:hover {
+      background: #3b3b5c;
+    }
+    .filter-btn.active:hover {
+      background: #7c3aed;
+    }
+    .reset-btn {
+      background: transparent;
+      border: 1px solid #3b3b5c;
+      color: #c4b5fd;
+      margin-left: auto;
+    }
+    .reset-btn:hover {
+      background: #2d2d44;
+    }
+    /* cards grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+    .card {
+      background: #1a1a2e;
+      border-radius: 24px;
+      padding: 1.5rem 1.3rem;
+      border: 1px solid #2d2d44;
+      transition: transform 0.1s ease, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      border-color: #8b5cf6;
+      box-shadow: 0 8px 24px rgba(139,92,246,0.08);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+      gap: 0.3rem 0.6rem;
+    }
+    .card-title {
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #f1f5f9;
+    }
+    .badge-cat {
+      background: #2e2e4a;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #a5b4fc;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      border: 1px solid #3b3b5c;
+    }
+    .badge-diff {
+      font-size: 0.7rem;
+      background: #1e293b;
+      padding: 0.2rem 0.7rem;
+      border-radius: 40px;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+    }
+    .desc {
+      color: #b9c7e0;
+      font-size: 0.9rem;
+      margin: 0.4rem 0 0.8rem 0;
+      line-height: 1.4;
+    }
+    .example-box {
+      background: #12121f;
+      border-radius: 16px;
+      padding: 0.8rem 1rem;
+      margin: 0.6rem 0 0.8rem 0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      border-left: 4px solid #8b5cf6;
+      word-break: break-word;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .example-box:hover {
+      background: #1a1a30;
+    }
+    .example-box .copy-icon {
+      position: absolute;
+      right: 8px;
+      top: 6px;
+      font-size: 0.7rem;
+      background: #2d2d44;
+      padding: 2px 8px;
+      border-radius: 30px;
+      color: #a5b4fc;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .example-box.copied .copy-icon {
+      background: #8b5cf6;
+      color: white;
+      opacity: 1;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 0.6rem;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      border-top: 1px solid #252540;
+    }
+    .effectiveness {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .stars {
+      color: #fbbf24;
+      letter-spacing: 1px;
+    }
+    .when-use {
+      font-style: italic;
+      color: #a5b4fc;
+      max-width: 65%;
+    }
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 0;
+      color: #64748b;
+    }
+    footer {
+      margin-top: 4rem;
+      text-align: center;
+      color: #475569;
+      font-size: 0.85rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 2rem;
+    }
+    @media (max-width: 640px) {
+      h1 { font-size: 1.8rem; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .reset-btn { margin-left: 0; }
+    }
+  </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+  <!-- BreadcrumbList -->
+  <nav class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+    <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+      <a itemprop="item" href="https://www.gpt0x.com/"><span itemprop="name">Home</span></a>
+      <meta itemprop="position" content="1">
+    </span>
+    <span class="sep">›</span>
+    <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+      <a itemprop="item" href="https://www.gpt0x.com/learn/"><span itemprop="name">Learn</span></a>
+      <meta itemprop="position" content="2">
+    </span>
+    <span class="sep">›</span>
+    <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+      <span itemprop="name">Prompt Engineering Cheat Sheet</span>
+      <meta itemprop="position" content="3">
+    </span>
+  </nav>
+
+  <h1>Prompt Engineering Cheat Sheet</h1>
+  <div class="subhead">30 techniques that work · filter by category & difficulty</div>
+
+  <!-- filters -->
+  <div class="filter-bar" id="filterBar">
+    <div class="filter-group">
+      <label>Category</label>
+      <button class="filter-btn active" data-category="all">All</button>
+      <button class="filter-btn" data-category="zero-shot">Zero-shot</button>
+      <button class="filter-btn" data-category="few-shot">Few-shot</button>
+      <button class="filter-btn" data-category="chain-of-thought">Chain-of-Thought</button>
+      <button class="filter-btn" data-category="self-consistency">Self-consistency</button>
+      <button class="filter-btn" data-category="tree-of-thought">Tree-of-Thought</button>
+      <button class="filter-btn" data-category="react">ReAct</button>
+      <button class="filter-btn" data-category="reflexion">Reflexion</button>
+      <button class="filter-btn" data-category="role-based">Role-based</button>
+      <button class="filter-btn" data-category="format-control">Format control</button>
+      <button class="filter-btn" data-category="output-structuring">Output structuring</button>
+    </div>
+    <div class="filter-group">
+      <label>Difficulty</label>
+      <button class="filter-btn active" data-difficulty="all">All</button>
+      <button class="filter-btn" data-difficulty="beginner">Beginner</button>
+      <button class="filter-btn" data-difficulty="intermediate">Intermediate</button>
+      <button class="filter-btn" data-difficulty="advanced">Advanced</button>
+    </div>
+    <button class="filter-btn reset-btn" id="resetFilters">↺ Reset</button>
+  </div>
+
+  <!-- grid -->
+  <div class="grid" id="cardGrid"></div>
+  <footer>
+    <p>© gpt0x.com — Prompt Engineering Reference. Data curated for interactive learning.</p>
+  </footer>
+<div style="margin:20px auto;max-width:728px;text-align:center">
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+</div>
+
+<script>
+  (function() {
+    // ----- 30 techniques dataset -----
+    const techniques = [
+      // Zero-shot (3)
+      { name: "Zero-shot", desc: "Ask directly without examples.", example: "Translate 'Hello' to French.", category: "zero-shot", difficulty: "beginner", whenUse: "Simple tasks, known patterns.", effectiveness: 3 },
+      { name: "Zero-shot with persona", desc: "Assign a role to guide style.", example: "You are a poet. Write a haiku about AI.", category: "zero-shot", difficulty: "beginner", whenUse: "Need creative tone.", effectiveness: 4 },
+      { name: "Zero-shot instruction", desc: "Explicit instructions without examples.", example: "Summarize this article in 2 sentences.", category: "zero-shot", difficulty: "beginner", whenUse: "Clear output requirements.", effectiveness: 4 },
+      // Few-shot (3)
+      { name: "Few-shot (2-shot)", desc: "Provide two examples before query.", example: "Q: What is capital of France? A: Paris. Q: Capital of Japan? A: Tokyo. Q: Capital of Egypt?", category: "few-shot", difficulty: "intermediate", whenUse: "Teach pattern or format.", effectiveness: 5 },
+      { name: "Few-shot with reasoning", desc: "Examples include reasoning steps.", example: "Q: 2+2=4 because... A: 4. Q: 3+5=8 because... A: 8. Q: 7+8?", category: "few-shot", difficulty: "intermediate", whenUse: "Complex reasoning.", effectiveness: 5 },
+      { name: "Few-shot (dynamic)", desc: "Select examples based on input.", example: "User query: 'weather' → show weather examples.", category: "few-shot", difficulty: "advanced", whenUse: "Personalized prompts.", effectiveness: 4 },
+      // Chain-of-Thought (3)
+      { name: "Chain-of-Thought (CoT)", desc: "Encourage step-by-step reasoning.", example: "Q: Roger has 5 balls. He buys 2 more. How many? Let's think step by step.", category: "chain-of-thought", difficulty: "intermediate", whenUse: "Math, logic, multi-step.", effectiveness: 5 },
+      { name: "CoT with explicit steps", desc: "List numbered steps.", example: "Step 1: Identify variables. Step 2: Calculate...", category: "chain-of-thought", difficulty: "intermediate", whenUse: "Complex calculations.", effectiveness: 5 },
+      { name: "CoT (zero-shot)", desc: "Add 'Let's think step by step' without examples.", example: "Q: A car travels 60 mph for 2 hours. How far? Let's think step by step.", category: "chain-of-thought", difficulty: "beginner", whenUse: "Quick reasoning boost.", effectiveness: 4 },
+      // Self-consistency (3)
+      { name: "Self-consistency", desc: "Sample multiple reasoning paths, majority vote.", example: "Solve 2+3*4, generate 3 solutions, pick most common.", category: "self-consistency", difficulty: "advanced", whenUse: "High-stakes accuracy.", effectiveness: 5 },
+      { name: "Self-consistency (temperature)", desc: "Use high temperature, aggregate answers.", example: "Q: 24/6? (run 5 times, choose majority).", category: "self-consistency", difficulty: "advanced", whenUse: "Reduce variance.", effectiveness: 4 },
+      { name: "Self-consistency + CoT", desc: "Combine CoT with multiple samples.", example: "Step-by-step reasoning, 3 chains, final vote.", category: "self-consistency", difficulty: "advanced", whenUse: "Math & reasoning.", effectiveness: 5 },
+      // Tree-of-Thought (3)
+      { name: "Tree-of-Thought (ToT)", desc: "Explore multiple reasoning branches.", example: "Consider 3 strategies: A, B, C. Evaluate each.", category: "tree-of-thought", difficulty: "advanced", whenUse: "Creative problem solving.", effectiveness: 4 },
+      { name: "ToT with pruning", desc: "Evaluate branches, cut weak ones.", example: "Generate 4 ideas, score each, keep top 2.", category: "tree-of-thought", difficulty: "advanced", whenUse: "Complex planning.", effectiveness: 5 },
+      { name: "ToT (BFS)", desc: "Breadth-first search over thoughts.", example: "Level 1: 3 options. Level 2: expand each.", category: "tree-of-thought", difficulty: "advanced", whenUse: "Exploration tasks.", effectiveness: 4 },
+      // ReAct (3)
+      { name: "ReAct (Reason+Act)", desc: "Interleave reasoning and actions.", example: "Thought: I need to search weather. Action: search(weather).", category: "react", difficulty: "advanced", whenUse: "Tool use, agents.", effectiveness: 5 },
+      { name: "ReAct with tools", desc: "Define tool calls in prompt.", example: "You have calculator, search. Reason then act.", category: "react", difficulty: "advanced", whenUse: "Multi-step tool tasks.", effectiveness: 5 },
+      { name: "ReAct (simplified)", desc: "Short reasoning + action format.", example: "Question: X. Thought: ... Action: ...", category: "react", difficulty: "intermediate", whenUse: "Simple agent tasks.", effectiveness: 4 },
+      // Reflexion (3)
+      { name: "Reflexion", desc: "Self-critique and refine.", example: "Answer: ... Critique: ... Improved answer:", category: "reflexion", difficulty: "advanced", whenUse: "Improve output quality.", effectiveness: 4 },
+      { name: "Reflexion with memory", desc: "Store past mistakes, avoid them.", example: "Previous error: ... Now correct.", category: "reflexion", difficulty: "advanced", whenUse: "Iterative tasks.", effectiveness: 5 },
+      { name: "Reflexion (verbal)", desc: "Describe what could be improved.", example: "Your answer was too vague. Make it specific.", category: "reflexion", difficulty: "intermediate", whenUse: "Self-correction.", effectiveness: 4 },
+      // Role-based (3)
+      { name: "Role-based (expert)", desc: "Assign expert role.", example: "You are a world-class physicist. Explain quantum.", category: "role-based", difficulty: "beginner", whenUse: "Authority, tone.", effectiveness: 4 },
+      { name: "Role-based (character)", desc: "Assume a fictional character.", example: "You are Sherlock Holmes. Deduce.", category: "role-based", difficulty: "beginner", whenUse: "Creative writing.", effectiveness: 3 },
+      { name: "Role-based (audience)", desc: "Specify audience.", example: "Explain to a 5-year-old.", category: "role-based", difficulty: "beginner", whenUse: "Simplify concepts.", effectiveness: 4 },
+      // Format control (3)
+      { name: "Format control (JSON)", desc: "Enforce JSON output.", example: "Return as JSON: { \"name\": ... }", category: "format-control", difficulty: "intermediate", whenUse: "Structured data.", effectiveness: 5 },
+      { name: "Format control (markdown)", desc: "Require markdown formatting.", example: "Use headings, bullet points.", category: "format-control", difficulty: "beginner", whenUse: "Readable output.", effectiveness: 4 },
+      { name: "Format control (XML)", desc: "XML tags for sections.", example: "<summary>...</summary>", category: "format-control", difficulty: "intermediate", whenUse: "Legacy systems.", effectiveness: 3 },
+      // Output structuring (3)
+      { name: "Output structuring (table)", desc: "Demand table format.", example: "Create table: | Name | Age |", category: "output-structuring", difficulty: "intermediate", whenUse: "Comparison data.", effectiveness: 4 },
+      { name: "Output structuring (bullet)", desc: "Bullet list output.", example: "List 3 benefits: - ...", category: "output-structuring", difficulty: "beginner", whenUse: "Summaries.", effectiveness: 4 },
+      { name: "Output structuring (key-value)", desc: "Key: value pairs.", example: "Name: John, Age: 30", category: "output-structuring", difficulty: "beginner", whenUse: "Simple records.", effectiveness: 3 }
+    ];
+
+    // render
+    const grid = document.getElementById('cardGrid');
+    let activeCategory = 'all';
+    let activeDifficulty = 'all';
+
+    function render() {
+      const filtered = techniques.filter(t => {
+        const catMatch = activeCategory === 'all' || t.category === activeCategory;
+        const diffMatch = activeDifficulty === 'all' || t.difficulty === activeDifficulty;
+        return catMatch && diffMatch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="no-results">✨ No techniques match the selected filters. Try reset.</div>`;
+        return;
+      }
+
+      let html = '';
+      filtered.forEach((t, idx) => {
+        const stars = '★'.repeat(t.effectiveness) + '☆'.repeat(5 - t.effectiveness);
+        const catLabel = t.category.replace(/-/g, ' ');
+        html += `
+          <div class="card" data-category="${t.category}" data-difficulty="${t.difficulty}">
+            <div class="card-header">
+              <span class="card-title">${t.name}</span>
+              <span class="badge-cat">${catLabel}</span>
+            </div>
+            <div class="desc">${t.desc}</div>
+            <div class="example-box" data-example="${idx}">
+              <span>${t.example}</span>
+              <span class="copy-icon">📋 copy</span>
+            </div>
+            <div class="meta-row">
+              <span class="when-use">🛈 ${t.whenUse}</span>
+              <span class="effectiveness"><span class="stars">${stars}</span> <span style="font-size:0.7rem;color:#64748b;">${t.effectiveness}/5</span></span>
+            </div>
+            <div style="margin-top:0.4rem;"><span class="badge-diff">${t.difficulty}</span></div>
+          </div>
+        `;
+      });
+      grid.innerHTML = html;
+
+      // attach copy listeners
+      document.querySelectorAll('.example-box').forEach(box => {
+        box.addEventListener('click', function(e) {
+          const text = this.querySelector('span:first-child')?.innerText || this.innerText;
+          navigator.clipboard.writeText(text).then(() => {
+            this.classList.add('copied');
+            const icon = this.querySelector('.copy-icon');
+            if (icon) icon.innerText = '✓ copied';
+            setTimeout(() => {
+              this.classList.remove('copied');
+              if (icon) icon.innerText = '📋 copy';
+            }, 1800);
+          }).catch(() => {});
+        });
+      });
+    }
+
+    // filter buttons
+    document.querySelectorAll('[data-category]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-category]').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        activeCategory = this.dataset.category;
+        render();
+      });
+    });
+    document.querySelectorAll('[data-difficulty]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-difficulty]').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        activeDifficulty = this.dataset.difficulty;
+        render();
+      });
+    });
+    document.getElementById('resetFilters').addEventListener('click', function() {
+      document.querySelectorAll('[data-category]').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-category="all"]').classList.add('active');
+      document.querySelectorAll('[data-difficulty]').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-difficulty="all"]').classList.add('active');
+      activeCategory = 'all';
+      activeDifficulty = 'all';
+      render();
+    });
+
+    // initial render
+    render();
+
+    // JSON-LD structured data (Article + FAQPage + BreadcrumbList)
+    const faqEntries = techniques.slice(0, 10).map((t, i) => ({
+      "@type": "Question",
+      "name": t.name,
+      "acceptedAnswer": { "@type": "Answer", "text": `${t.desc} Example: ${t.example}. Best used: ${t.whenUse}. Effectiveness: ${t.effectiveness}/5.` }
+    }));
+    const ld = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "Prompt Engineering Cheat Sheet — 30 Techniques That Work",
+          "description": "30 proven prompt engineering techniques organized by category with examples, difficulty, and effectiveness ratings.",
+          "url": "https://www.gpt0x.com/prompt-engineering-cheat-sheet",
+          "author": { "@type": "Organization", "name": "gpt0x.com" }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": faqEntries
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.gpt0x.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Learn", "item": "https://www.gpt0x.com/learn/" },
+            { "@type": "ListItem", "position": 3, "name": "Prompt Engineering Cheat Sheet", "item": "https://www.gpt0x.com/prompt-engineering-cheat-sheet" }
+          ]
+        }
+      ]
+    };
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(ld, null, 2);
+    document.head.appendChild(script);
+  })();
+</script>
+</body>
+</html>

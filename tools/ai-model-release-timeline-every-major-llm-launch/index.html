@@ -1,0 +1,474 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Model Release Timeline — Every Major LLM Launch</title>
+  <meta name="description" content="Interactive timeline of major LLM releases from GPT-1 (2018) to mid-2026. Filter by company, size, open/closed source. Click for details.">
+  <link rel="canonical" href="https://gpt0x.com/ai-model-release-timeline">
+  <!-- JSON-LD structured data: Article + BreadcrumbList -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "AI Model Release Timeline — Every Major LLM Launch",
+      "description": "Interactive timeline of major LLM releases from GPT-1 (2018) to mid-2026. Filter by company, size, open/closed source.",
+      "author": {
+        "@type": "Organization",
+        "name": "gpt0x"
+      },
+      "datePublished": "2026-01-15",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://gpt0x.com/ai-model-release-timeline"
+      }
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+        { "@type": "ListItem", "position": 2, "name": "AI Model Timeline", "item": "https://gpt0x.com/ai-model-release-timeline" }
+      ]
+    }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0f0f1a;
+      color: #e5e5e5;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #2a2a3e;
+      padding-bottom: 1rem;
+    }
+    h1 {
+      font-weight: 500;
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #c084fc, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subhead {
+      color: #aaa;
+      font-size: 0.9rem;
+      margin-top: 0.2rem;
+    }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem 2rem;
+      align-items: center;
+      background: #1c1c2e;
+      padding: 0.8rem 1.5rem;
+      border-radius: 40px;
+      margin-bottom: 2rem;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .filter-group label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #aaa;
+    }
+    .filter-btn {
+      background: #2a2a40;
+      border: 1px solid #3a3a54;
+      color: #ddd;
+      padding: 0.3rem 0.9rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn.active {
+      background: #8b5cf6;
+      border-color: #8b5cf6;
+      color: #fff;
+      box-shadow: 0 0 8px #8b5cf680;
+    }
+    .filter-btn:hover {
+      background: #6d4bc7;
+      border-color: #8b5cf6;
+    }
+    .timeline-wrapper {
+      position: relative;
+      background: #12121f;
+      border-radius: 28px;
+      padding: 1.5rem 0.5rem 0.5rem 0.5rem;
+      border: 1px solid #2a2a42;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      overflow-x: auto;
+      overflow-y: visible;
+    }
+    .timeline-scroll {
+      display: flex;
+      flex-direction: column;
+      min-width: 800px;
+      padding: 0 20px 20px 20px;
+    }
+    .axis {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      padding: 0 10px;
+      font-size: 0.7rem;
+      color: #888;
+      border-bottom: 1px solid #2f2f48;
+      padding-bottom: 0.3rem;
+    }
+    .timeline-grid {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .model-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.4rem 0;
+      border-radius: 40px;
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+    .model-row:hover {
+      background: #1e1e34;
+    }
+    .model-marker {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .model-year {
+      font-size: 0.7rem;
+      color: #8b8baa;
+      width: 2.8rem;
+      flex-shrink: 0;
+    }
+    .model-bar {
+      flex: 1;
+      min-width: 80px;
+      height: 28px;
+      background: #2a2a44;
+      border-radius: 40px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 0.8rem;
+      transition: all 0.1s;
+      border-left: 3px solid #8b5cf6;
+    }
+    .model-name {
+      font-weight: 500;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+      color: #f0f0ff;
+    }
+    .model-badge {
+      font-size: 0.55rem;
+      background: #3a3a5a;
+      padding: 0.1rem 0.5rem;
+      border-radius: 30px;
+      margin-left: 0.5rem;
+      white-space: nowrap;
+    }
+    .model-detail-card {
+      display: none;
+      background: #1c1c30;
+      border: 1px solid #8b5cf6;
+      border-radius: 20px;
+      padding: 1.2rem 1.5rem;
+      margin: 0.5rem 0 1rem 2.8rem;
+      box-shadow: 0 8px 20px #00000080;
+      grid-column: 1 / -1;
+    }
+    .model-detail-card.open {
+      display: block;
+    }
+    .detail-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 2rem;
+    }
+    .detail-item {
+      min-width: 120px;
+    }
+    .detail-item span {
+      font-size: 0.7rem;
+      color: #aaa;
+      text-transform: uppercase;
+    }
+    .detail-item p {
+      font-weight: 500;
+      margin-top: 0.2rem;
+    }
+    .close-btn {
+      background: none;
+      border: 1px solid #5a5a7a;
+      color: #ccc;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      float: right;
+      font-size: 0.7rem;
+    }
+    .zoom-controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .zoom-btn {
+      background: #2a2a44;
+      border: none;
+      color: #ddd;
+      width: 30px;
+      height: 30px;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: #5a5a7a;
+      font-size: 0.8rem;
+    }
+    @media (max-width: 700px) {
+      .filters { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+      .model-bar { min-width: 60px; }
+    }
+  </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>🧠 AI Model Release Timeline</h1>
+      <div class="subhead">Every major LLM launch · GPT-1 (2018) → mid-2026</div>
+    </div>
+    <div style="color:#8b5cf6; font-size:0.8rem;">gpt0x.com</div>
+  </header>
+
+  <!-- filter controls -->
+  <div class="filters" id="filterContainer">
+    <div class="filter-group">
+      <label>Company</label>
+      <button class="filter-btn active" data-filter="company" data-value="all">All</button>
+      <button class="filter-btn" data-filter="company" data-value="OpenAI">OpenAI</button>
+      <button class="filter-btn" data-filter="company" data-value="Anthropic">Anthropic</button>
+      <button class="filter-btn" data-filter="company" data-value="Google">Google</button>
+      <button class="filter-btn" data-filter="company" data-value="Meta">Meta</button>
+      <button class="filter-btn" data-filter="company" data-value="Mistral">Mistral</button>
+      <button class="filter-btn" data-filter="company" data-value="DeepSeek">DeepSeek</button>
+    </div>
+    <div class="filter-group">
+      <label>Size</label>
+      <button class="filter-btn active" data-filter="size" data-value="all">All</button>
+      <button class="filter-btn" data-filter="size" data-value="small">Small</button>
+      <button class="filter-btn" data-filter="size" data-value="medium">Medium</button>
+      <button class="filter-btn" data-filter="size" data-value="large">Large</button>
+    </div>
+    <div class="filter-group">
+      <label>Source</label>
+      <button class="filter-btn active" data-filter="source" data-value="all">All</button>
+      <button class="filter-btn" data-filter="source" data-value="open">Open</button>
+      <button class="filter-btn" data-filter="source" data-value="closed">Closed</button>
+    </div>
+  </div>
+
+  <!-- timeline + zoom -->
+  <div class="timeline-wrapper" id="timelineWrapper">
+    <div class="zoom-controls">
+      <button class="zoom-btn" id="zoomIn">+</button>
+      <button class="zoom-btn" id="zoomOut">−</button>
+    </div>
+    <div class="timeline-scroll" id="timelineScroll">
+      <div class="axis"><span>2018</span><span>2020</span><span>2022</span><span>2024</span><span>2026</span></div>
+      <div class="timeline-grid" id="timelineGrid"></div>
+    </div>
+  </div>
+  <div class="footer">Click any model row for details · zoomable · data up to mid-2026</div>
+</div>
+
+<script>
+  (function() {
+    // ----- MODEL DATASET (curated) -----
+    const models = [
+      { id: 'gpt1', name: 'GPT-1', company: 'OpenAI', year: 2018, params: '117M', context: '512', keyCapability: 'Language understanding', mmlu: 0.25, humaneval: 0.0, size: 'small', source: 'closed' },
+      { id: 'gpt2', name: 'GPT-2', company: 'OpenAI', year: 2019, params: '1.5B', context: '1024', keyCapability: 'Text generation', mmlu: 0.32, humaneval: 0.02, size: 'medium', source: 'open' },
+      { id: 'gpt3', name: 'GPT-3', company: 'OpenAI', year: 2020, params: '175B', context: '2048', keyCapability: 'Few-shot learning', mmlu: 0.43, humaneval: 0.08, size: 'large', source: 'closed' },
+      { id: 'llama1', name: 'LLaMA 1', company: 'Meta', year: 2023, params: '65B', context: '2048', keyCapability: 'Research foundation', mmlu: 0.47, humaneval: 0.15, size: 'large', source: 'open' },
+      { id: 'gpt4', name: 'GPT-4', company: 'OpenAI', year: 2023, params: '1.8T (est.)', context: '8192', keyCapability: 'Multimodal reasoning', mmlu: 0.86, humaneval: 0.67, size: 'large', source: 'closed' },
+      { id: 'claude3', name: 'Claude 3', company: 'Anthropic', year: 2024, params: '2T (est.)', context: '200K', keyCapability: 'Safety & long context', mmlu: 0.88, humaneval: 0.73, size: 'large', source: 'closed' },
+      { id: 'gemini1', name: 'Gemini 1.5', company: 'Google', year: 2024, params: '1.5T (est.)', context: '1M', keyCapability: 'Multimodal, long context', mmlu: 0.90, humaneval: 0.71, size: 'large', source: 'closed' },
+      { id: 'llama3', name: 'LLaMA 3', company: 'Meta', year: 2024, params: '70B', context: '8192', keyCapability: 'Open efficiency', mmlu: 0.82, humaneval: 0.62, size: 'medium', source: 'open' },
+      { id: 'mistral7b', name: 'Mistral 7B', company: 'Mistral', year: 2023, params: '7B', context: '8192', keyCapability: 'Efficient open LLM', mmlu: 0.64, humaneval: 0.30, size: 'small', source: 'open' },
+      { id: 'mistralLarge', name: 'Mistral Large', company: 'Mistral', year: 2024, params: '~120B', context: '32768', keyCapability: 'Multilingual', mmlu: 0.84, humaneval: 0.70, size: 'large', source: 'closed' },
+      { id: 'deepseekV3', name: 'DeepSeek V3', company: 'DeepSeek', year: 2024, params: '671B', context: '128K', keyCapability: 'MoE, coding', mmlu: 0.89, humaneval: 0.82, size: 'large', source: 'open' },
+      { id: 'deepseekR1', name: 'DeepSeek R1', company: 'DeepSeek', year: 2025, params: '~700B', context: '128K', keyCapability: 'Reasoning', mmlu: 0.91, humaneval: 0.85, size: 'large', source: 'open' },
+      { id: 'gpt4o', name: 'GPT-4o', company: 'OpenAI', year: 2024, params: '~1.8T', context: '128K', keyCapability: 'Omni multimodal', mmlu: 0.92, humaneval: 0.88, size: 'large', source: 'closed' },
+      { id: 'claude35', name: 'Claude 3.5', company: 'Anthropic', year: 2024, params: '~2T', context: '200K', keyCapability: 'Reasoning & coding', mmlu: 0.93, humaneval: 0.90, size: 'large', source: 'closed' },
+      { id: 'claude4', name: 'Claude 4', company: 'Anthropic', year: 2025, params: '~2.5T', context: '500K', keyCapability: 'Advanced reasoning', mmlu: 0.95, humaneval: 0.92, size: 'large', source: 'closed' },
+      { id: 'gemini2', name: 'Gemini 2', company: 'Google', year: 2025, params: '~3T', context: '2M', keyCapability: 'Agentic & multimodal', mmlu: 0.96, humaneval: 0.93, size: 'large', source: 'closed' },
+      { id: 'llama4', name: 'LLaMA 4 (mock)', company: 'Meta', year: 2026, params: '~500B', context: '256K', keyCapability: 'Open frontier', mmlu: 0.94, humaneval: 0.91, size: 'large', source: 'open' }
+    ];
+
+    // ----- state -----
+    let activeFilters = { company: 'all', size: 'all', source: 'all' };
+    let zoomLevel = 1; // not used for true zoom, but changes bar width factor
+
+    const grid = document.getElementById('timelineGrid');
+    const timelineScroll = document.getElementById('timelineScroll');
+
+    function render() {
+      const filtered = models.filter(m => {
+        const c = activeFilters.company === 'all' || m.company === activeFilters.company;
+        const s = activeFilters.size === 'all' || m.size === activeFilters.size;
+        const src = activeFilters.source === 'all' || m.source === activeFilters.source;
+        return c && s && src;
+      });
+
+      let html = '';
+      filtered.forEach(m => {
+        const yearOffset = ((m.year - 2018) / 8) * 100; // 0 to 100%
+        const barWidth = Math.max(20, 10 + (m.params.includes('B') ? parseInt(m.params) * 0.02 : 5));
+        const isLarge = m.size === 'large' ? '⚡' : '';
+        html += `<div class="model-row" data-model-id="${m.id}">
+          <div class="model-marker">
+            <span class="model-year">${m.year}</span>
+            <div class="model-bar" style="width: ${Math.min(90, 20 + barWidth)}%; background: #2a2a44; border-left-color: #8b5cf6;">
+              <span class="model-name">${m.name}</span>
+              <span class="model-badge">${m.company}</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-detail-card" id="detail-${m.id}">
+          <button class="close-btn" data-close="${m.id}">✕ close</button>
+          <div class="detail-grid">
+            <div class="detail-item"><span>Parameters</span><p>${m.params}</p></div>
+            <div class="detail-item"><span>Context</span><p>${m.context}</p></div>
+            <div class="detail-item"><span>Key capability</span><p>${m.keyCapability}</p></div>
+            <div class="detail-item"><span>MMLU</span><p>${(m.mmlu * 100).toFixed(0)}%</p></div>
+            <div class="detail-item"><span>HumanEval</span><p>${(m.humaneval * 100).toFixed(0)}%</p></div>
+            <div class="detail-item"><span>Source</span><p>${m.source === 'open' ? '🔓 Open' : '🔒 Closed'}</p></div>
+          </div>
+        </div>`;
+      });
+      grid.innerHTML = html;
+
+      // attach click to rows for detail toggle
+      document.querySelectorAll('.model-row').forEach(row => {
+        row.addEventListener('click', function(e) {
+          const id = this.dataset.modelId;
+          const detail = document.getElementById('detail-' + id);
+          if (!detail) return;
+          const isOpen = detail.classList.contains('open');
+          // close all other details
+          document.querySelectorAll('.model-detail-card').forEach(c => c.classList.remove('open'));
+          if (!isOpen) detail.classList.add('open');
+        });
+      });
+      // close buttons
+      document.querySelectorAll('.close-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const id = this.dataset.close;
+          const detail = document.getElementById('detail-' + id);
+          if (detail) detail.classList.remove('open');
+        });
+      });
+    }
+
+    // filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const filterType = this.dataset.filter;
+        const value = this.dataset.value;
+        // update active state within same group
+        document.querySelectorAll(`.filter-btn[data-filter="${filterType}"]`).forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        activeFilters[filterType] = value;
+        render();
+      });
+    });
+
+    // zoom (increase bar width factor)
+    let zoomFactor = 1;
+    document.getElementById('zoomIn').addEventListener('click', function() {
+      zoomFactor = Math.min(2.5, zoomFactor + 0.2);
+      applyZoom();
+    });
+    document.getElementById('zoomOut').addEventListener('click', function() {
+      zoomFactor = Math.max(0.5, zoomFactor - 0.2);
+      applyZoom();
+    });
+    function applyZoom() {
+      const bars = document.querySelectorAll('.model-bar');
+      bars.forEach(bar => {
+        // base width from inline style? we override via style
+        const base = parseFloat(bar.style.width) || 30;
+        // but we recompute using zoom factor stored
+        // simpler: adjust all bars by scaling width
+        const currentWidth = parseFloat(bar.style.width) || 30;
+        // we want to scale around original base; we'll just multiply by factor relative to 1
+        // we'll store original base in dataset
+        if (!bar.dataset.baseWidth) {
+          bar.dataset.baseWidth = currentWidth;
+        }
+        const base = parseFloat(bar.dataset.baseWidth);
+        bar.style.width = Math.min(95, base * zoomFactor) + '%';
+      });
+    }
+
+    // initial render
+    render();
+
+    // after render set base widths for zoom
+    setTimeout(() => {
+      document.querySelectorAll('.model-bar').forEach(bar => {
+        const w = parseFloat(bar.style.width) || 30;
+        bar.dataset.baseWidth = w;
+      });
+    }, 50);
+
+  })();
+</script>
+<div style="margin:20px auto;max-width:728px;text-align:center">
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+</body>
+</html>
