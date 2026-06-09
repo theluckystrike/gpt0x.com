@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Window Packing Optimizer</title>
+    <meta name="description" content="Optimize content allocation in context windows. Calculate optimal token distribution, packing efficiency, and allocation recommendations.">
+    <meta name="theme-color" content="#06b6d4">
+    <link rel="canonical" href="https://gpt0x.com/tools/context-window-packing-optimizer">
+    <meta property="og:title" content="Context Window Packing Optimizer">
+    <meta property="og:description" content="Maximize context window efficiency with smart token allocation.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gpt0x.com/tools/context-window-packing-optimizer">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Context Window Packing Optimizer">
+    <meta name="twitter:description" content="Optimize token allocation across system prompts, examples, and user input.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Context Window Packing Optimizer",
+        "description": "Optimize token allocation across context window components for maximum efficiency",
+        "url": "https://gpt0x.com/tools/context-window-packing-optimizer",
+        "applicationCategory": "UtilityApplication",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a2f4a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #06b6d4;
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.1);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(6, 182, 212, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-left: 4px solid #06b6d4;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+        }
+
+        .result-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #06b6d4;
+            font-family: 'Monaco', monospace;
+        }
+
+        .pie-chart {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+            background: conic-gradient(
+                #06b6d4 0deg 0deg,
+                #0891b2 0deg 90deg,
+                #06d6ff 90deg 180deg,
+                #0dcfe1 180deg 270deg,
+                #06b6d4 270deg 360deg
+            );
+            border-radius: 50%;
+            box-shadow: 0 8px 32px rgba(6, 182, 212, 0.2);
+        }
+
+        .pie-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .pie-label {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #06b6d4;
+        }
+
+        .pie-sublabel {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .allocation-breakdown {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .allocation-item {
+            display: grid;
+            grid-template-columns: 150px 1fr 120px;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .allocation-item:last-child {
+            border-bottom: none;
+        }
+
+        .allocation-name {
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .allocation-bar {
+            height: 24px;
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .allocation-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #06b6d4 0%, #0891b2 100%);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .allocation-tokens {
+            text-align: right;
+            color: #06b6d4;
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        .recommendations {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .recommendations h3 {
+            color: #06b6d4;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .recommendation-item {
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .recommendation-item::before {
+            content: "✓ ";
+            color: #06b6d4;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .allocation-item {
+                grid-template-columns: 120px 1fr 80px;
+            }
+
+            .pie-chart {
+                width: 250px;
+                height: 250px;
+            }
+
+            .pie-center {
+                width: 170px;
+                height: 170px;
+            }
+        }
+    </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Context Window Packing Optimizer</h1>
+            <p class="subtitle">Maximize token allocation across system prompts, examples, and user input</p>
+        </header>
+
+        <div class="card">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="contextSize">Total Context Window (tokens)</label>
+                    <select id="contextSize">
+                        <option value="4096">4K (GPT-3.5)</option>
+                        <option value="8192">8K</option>
+                        <option value="16384">16K</option>
+                        <option value="32768">32K</option>
+                        <option value="65536">64K</option>
+                        <option value="131072">128K (Claude 3)</option>
+                        <option value="200000">200K (Claude 3 Opus)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="systemPrompt">System Prompt Tokens</label>
+                    <input type="number" id="systemPrompt" value="500" min="0" step="50">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="fewShot">Few-Shot Examples (count)</label>
+                    <input type="number" id="fewShot" value="3" min="0" step="1">
+                </div>
+
+                <div class="input-group">
+                    <label for="tokensPerExample">Tokens Per Example</label>
+                    <input type="number" id="tokensPerExample" value="200" min="50" step="50">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="userMessage">Estimated User Message Size (tokens)</label>
+                <input type="number" id="userMessage" value="500" min="100" step="100">
+            </div>
+
+            <button onclick="calculatePacking()">Calculate Optimal Allocation</button>
+        </div>
+
+        <div class="card results" id="results">
+            <h2 style="margin-bottom: 20px; color: #cbd5e1;">Allocation Results</h2>
+
+            <div class="result-item">
+                <div class="result-label">Remaining Context Available</div>
+                <div class="result-value" id="remaining">0</div>
+                <div style="color: #94a3b8; font-size: 0.9rem; margin-top: 8px;" id="remainingNote"></div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">Packing Efficiency</div>
+                <div class="result-value" id="efficiency">0%</div>
+                <div style="margin-top: 12px;">
+                    <div style="height: 12px; background: rgba(15, 23, 42, 0.8); border-radius: 6px; overflow: hidden;">
+                        <div id="efficiencyBar" style="height: 100%; background: linear-gradient(90deg, #06b6d4 0%, #0891b2 100%); width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="allocation-breakdown">
+                <h3 style="margin-bottom: 16px; color: #cbd5e1;">Token Allocation</h3>
+
+                <div class="allocation-item">
+                    <div class="allocation-name">System Prompt</div>
+                    <div class="allocation-bar">
+                        <div class="allocation-fill" id="systemFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="allocation-tokens" id="systemTokens">0</div>
+                </div>
+
+                <div class="allocation-item">
+                    <div class="allocation-name">Few-Shot Examples</div>
+                    <div class="allocation-bar">
+                        <div class="allocation-fill" id="examplesFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="allocation-tokens" id="examplesTokens">0</div>
+                </div>
+
+                <div class="allocation-item">
+                    <div class="allocation-name">User Message</div>
+                    <div class="allocation-bar">
+                        <div class="allocation-fill" id="userFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="allocation-tokens" id="userTokens">0</div>
+                </div>
+
+                <div class="allocation-item" style="background: rgba(6, 182, 212, 0.05); border-radius: 6px; margin-top: 8px; padding: 12px;">
+                    <div class="allocation-name" style="font-weight: 600;">Available for Response</div>
+                    <div class="allocation-bar">
+                        <div class="allocation-fill" id="responseFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="allocation-tokens" id="responseTokens">0</div>
+                </div>
+            </div>
+
+            <div class="recommendations">
+                <h3>Optimization Recommendations</h3>
+                <div id="recommendationsList"></div>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 gpt0x.com — AI Engineering Tools
+        </footer>
+<div style="margin:20px auto;max-width:728px;text-align:center">
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+    </div>
+
+    <script>
+        function calculatePacking() {
+            const contextSize = parseInt(document.getElementById('contextSize').value);
+            const systemPrompt = parseInt(document.getElementById('systemPrompt').value);
+            const fewShot = parseInt(document.getElementById('fewShot').value);
+            const tokensPerExample = parseInt(document.getElementById('tokensPerExample').value);
+            const userMessage = parseInt(document.getElementById('userMessage').value);
+
+            const examplesTokens = fewShot * tokensPerExample;
+            const usedTokens = systemPrompt + examplesTokens + userMessage;
+            const remainingTokens = Math.max(0, contextSize - usedTokens);
+            const efficiency = Math.round((usedTokens / contextSize) * 100);
+
+            document.getElementById('remaining').textContent = remainingTokens.toLocaleString();
+            document.getElementById('efficiency').textContent = efficiency + '%';
+            document.getElementById('efficiencyBar').style.width = efficiency + '%';
+
+            document.getElementById('systemTokens').textContent = systemPrompt.toLocaleString();
+            document.getElementById('examplesTokens').textContent = examplesTokens.toLocaleString();
+            document.getElementById('userTokens').textContent = userMessage.toLocaleString();
+            document.getElementById('responseTokens').textContent = remainingTokens.toLocaleString();
+
+            const systemPct = (systemPrompt / contextSize) * 100;
+            const examplesPct = (examplesTokens / contextSize) * 100;
+            const userPct = (userMessage / contextSize) * 100;
+            const responsePct = (remainingTokens / contextSize) * 100;
+
+            document.getElementById('systemFill').style.width = systemPct + '%';
+            document.getElementById('examplesFill').style.width = examplesPct + '%';
+            document.getElementById('userFill').style.width = userPct + '%';
+            document.getElementById('responseFill').style.width = responsePct + '%';
+
+            const recommendations = [];
+
+            if (efficiency > 90) {
+                recommendations.push('Context window is tightly packed. Consider reducing examples or system prompt verbosity.');
+            } else if (efficiency > 70) {
+                recommendations.push('Efficient packing. Good balance between context and response space.');
+            }
+
+            if (remainingTokens < contextSize * 0.1) {
+                recommendations.push('Less than 10% space for response. Reduce inputs or use streaming.');
+            }
+
+            if (examplesTokens > contextSize * 0.3) {
+                recommendations.push('Few-shot examples exceed 30% of context. Consider reducing example count.');
+            }
+
+            if (systemPrompt > contextSize * 0.25) {
+                recommendations.push('System prompt exceeds 25% of context. Optimize instructions or use external guidance.');
+            }
+
+            if (fewShot > 5) {
+                recommendations.push('More than 5 examples may cause instruction following degradation.');
+            }
+
+            if (remainingTokens > contextSize * 0.5) {
+                recommendations.push('Over 50% context available for response. Consider adding more examples for quality.');
+            }
+
+            const recList = document.getElementById('recommendationsList');
+            recList.innerHTML = recommendations.map(rec => `<div class="recommendation-item">${rec}</div>`).join('');
+
+            document.getElementById('results').classList.add('active');
+        }
+
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', calculatePacking);
+        });
+
+        calculatePacking();
+    </script>
+</body>
+</html>

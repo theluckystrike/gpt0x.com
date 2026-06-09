@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-Tuning Data Estimator</title>
+    <meta name="description" content="Estimate training data requirements for LLM fine-tuning. Get data volume, training time, cost projections, and quality checklists.">
+    <meta name="theme-color" content="#06b6d4">
+    <link rel="canonical" href="https://gpt0x.com/tools/fine-tuning-data-estimator">
+    <meta property="og:title" content="Fine-Tuning Data Estimator">
+    <meta property="og:description" content="Calculate optimal training data volume for LLM fine-tuning projects.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gpt0x.com/tools/fine-tuning-data-estimator">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Fine-Tuning Data Estimator">
+    <meta name="twitter:description" content="Estimate training data, cost, and time for fine-tuning models.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Fine-Tuning Data Estimator",
+        "description": "Estimate training data requirements and costs for LLM fine-tuning",
+        "url": "https://gpt0x.com/tools/fine-tuning-data-estimator",
+        "applicationCategory": "UtilityApplication",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a2f4a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        input[type="number"], input[type="range"], select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #06b6d4;
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.1);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(6, 182, 212, 0.3);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-left: 4px solid #06b6d4;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+        }
+
+        .result-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #06b6d4;
+            font-family: 'Monaco', monospace;
+        }
+
+        .result-unit {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #06b6d4;
+            font-family: monospace;
+        }
+
+        .checklist {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .checklist h3 {
+            color: #06b6d4;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .checklist-item::before {
+            content: "□";
+            color: #06b6d4;
+            font-weight: 600;
+            margin-right: 10px;
+            min-width: 20px;
+        }
+
+        .accuracy-curve {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .accuracy-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 80px;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .accuracy-row:last-child {
+            border-bottom: none;
+        }
+
+        .accuracy-label {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        .accuracy-bar {
+            height: 20px;
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .accuracy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #06b6d4 0%, #0891b2 100%);
+            border-radius: 4px;
+        }
+
+        .accuracy-pct {
+            color: #06b6d4;
+            font-family: monospace;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .accuracy-row {
+                grid-template-columns: 100px 1fr 60px;
+            }
+        }
+    </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Fine-Tuning Data Estimator</h1>
+            <p class="subtitle">Calculate training data needs for LLM fine-tuning</p>
+        </header>
+
+        <div class="card">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="taskType">Task Type</label>
+                    <select id="taskType">
+                        <option value="classification">Text Classification</option>
+                        <option value="generation">Content Generation</option>
+                        <option value="extraction">Information Extraction</option>
+                        <option value="qa">Question Answering</option>
+                        <option value="chat">Chat/Instruction Following</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="baseModel">Base Model</label>
+                    <select id="baseModel">
+                        <option value="gpt3.5">GPT-3.5 Turbo (1.5B params)</option>
+                        <option value="gpt4">GPT-4 (100B+ params)</option>
+                        <option value="claude2">Claude 2 (100B params)</option>
+                        <option value="llama70b">Llama 2 70B</option>
+                        <option value="mistral">Mistral 7B</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="targetAccuracy">Target Accuracy (%)</label>
+                    <input type="number" id="targetAccuracy" value="85" min="60" max="99" step="5">
+                </div>
+
+                <div class="input-group">
+                    <label for="dataQuality">Data Quality Level</label>
+                    <select id="dataQuality">
+                        <option value="low">Low (Human review not done)</option>
+                        <option value="medium">Medium (Basic QA)</option>
+                        <option value="high">High (Expert reviewed)</option>
+                        <option value="expert">Expert (Domain specialist)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="calculateEstimate()">Estimate Requirements</button>
+        </div>
+
+        <div class="card results" id="results">
+            <h2 style="margin-bottom: 20px; color: #cbd5e1;">Fine-Tuning Estimates</h2>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Recommended Training Examples</div>
+                    <div class="metric-value" id="trainingExamples">0</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Validation Set Size</div>
+                    <div class="metric-value" id="validationSize">0</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Estimated Training Time</div>
+                    <div class="metric-value" id="trainingTime">0h</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Estimated Fine-Tuning Cost</div>
+                    <div class="metric-value" id="ftCost">$0</div>
+                </div>
+            </div>
+
+            <div class="result-item" style="margin-top: 20px;">
+                <div class="result-label">Total Dataset Size (including validation)</div>
+                <div class="result-value" id="totalSize">0</div>
+                <div class="result-unit">training + validation examples</div>
+            </div>
+
+            <div class="accuracy-curve">
+                <h3 style="color: #cbd5e1; margin-bottom: 12px;">Expected Accuracy Improvement</h3>
+                <div class="accuracy-row">
+                    <div class="accuracy-label">Base Model</div>
+                    <div class="accuracy-bar"><div class="accuracy-fill" style="width: 70%;"></div></div>
+                    <div class="accuracy-pct">70%</div>
+                </div>
+                <div class="accuracy-row">
+                    <div class="accuracy-label">At 50% Data</div>
+                    <div class="accuracy-bar"><div class="accuracy-fill" id="acc50" style="width: 70%;"></div></div>
+                    <div class="accuracy-pct" id="acc50pct">70%</div>
+                </div>
+                <div class="accuracy-row">
+                    <div class="accuracy-label">At 100% Data</div>
+                    <div class="accuracy-bar"><div class="accuracy-fill" id="acc100" style="width: 70%;"></div></div>
+                    <div class="accuracy-pct" id="acc100pct">70%</div>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <h3>Data Quality Checklist</h3>
+                <div class="checklist-item">Ensure all examples follow consistent format</div>
+                <div class="checklist-item">Remove duplicate or near-duplicate examples</div>
+                <div class="checklist-item">Validate labels by domain expert (min 10% sample)</div>
+                <div class="checklist-item">Balance class distribution (for classification)</div>
+                <div class="checklist-item">Include edge cases and corner cases</div>
+                <div class="checklist-item">Document data collection methodology</div>
+                <div class="checklist-item">Version control dataset and splits</div>
+                <div class="checklist-item">Log metrics on independent test set</div>
+            </div>
+
+            <div class="checklist" style="margin-top: 16px;">
+                <h3>Implementation Recommendations</h3>
+                <div class="checklist-item"><strong>Data Collection:</strong> <span id="recommendation1"></span></div>
+                <div class="checklist-item"><strong>Training Strategy:</strong> <span id="recommendation2"></span></div>
+                <div class="checklist-item"><strong>Validation:</strong> <span id="recommendation3"></span></div>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 gpt0x.com — AI Engineering Tools
+        </footer>
+<div style="margin:20px auto;max-width:728px;text-align:center">
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+    </div>
+
+    <script>
+        const taskDefaults = {
+            classification: { baseExamples: 500, accuracy70: 500, accuracy85: 2000, accuracy95: 5000 },
+            generation: { baseExamples: 1000, accuracy70: 1000, accuracy85: 5000, accuracy95: 10000 },
+            extraction: { baseExamples: 800, accuracy70: 800, accuracy85: 3000, accuracy95: 7000 },
+            qa: { baseExamples: 1200, accuracy70: 1200, accuracy85: 4000, accuracy95: 8000 },
+            chat: { baseExamples: 2000, accuracy70: 2000, accuracy85: 6000, accuracy95: 12000 }
+        };
+
+        const modelSize = {
+            'gpt3.5': 1.5,
+            'gpt4': 100,
+            'claude2': 100,
+            'llama70b': 70,
+            'mistral': 7
+        };
+
+        function calculateEstimate() {
+            const taskType = document.getElementById('taskType').value;
+            const baseModel = document.getElementById('baseModel').value;
+            const targetAccuracy = parseInt(document.getElementById('targetAccuracy').value);
+            const dataQuality = document.getElementById('dataQuality').value;
+
+            const defaults = taskDefaults[taskType];
+            let trainingExamples = defaults.accuracy85;
+
+            if (targetAccuracy >= 90) {
+                trainingExamples = defaults.accuracy95;
+            } else if (targetAccuracy >= 80) {
+                trainingExamples = defaults.accuracy85;
+            } else {
+                trainingExamples = defaults.accuracy70;
+            }
+
+            const qualityMultiplier = { low: 1.5, medium: 1.1, high: 0.9, expert: 0.7 };
+            trainingExamples = Math.ceil(trainingExamples * qualityMultiplier[dataQuality]);
+
+            const validationSize = Math.ceil(trainingExamples * 0.2);
+            const totalSize = trainingExamples + validationSize;
+
+            const modelSizeVal = modelSize[baseModel];
+            const trainingHours = Math.ceil((trainingExamples * 0.0001) * (modelSizeVal / 10));
+            const costPerHour = 0.5 + (modelSizeVal / 50);
+            const ftCost = trainingHours * costPerHour;
+
+            document.getElementById('trainingExamples').textContent = trainingExamples.toLocaleString();
+            document.getElementById('validationSize').textContent = validationSize.toLocaleString();
+            document.getElementById('trainingTime').textContent = trainingHours + 'h';
+            document.getElementById('ftCost').textContent = '$' + ftCost.toFixed(2);
+            document.getElementById('totalSize').textContent = totalSize.toLocaleString();
+
+            const baseAccuracy = 70;
+            const targetAccFinal = targetAccuracy;
+            const acc50 = baseAccuracy + ((targetAccFinal - baseAccuracy) * 0.6);
+            const acc100 = targetAccFinal;
+
+            document.getElementById('acc50').style.width = acc50 + '%';
+            document.getElementById('acc50pct').textContent = acc50.toFixed(0) + '%';
+            document.getElementById('acc100').style.width = acc100 + '%';
+            document.getElementById('acc100pct').textContent = acc100.toFixed(0) + '%';
+
+            let rec1 = 'Start with ' + Math.ceil(trainingExamples * 0.3) + ' examples, expand iteratively.';
+            let rec2 = 'Use learning rate 1e-4 to 1e-5. Run 3-5 epochs.';
+            let rec3 = 'Hold out 20% for validation. Monitor overfitting at epoch 2.';
+
+            if (trainingExamples > 5000) {
+                rec1 = 'Use stratified sampling. Consider active learning to prioritize harder examples.';
+            }
+            if (targetAccuracy > 90) {
+                rec2 = 'Use lower learning rate (1e-5). Consider curriculum learning strategy.';
+            }
+
+            document.getElementById('recommendation1').textContent = rec1;
+            document.getElementById('recommendation2').textContent = rec2;
+            document.getElementById('recommendation3').textContent = rec3;
+
+            document.getElementById('results').classList.add('active');
+        }
+
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', calculateEstimate);
+        });
+
+        calculateEstimate();
+    </script>
+</body>
+</html>

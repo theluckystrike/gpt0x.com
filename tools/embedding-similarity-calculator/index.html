@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedding Similarity Calculator</title>
+    <meta name="description" content="Calculate cosine similarity between text embeddings. Get similarity scores, dot products, vector dimensions, and visual similarity meters.">
+    <meta name="theme-color" content="#06b6d4">
+    <link rel="canonical" href="https://gpt0x.com/tools/embedding-similarity-calculator">
+    <meta property="og:title" content="Embedding Similarity Calculator">
+    <meta property="og:description" content="Compute cosine similarity between two text embeddings instantly.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gpt0x.com/tools/embedding-similarity-calculator">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Embedding Similarity Calculator">
+    <meta name="twitter:description" content="Calculate cosine similarity between embeddings.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Embedding Similarity Calculator",
+        "description": "Calculate cosine similarity between text embeddings with vector analysis",
+        "url": "https://gpt0x.com/tools/embedding-similarity-calculator",
+        "applicationCategory": "UtilityApplication",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a2f4a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #06b6d4;
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(6, 182, 212, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-left: 4px solid #06b6d4;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+        }
+
+        .result-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #06b6d4;
+            font-family: 'Monaco', monospace;
+        }
+
+        .similarity-meter {
+            width: 100%;
+            height: 12px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .similarity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444 0%, #f97316 40%, #eab308 70%, #22c55e 100%);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        .similarity-label {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .breakdown {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            color: #94a3b8;
+        }
+
+        .breakdown-value {
+            color: #06b6d4;
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 16px;
+            }
+        }
+    </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Embedding Similarity Calculator</h1>
+            <p class="subtitle">Compute cosine similarity between text embeddings</p>
+        </header>
+
+        <div class="card">
+            <div class="input-group">
+                <label for="text1">Text 1</label>
+                <textarea id="text1" placeholder="Enter first text (or paste embedding vector)..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="text2">Text 2</label>
+                <textarea id="text2" placeholder="Enter second text (or paste embedding vector)..."></textarea>
+            </div>
+
+            <button onclick="calculateSimilarity()">Calculate Similarity</button>
+        </div>
+
+        <div class="card results" id="results">
+            <h2 style="margin-bottom: 20px; color: #cbd5e1;">Results</h2>
+
+            <div class="result-item">
+                <div class="result-label">Cosine Similarity Score</div>
+                <div class="result-value" id="similarityScore">0.000</div>
+                <div class="similarity-meter">
+                    <div class="similarity-fill" id="similarityFill" style="width: 0%"></div>
+                </div>
+                <div class="similarity-label" id="similarityInterpretation">No vectors provided</div>
+            </div>
+
+            <div class="grid">
+                <div class="result-item">
+                    <div class="result-label">Vector Dimension</div>
+                    <div class="result-value" id="dimension">0</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Dot Product</div>
+                    <div class="result-value" id="dotProduct">0.000</div>
+                </div>
+            </div>
+
+            <div class="breakdown">
+                <h3 style="margin-bottom: 12px; color: #cbd5e1; font-size: 1rem;">Vector Breakdown</h3>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Text 1 Magnitude</span>
+                    <span class="breakdown-value" id="mag1">0.000</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Text 2 Magnitude</span>
+                    <span class="breakdown-value" id="mag2">0.000</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Similarity Interpretation</span>
+                    <span class="breakdown-value" id="interpretation">-</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Use Case</span>
+                    <span class="breakdown-value" id="useCase">-</span>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 gpt0x.com — AI Engineering Tools
+        </footer>
+<div style="margin:20px auto;max-width:728px;text-align:center">
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+    </div>
+
+    <script>
+        function tokenizeText(text) {
+            return text.toLowerCase()
+                .replace(/[^\w\s]/g, ' ')
+                .split(/\s+/)
+                .filter(word => word.length > 0);
+        }
+
+        function createBagOfWords(text) {
+            const tokens = tokenizeText(text);
+            const vector = {};
+            tokens.forEach(token => {
+                vector[token] = (vector[token] || 0) + 1;
+            });
+            return vector;
+        }
+
+        function vectorsToArrays(vec1, vec2) {
+            const allWords = new Set([...Object.keys(vec1), ...Object.keys(vec2)]);
+            const arr1 = Array.from(allWords).map(word => vec1[word] || 0);
+            const arr2 = Array.from(allWords).map(word => vec2[word] || 0);
+            return [arr1, arr2, Array.from(allWords).length];
+        }
+
+        function dotProduct(arr1, arr2) {
+            return arr1.reduce((sum, val, idx) => sum + val * arr2[idx], 0);
+        }
+
+        function magnitude(arr) {
+            return Math.sqrt(arr.reduce((sum, val) => sum + val * val, 0));
+        }
+
+        function cosineSimilarity(arr1, arr2) {
+            const dot = dotProduct(arr1, arr2);
+            const mag1 = magnitude(arr1);
+            const mag2 = magnitude(arr2);
+
+            if (mag1 === 0 || mag2 === 0) return 0;
+            return dot / (mag1 * mag2);
+        }
+
+        function calculateSimilarity() {
+            const text1 = document.getElementById('text1').value.trim();
+            const text2 = document.getElementById('text2').value.trim();
+
+            if (!text1 || !text2) {
+                alert('Please enter text in both fields');
+                return;
+            }
+
+            const vec1 = createBagOfWords(text1);
+            const vec2 = createBagOfWords(text2);
+            const [arr1, arr2, dim] = vectorsToArrays(vec1, vec2);
+
+            const dot = dotProduct(arr1, arr2);
+            const mag1 = magnitude(arr1);
+            const mag2 = magnitude(arr2);
+            const similarity = cosineSimilarity(arr1, arr2);
+
+            document.getElementById('similarityScore').textContent = similarity.toFixed(3);
+            document.getElementById('similarityFill').style.width = (similarity * 100) + '%';
+            document.getElementById('dimension').textContent = dim;
+            document.getElementById('dotProduct').textContent = dot.toFixed(3);
+            document.getElementById('mag1').textContent = mag1.toFixed(3);
+            document.getElementById('mag2').textContent = mag2.toFixed(3);
+
+            let interpretation = '';
+            let useCase = '';
+            if (similarity > 0.8) {
+                interpretation = 'Very Similar (Duplicate/Near-match)';
+                useCase = 'Deduplication, Same-meaning detection';
+            } else if (similarity > 0.6) {
+                interpretation = 'Quite Similar (Related content)';
+                useCase = 'Recommendation, Clustering';
+            } else if (similarity > 0.4) {
+                interpretation = 'Moderately Similar (Some overlap)';
+                useCase = 'Topic matching, Relevance ranking';
+            } else if (similarity > 0.2) {
+                interpretation = 'Weakly Similar (Different topics)';
+                useCase = 'Contrast detection, Diversity sampling';
+            } else {
+                interpretation = 'Dissimilar (Unrelated)';
+                useCase = 'Negative sampling, Outlier detection';
+            }
+
+            document.getElementById('interpretation').textContent = interpretation;
+            document.getElementById('useCase').textContent = useCase;
+            document.getElementById('similarityInterpretation').textContent = interpretation;
+
+            document.getElementById('results').classList.add('active');
+        }
+
+        document.getElementById('text1').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) calculateSimilarity();
+        });
+
+        document.getElementById('text2').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) calculateSimilarity();
+        });
+    </script>
+</body>
+</html>

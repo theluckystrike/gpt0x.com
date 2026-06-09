@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Rate-Limit Planner</title>
+    <meta name="description" content="Plan production API rate limits with throughput calculations, queue depth analysis, retry strategies, and cost projections.">
+    <meta name="theme-color" content="#06b6d4">
+    <link rel="canonical" href="https://gpt0x.com/tools/rate-limit-planner">
+    <meta property="og:title" content="API Rate-Limit Planner">
+    <meta property="og:description" content="Calculate optimal rate limits, queue depth, and retry strategies for production APIs.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gpt0x.com/tools/rate-limit-planner">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="API Rate-Limit Planner">
+    <meta name="twitter:description" content="Design production-ready rate limiting and resilience strategies.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "API Rate-Limit Planner",
+        "description": "Plan API rate limits, queue depth, and retry strategies for production deployments",
+        "url": "https://gpt0x.com/tools/rate-limit-planner",
+        "applicationCategory": "UtilityApplication",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a2f4a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #06b6d4;
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.1);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(6, 182, 212, 0.3);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-left: 4px solid #06b6d4;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+        }
+
+        .result-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #06b6d4;
+            font-family: 'Monaco', monospace;
+        }
+
+        .result-unit {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #06b6d4;
+            font-family: monospace;
+        }
+
+        .strategy-card {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .strategy-title {
+            color: #06b6d4;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .strategy-content {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .strategy-item {
+            margin-bottom: 8px;
+        }
+
+        .cost-breakdown {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .cost-item:last-child {
+            border-bottom: none;
+        }
+
+        .cost-label {
+            color: #94a3b8;
+        }
+
+        .cost-value {
+            color: #06b6d4;
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>API Rate-Limit Planner</h1>
+            <p class="subtitle">Calculate throughput, queue depth, and resilience strategies</p>
+        </header>
+
+        <div class="card">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="requestsPerMinute">Target Requests/Minute</label>
+                    <input type="number" id="requestsPerMinute" value="60" min="1" step="10">
+                </div>
+
+                <div class="input-group">
+                    <label for="provider">Provider</label>
+                    <select id="provider">
+                        <option value="openai">OpenAI</option>
+                        <option value="anthropic">Anthropic</option>
+                        <option value="google">Google Vertex AI</option>
+                        <option value="cohere">Cohere</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="tier">Tier / Plan Level</label>
+                    <select id="tier">
+                        <option value="free">Free / Starter</option>
+                        <option value="pro">Pro / Standard</option>
+                        <option value="enterprise">Enterprise</option>
+                        <option value="custom">Custom Rate Limit</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="avgLatency">Average API Latency (ms)</label>
+                    <input type="number" id="avgLatency" value="800" min="50" step="100">
+                </div>
+            </div>
+
+            <button onclick="calculateRateLimits()">Calculate Rate Limit Plan</button>
+        </div>
+
+        <div class="card results" id="results">
+            <h2 style="margin-bottom: 20px; color: #cbd5e1;">Rate Limit Analysis</h2>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Requests per Second</div>
+                    <div class="metric-value" id="rpsValue">0</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Max Concurrent Requests</div>
+                    <div class="metric-value" id="concurrentValue">0</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Queue Depth (95th Percentile)</div>
+                    <div class="metric-value" id="queueValue">0</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Queue Wait Time (avg)</div>
+                    <div class="metric-value" id="waitTimeValue">0ms</div>
+                </div>
+            </div>
+
+            <div class="result-item" style="margin-top: 20px;">
+                <div class="result-label">Effective Throughput</div>
+                <div class="result-value" id="throughput">0</div>
+                <div class="result-unit">requests/minute (sustainable)</div>
+            </div>
+
+            <h2 style="margin-top: 30px; margin-bottom: 16px; color: #cbd5e1; font-size: 1.3rem;">Recommended Retry Strategy</h2>
+
+            <div class="strategy-card">
+                <div class="strategy-title">Exponential Backoff with Jitter</div>
+                <div class="strategy-content">
+                    <div class="strategy-item"><strong>Base delay:</strong> <span id="baseDelay">500</span>ms</div>
+                    <div class="strategy-item"><strong>Max retries:</strong> <span id="maxRetries">5</span></div>
+                    <div class="strategy-item"><strong>Max backoff:</strong> <span id="maxBackoff">32</span> seconds</div>
+                    <div class="strategy-item"><strong>Jitter:</strong> ±20% random</div>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 30px; margin-bottom: 16px; color: #cbd5e1; font-size: 1.3rem;">Cost at Sustained Rate</h2>
+
+            <div class="cost-breakdown">
+                <div class="cost-item">
+                    <span class="cost-label">Daily Requests</span>
+                    <span class="cost-value" id="dailyRequests">0</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-label">Monthly Requests</span>
+                    <span class="cost-value" id="monthlyRequests">0</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-label">Estimated Monthly Cost</span>
+                    <span class="cost-value" id="monthlyCost">$0</span>
+                </div>
+            </div>
+
+            <div class="strategy-card" style="margin-top: 20px;">
+                <div class="strategy-title">Implementation Notes</div>
+                <div class="strategy-content">
+                    <div class="strategy-item" id="note1"></div>
+                    <div class="strategy-item" id="note2"></div>
+                    <div class="strategy-item" id="note3"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 gpt0x.com — AI Engineering Tools
+        </footer>
+<div style="margin:20px auto;max-width:728px;text-align:center">
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+    </div>
+
+    <script>
+        const providerLimits = {
+            openai: {
+                free: { rpm: 3, tpm: 90000, costPer1kTokens: 0.0015 },
+                pro: { rpm: 3500, tpm: 90000, costPer1kTokens: 0.0015 },
+                enterprise: { rpm: null, tpm: null, costPer1kTokens: 0.0015 }
+            },
+            anthropic: {
+                free: { rpm: 50, tpm: 40000, costPer1kTokens: 0.008 },
+                pro: { rpm: 600, tpm: 40000, costPer1kTokens: 0.008 },
+                enterprise: { rpm: null, tpm: null, costPer1kTokens: 0.008 }
+            },
+            google: {
+                free: { rpm: 60, tpm: 1000, costPer1kTokens: 0.001 },
+                pro: { rpm: 100, tpm: 1000, costPer1kTokens: 0.001 },
+                enterprise: { rpm: null, tpm: null, costPer1kTokens: 0.001 }
+            },
+            cohere: {
+                free: { rpm: 100, tpm: 10000, costPer1kTokens: 0.001 },
+                pro: { rpm: 1000, tpm: 10000, costPer1kTokens: 0.001 },
+                enterprise: { rpm: null, tpm: null, costPer1kTokens: 0.001 }
+            },
+            custom: {
+                free: { rpm: 100, tpm: 10000, costPer1kTokens: 0.001 },
+                pro: { rpm: 1000, tpm: 10000, costPer1kTokens: 0.001 },
+                enterprise: { rpm: null, tpm: null, costPer1kTokens: 0.001 }
+            }
+        };
+
+        function calculateRateLimits() {
+            const targetRpm = parseInt(document.getElementById('requestsPerMinute').value);
+            const provider = document.getElementById('provider').value;
+            const tier = document.getElementById('tier').value;
+            const avgLatency = parseInt(document.getElementById('avgLatency').value);
+
+            const limits = providerLimits[provider][tier];
+            const maxRpm = limits.rpm || targetRpm;
+            const rpm = Math.min(targetRpm, maxRpm || targetRpm);
+            const rps = rpm / 60;
+            const concurrent = Math.ceil((rps * avgLatency) / 1000);
+
+            const queueDepth = Math.max(0, concurrent - 5);
+            const queueWaitTime = queueDepth > 0 ? Math.round((queueDepth / rps) * 1000) : 0;
+
+            document.getElementById('rpsValue').textContent = rps.toFixed(2);
+            document.getElementById('concurrentValue').textContent = concurrent;
+            document.getElementById('queueValue').textContent = queueDepth;
+            document.getElementById('waitTimeValue').textContent = queueWaitTime + 'ms';
+            document.getElementById('throughput').textContent = rpm.toLocaleString();
+
+            const baseDelay = Math.round(avgLatency * 0.5);
+            const maxRetries = rpm > 1000 ? 3 : 5;
+            const maxBackoff = rpm > 1000 ? 16 : 32;
+
+            document.getElementById('baseDelay').textContent = baseDelay;
+            document.getElementById('maxRetries').textContent = maxRetries;
+            document.getElementById('maxBackoff').textContent = maxBackoff;
+
+            const dailyRequests = rpm * 60 * 24;
+            const monthlyRequests = dailyRequests * 30;
+            const monthlyCost = (monthlyRequests / 1000) * limits.costPer1kTokens * 0.7;
+
+            document.getElementById('dailyRequests').textContent = dailyRequests.toLocaleString();
+            document.getElementById('monthlyRequests').textContent = monthlyRequests.toLocaleString();
+            document.getElementById('monthlyCost').textContent = '$' + monthlyCost.toFixed(2);
+
+            let note1 = 'Use connection pooling to reuse TCP connections.';
+            let note2 = `Monitor queue depth; trigger alerts if queue exceeds ${queueDepth * 2} items.`;
+            let note3 = 'Implement circuit breaker pattern for cascading failures.';
+
+            if (concurrent > 100) {
+                note1 = 'High concurrency detected. Use connection pooling and load balancing.';
+            }
+            if (queueWaitTime > 5000) {
+                note2 = 'Queue wait times exceed 5s. Consider reducing target rate or increasing concurrency.';
+            }
+
+            document.getElementById('note1').textContent = '→ ' + note1;
+            document.getElementById('note2').textContent = '→ ' + note2;
+            document.getElementById('note3').textContent = '→ ' + note3;
+
+            document.getElementById('results').classList.add('active');
+        }
+
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', calculateRateLimits);
+        });
+
+        calculateRateLimits();
+    </script>
+</body>
+</html>

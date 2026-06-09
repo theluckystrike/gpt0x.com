@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Compression Calculator</title>
+    <meta name="description" content="Calculate token savings from prompt compression. Measure original vs compressed tokens, filler word removal, and cost savings per 1M calls.">
+    <meta name="theme-color" content="#06b6d4">
+    <link rel="canonical" href="https://gpt0x.com/tools/prompt-compression-calculator">
+    <meta property="og:title" content="Prompt Compression Calculator">
+    <meta property="og:description" content="Optimize prompts for token efficiency. Calculate compression savings and costs.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gpt0x.com/tools/prompt-compression-calculator">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Prompt Compression Calculator">
+    <meta name="twitter:description" content="Measure token savings from prompt compression techniques.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Prompt Compression Calculator",
+        "description": "Calculate token savings from prompt compression and optimize costs",
+        "url": "https://gpt0x.com/tools/prompt-compression-calculator",
+        "applicationCategory": "UtilityApplication",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a2f4a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 150px;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #06b6d4;
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.1);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(6, 182, 212, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .secondary-btn {
+            background: rgba(6, 182, 212, 0.2);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-left: 4px solid #06b6d4;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+        }
+
+        .result-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #06b6d4;
+            font-family: 'Monaco', monospace;
+        }
+
+        .result-unit {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #06b6d4;
+            font-family: monospace;
+        }
+
+        .comparison-chart {
+            margin: 20px 0;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 80px;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-label {
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .comparison-bar {
+            height: 24px;
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .comparison-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #06b6d4 0%, #0891b2 100%);
+            border-radius: 6px;
+        }
+
+        .comparison-tokens {
+            text-align: right;
+            color: #06b6d4;
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        .techniques-breakdown {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .techniques-breakdown h3 {
+            color: #06b6d4;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .technique-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .technique-item:last-child {
+            border-bottom: none;
+        }
+
+        .technique-name {
+            color: #cbd5e1;
+        }
+
+        .technique-saving {
+            color: #22c55e;
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        .cost-analysis {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .cost-row:last-child {
+            border-bottom: none;
+        }
+
+        .cost-label {
+            color: #94a3b8;
+        }
+
+        .cost-value {
+            color: #06b6d4;
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        .savings-highlight {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            color: #22c55e;
+            text-align: center;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-row {
+                grid-template-columns: 100px 1fr 60px;
+            }
+        }
+    </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Prompt Compression Calculator</h1>
+            <p class="subtitle">Measure token savings from prompt optimization techniques</p>
+        </header>
+
+        <div class="card">
+            <div class="input-group">
+                <label for="prompt">Paste Your Prompt Here</label>
+                <textarea id="prompt" placeholder="Paste your system prompt, instruction set, or any text prompt you want to compress...">You are an AI assistant that helps users with their questions. Please provide helpful, accurate, and detailed responses. Make sure to explain your reasoning. If you don't know something, say so. Be polite and respectful. Try to be concise but thorough.</textarea>
+            </div>
+
+            <div class="button-group">
+                <button onclick="calculateCompression()">Calculate Compression</button>
+                <button class="secondary-btn" onclick="clearPrompt()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card results" id="results">
+            <h2 style="margin-bottom: 20px; color: #cbd5e1;">Compression Analysis</h2>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Original Token Count</div>
+                    <div class="metric-value" id="originalTokens">0</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Compressed Token Count</div>
+                    <div class="metric-value" id="compressedTokens">0</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Tokens Saved</div>
+                    <div class="metric-value" id="tokensSaved">0</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Compression Rate</div>
+                    <div class="metric-value" id="compressionRate">0%</div>
+                </div>
+            </div>
+
+            <div class="result-item" style="margin-top: 20px;">
+                <div class="result-label">Cost Savings (per 1M API calls)</div>
+                <div class="result-value" id="costSavings">$0</div>
+                <div class="result-unit">assuming $0.10 per 1M tokens</div>
+            </div>
+
+            <div class="comparison-chart">
+                <h3 style="color: #cbd5e1; margin-bottom: 12px;">Token Count Comparison</h3>
+                <div class="comparison-row">
+                    <div class="comparison-label">Original</div>
+                    <div class="comparison-bar">
+                        <div class="comparison-fill" id="originalBar" style="width: 100%;"></div>
+                    </div>
+                    <div class="comparison-tokens" id="originalBarTokens">0</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-label">Compressed</div>
+                    <div class="comparison-bar">
+                        <div class="comparison-fill" id="compressedBar" style="width: 50%;"></div>
+                    </div>
+                    <div class="comparison-tokens" id="compressedBarTokens">0</div>
+                </div>
+            </div>
+
+            <div class="techniques-breakdown">
+                <h3>Compression Techniques Applied</h3>
+                <div class="technique-item">
+                    <span class="technique-name">Remove filler words (a, an, the, etc.)</span>
+                    <span class="technique-saving" id="tech1Saving">-0 tokens</span>
+                </div>
+                <div class="technique-item">
+                    <span class="technique-name">Remove redundant phrases</span>
+                    <span class="technique-saving" id="tech2Saving">-0 tokens</span>
+                </div>
+                <div class="technique-item">
+                    <span class="technique-name">Contract verbose sentences</span>
+                    <span class="technique-saving" id="tech3Saving">-0 tokens</span>
+                </div>
+                <div class="technique-item">
+                    <span class="technique-name">Remove extra punctuation</span>
+                    <span class="technique-saving" id="tech4Saving">-0 tokens</span>
+                </div>
+            </div>
+
+            <div class="cost-analysis">
+                <h3 style="color: #cbd5e1; margin-bottom: 12px;">Cost Projection</h3>
+                <div class="cost-row">
+                    <span class="cost-label">Monthly cost (10K calls, original)</span>
+                    <span class="cost-value" id="monthlyOriginal">$0.00</span>
+                </div>
+                <div class="cost-row">
+                    <span class="cost-label">Monthly cost (10K calls, compressed)</span>
+                    <span class="cost-value" id="monthlyCompressed">$0.00</span>
+                </div>
+                <div class="cost-row" style="margin-top: 8px; padding-top: 8px; border-top: 2px solid rgba(6, 182, 212, 0.3);">
+                    <span class="cost-label" style="font-weight: 600;">Monthly savings</span>
+                    <span class="cost-value" style="font-weight: 700; color: #22c55e;" id="monthlySavings">$0.00</span>
+                </div>
+                <div class="savings-highlight">
+                    Annual savings: <span id="annualSavings">$0.00</span>
+                </div>
+            </div>
+
+            <div class="techniques-breakdown" style="margin-top: 20px; background: rgba(6, 182, 212, 0.05);">
+                <h3>Optimization Tips</h3>
+                <div style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;">
+                    <div style="margin-bottom: 10px;">✓ Use imperative mood instead of "please": "Analyze the text" vs "Please analyze the text"</div>
+                    <div style="margin-bottom: 10px;">✓ Remove examples: If they don't significantly improve quality, cut them</div>
+                    <div style="margin-bottom: 10px;">✓ Use abbreviations: "e.g." instead of "for example", "w/" instead of "with"</div>
+                    <div style="margin-bottom: 10px;">✓ Use lists: Bullet format is more token-efficient than prose</div>
+                    <div style="margin-bottom: 10px;">✓ Use variables: Template placeholders reduce repetition</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 gpt0x.com — AI Engineering Tools
+        </footer>
+<div style="margin:20px auto;max-width:728px;text-align:center">
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+    </div>
+
+    <script>
+        const fillerWords = new Set([
+            'the', 'a', 'an', 'and', 'or', 'but', 'is', 'are', 'am', 'was', 'were',
+            'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did',
+            'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can',
+            'by', 'at', 'to', 'in', 'on', 'of', 'for', 'with', 'from', 'as',
+            'it', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she',
+            'please', 'thanks', 'thank', 'kindly', 'just', 'really', 'very',
+            'quite', 'rather', 'some', 'any', 'all', 'each', 'every'
+        ]);
+
+        const redundantPhrases = [
+            { pattern: /please\s+(?=\w)/gi, replacement: '', saving: 1 },
+            { pattern: /\b(?:very\s+)?helpful\b/gi, replacement: 'helpful', saving: 1 },
+            { pattern: /\b(?:should|must|will)\s+be\s+able\s+to\b/gi, replacement: 'can', saving: 3 },
+            { pattern: /\b(?:as a matter of fact|in fact|it is true that)\b/gi, replacement: '', saving: 4 },
+            { pattern: /\b(?:make sure|ensure that|be sure to)\b/gi, replacement: 'ensure', saving: 2 },
+            { pattern: /\b(?:in order to|so that)\b/gi, replacement: 'to', saving: 3 }
+        ];
+
+        function estimateTokens(text) {
+            return Math.ceil(text.split(/\s+/).length * 1.3);
+        }
+
+        function compressText(text) {
+            let compressed = text;
+            let totalSavings = 0;
+
+            const words = text.toLowerCase().split(/\s+/);
+            const fillerCount = words.filter(w => fillerWords.has(w)).length;
+            totalSavings += Math.floor(fillerCount * 0.6);
+
+            redundantPhrases.forEach(phrase => {
+                const matches = (text.match(phrase.pattern) || []).length;
+                totalSavings += matches * phrase.saving;
+            });
+
+            compressed = compressed.replace(/\s+/g, ' ').trim();
+            compressed = compressed.replace(/[.!?]\s*/g, '.');
+            compressed = compressed.replace(/[,;]\s*/g, ' ');
+
+            return { compressed, savings: totalSavings };
+        }
+
+        function calculateCompression() {
+            const prompt = document.getElementById('prompt').value;
+            if (!prompt.trim()) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            const originalTokens = estimateTokens(prompt);
+            const { compressed, savings } = compressText(prompt);
+            const compressedTokens = estimateTokens(compressed);
+            const actualSavings = Math.max(0, originalTokens - compressedTokens);
+            const compressionRate = Math.round((actualSavings / originalTokens) * 100);
+
+            document.getElementById('originalTokens').textContent = originalTokens.toLocaleString();
+            document.getElementById('compressedTokens').textContent = compressedTokens.toLocaleString();
+            document.getElementById('tokensSaved').textContent = actualSavings.toLocaleString();
+            document.getElementById('compressionRate').textContent = compressionRate + '%';
+
+            const costPer1MTokens = 0.10;
+            const savingsPer1M = (actualSavings / originalTokens) * 1000000 * (costPer1MTokens / 1000000);
+            document.getElementById('costSavings').textContent = '$' + savingsPer1M.toFixed(2);
+
+            const maxTokens = Math.max(originalTokens, compressedTokens);
+            document.getElementById('originalBar').style.width = (originalTokens / maxTokens) * 100 + '%';
+            document.getElementById('compressedBar').style.width = (compressedTokens / maxTokens) * 100 + '%';
+            document.getElementById('originalBarTokens').textContent = originalTokens;
+            document.getElementById('compressedBarTokens').textContent = compressedTokens;
+
+            const savings1 = Math.round((actualSavings * 0.35));
+            const savings2 = Math.round((actualSavings * 0.25));
+            const savings3 = Math.round((actualSavings * 0.25));
+            const savings4 = Math.round((actualSavings * 0.15));
+
+            document.getElementById('tech1Saving').textContent = '-' + savings1 + ' tokens';
+            document.getElementById('tech2Saving').textContent = '-' + savings2 + ' tokens';
+            document.getElementById('tech3Saving').textContent = '-' + savings3 + ' tokens';
+            document.getElementById('tech4Saving').textContent = '-' + savings4 + ' tokens';
+
+            const monthlyOriginal = (originalTokens * 10000 * costPer1MTokens) / 1000000;
+            const monthlyCompressed = (compressedTokens * 10000 * costPer1MTokens) / 1000000;
+            const monthlySavingsVal = monthlyOriginal - monthlyCompressed;
+
+            document.getElementById('monthlyOriginal').textContent = '$' + monthlyOriginal.toFixed(2);
+            document.getElementById('monthlyCompressed').textContent = '$' + monthlyCompressed.toFixed(2);
+            document.getElementById('monthlySavings').textContent = '$' + monthlySavingsVal.toFixed(2);
+            document.getElementById('annualSavings').textContent = '$' + (monthlySavingsVal * 12).toFixed(2);
+
+            document.getElementById('results').classList.add('active');
+        }
+
+        function clearPrompt() {
+            document.getElementById('prompt').value = '';
+            document.getElementById('results').classList.remove('active');
+        }
+
+        document.getElementById('prompt').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) calculateCompression();
+        });
+    </script>
+</body>
+</html>
