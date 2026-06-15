@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Model Context Window Comparison — Free Tool | GPT0x</title>
+<meta name="description" content="Compare context windows of all major AI models. OpenAI, Claude, Gemini, LLaMA, and more. See token counts and estimated words.">
+<meta name="robots" content="index, follow">
+<meta name="language" content="English">
+<link rel="canonical" href="https://gpt0x.com/tools/ai-model-context-window-comparison/">
+<meta property="og:title" content="AI Model Context Window Comparison — GPT0x">
+<meta property="og:description" content="Interactive comparison of context windows across all major AI models. See pricing and token counts.">
+<meta property="og:url" content="https://gpt0x.com/tools/ai-model-context-window-comparison/">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a0a0a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AI Model Context Window Comparison",
+  "url": "https://gpt0x.com/tools/ai-model-context-window-comparison/",
+  "applicationCategory": "Utility",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0"
+  }
+}
+</script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #0a0a0a;
+  color: #e8e8e8;
+  line-height: 1.6;
+  padding: 20px;
+}
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px 0;
+  border-bottom: 1px solid #2d2d2d;
+}
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  color: #3b82f6;
+}
+.subtitle {
+  color: #a0a0a0;
+  font-size: 1rem;
+}
+.controls {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.control-group {
+  flex: 1;
+  min-width: 200px;
+}
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #e8e8e8;
+  font-size: 0.9rem;
+}
+select,
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  background: #0f0f0f;
+  color: #e8e8e8;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+select:focus,
+input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.button-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: #3b82f6;
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+.btn-secondary {
+  background: #2d2d2d;
+  color: #e8e8e8;
+}
+.btn-secondary:hover {
+  background: #3d3d3d;
+}
+.table-wrapper {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead {
+  background: #0f0f0f;
+  border-bottom: 2px solid #3b82f6;
+}
+th {
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 700;
+  color: #3b82f6;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #2d2d2d;
+  font-size: 0.95rem;
+}
+tbody tr:hover {
+  background: rgba(59, 130, 246, 0.05);
+}
+tbody tr:last-child td {
+  border-bottom: none;
+}
+.model-name {
+  font-weight: 600;
+  color: #3b82f6;
+}
+.provider {
+  color: #a0a0a0;
+  font-size: 0.85rem;
+}
+.tokens {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.9rem;
+  color: #10b981;
+}
+.words-est {
+  color: #808080;
+  font-size: 0.9rem;
+}
+.price-in {
+  color: #a0a0a0;
+}
+.price-out {
+  color: #f59e0b;
+}
+.tier-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-right: 4px;
+}
+.tier-base {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+.tier-pro {
+  background: #7c3aed;
+  color: #fff;
+}
+.tier-enterprise {
+  background: #dc2626;
+  color: #fff;
+}
+.filter-note {
+  color: #a0a0a0;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+.converter-section {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 24px;
+  margin: 30px 0;
+}
+.converter-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e8e8e8;
+  margin-bottom: 16px;
+}
+.converter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.converter-item {
+  display: flex;
+  flex-direction: column;
+}
+.converter-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  background: #0f0f0f;
+  color: #e8e8e8;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+.converter-output {
+  padding: 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  color: #3b82f6;
+  font-weight: 600;
+}
+.partner-box {
+  margin: 30px auto;
+  max-width: 728px;
+  text-align: center;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border: 1px solid #334155;
+  border-radius: 10px;
+}
+.partner-box p {
+  margin: 0;
+}
+.partner-box p:first-child {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+.partner-box a {
+  color: #38bdf8;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-decoration: none;
+  display: inline-block;
+}
+.partner-box a:hover {
+  text-decoration: underline;
+}
+.partner-box p:last-child {
+  margin-top: 6px;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+.ad-unit {
+  margin: 20px auto;
+  max-width: 728px;
+  text-align: center;
+}
+footer {
+  border-top: 1px solid #2d2d2d;
+  padding: 20px 0;
+  text-align: center;
+  color: #808080;
+  font-size: 0.9rem;
+}
+footer a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .control-group {
+    min-width: unset;
+  }
+  table {
+    font-size: 0.85rem;
+  }
+  th, td {
+    padding: 10px 8px;
+  }
+  .converter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>AI Model Context Window Comparison</h1>
+    <p class="subtitle">Compare context sizes, pricing, and capabilities across all major models</p>
+  </header>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Filter by Provider</label>
+      <select id="providerFilter" onchange="updateTable()">
+        <option value="">All Providers</option>
+        <option value="OpenAI">OpenAI</option>
+        <option value="Anthropic">Anthropic</option>
+        <option value="Google">Google</option>
+        <option value="Meta">Meta</option>
+        <option value="Mistral">Mistral</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Sort By</label>
+      <select id="sortBy" onchange="updateTable()">
+        <option value="context-desc">Context Size (Largest First)</option>
+        <option value="context-asc">Context Size (Smallest First)</option>
+        <option value="release-desc">Release Date (Newest First)</option>
+        <option value="price-asc">Price (Cheapest First)</option>
+      </select>
+    </div>
+    <div class="button-group">
+      <button class="btn-primary" onclick="updateTable()">Apply Filters</button>
+      <button class="btn-secondary" onclick="resetFilters()">Reset</button>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table id="modelsTable">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Provider</th>
+          <th>Context Tokens</th>
+          <th>Est. Words</th>
+          <th>Input $/1M</th>
+          <th>Output $/1M</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+      </tbody>
+    </table>
+  </div>
+
+  <div class="converter-section">
+    <div class="converter-title">Tokens to Words Converter</div>
+    <div class="converter-grid">
+      <div class="converter-item">
+        <label style="color: #a0a0a0; font-size: 0.85rem; margin-bottom: 8px;">Enter Token Count</label>
+        <input type="number" id="tokenInput" placeholder="e.g., 100000" oninput="convertTokensToWords()">
+      </div>
+      <div class="converter-item">
+        <label style="color: #a0a0a0; font-size: 0.85rem; margin-bottom: 8px;">Estimated Word Count</label>
+        <div class="converter-output" id="wordOutput">—</div>
+      </div>
+    </div>
+    <div class="filter-note">Note: 1 token ≈ 0.75 words (approximate). Actual conversion varies by model and content type.</div>
+  </div>
+
+  <div class="partner-box">
+    <p>Recommended by our team</p>
+    <a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener">BeLikeNative.com</a>
+    <p>The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
+  </div>
+
+  <div class="ad-unit">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 GPT0x. <a href="https://gpt0x.com/tools/">More AI Tools</a></p>
+  </footer>
+</div>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+
+<script>
+const modelData = [
+  { name: 'Claude 3.5 Sonnet', provider: 'Anthropic', tokens: 200000, inputPrice: 3, outputPrice: 15, tier: 'pro', release: '2024-06' },
+  { name: 'Claude 3 Opus', provider: 'Anthropic', tokens: 200000, inputPrice: 15, outputPrice: 75, tier: 'enterprise', release: '2024-03' },
+  { name: 'Claude 3 Sonnet', provider: 'Anthropic', tokens: 200000, inputPrice: 3, outputPrice: 15, tier: 'pro', release: '2024-03' },
+  { name: 'Claude 3 Haiku', provider: 'Anthropic', tokens: 200000, inputPrice: 0.25, outputPrice: 1.25, tier: 'base', release: '2024-03' },
+  { name: 'GPT-4 Turbo', provider: 'OpenAI', tokens: 128000, inputPrice: 10, outputPrice: 30, tier: 'enterprise', release: '2023-11' },
+  { name: 'GPT-4', provider: 'OpenAI', tokens: 8192, inputPrice: 30, outputPrice: 60, tier: 'enterprise', release: '2023-03' },
+  { name: 'GPT-3.5 Turbo', provider: 'OpenAI', tokens: 16384, inputPrice: 0.5, outputPrice: 1.5, tier: 'base', release: '2023-06' },
+  { name: 'Gemini 1.5 Pro', provider: 'Google', tokens: 1000000, inputPrice: 1.25, outputPrice: 5, tier: 'pro', release: '2024-05' },
+  { name: 'Gemini 1.5 Flash', provider: 'Google', tokens: 1000000, inputPrice: 0.075, outputPrice: 0.3, tier: 'base', release: '2024-05' },
+  { name: 'Gemini 1 Pro', provider: 'Google', tokens: 32000, inputPrice: 0.5, outputPrice: 1.5, tier: 'base', release: '2023-12' },
+  { name: 'Llama 3.1 405B', provider: 'Meta', tokens: 128000, inputPrice: 2.7, outputPrice: 8.1, tier: 'pro', release: '2024-07' },
+  { name: 'Llama 3.1 70B', provider: 'Meta', tokens: 128000, inputPrice: 0.54, outputPrice: 0.81, tier: 'base', release: '2024-07' },
+  { name: 'Llama 3 70B', provider: 'Meta', tokens: 8192, inputPrice: 0.7, outputPrice: 0.9, tier: 'base', release: '2024-04' },
+  { name: 'Mistral Large', provider: 'Mistral', tokens: 128000, inputPrice: 8, outputPrice: 24, tier: 'enterprise', release: '2024-02' },
+  { name: 'Mistral Medium', provider: 'Mistral', tokens: 128000, inputPrice: 2.7, outputPrice: 8.1, tier: 'pro', release: '2023-12' },
+  { name: 'Mistral Small', provider: 'Mistral', tokens: 32000, inputPrice: 0.27, outputPrice: 0.81, tier: 'base', release: '2024-02' },
+];
+
+function formatTokens(tokens) {
+  if (tokens >= 1000000) {
+    return (tokens / 1000000).toFixed(1) + 'M';
+  } else if (tokens >= 1000) {
+    return (tokens / 1000).toFixed(0) + 'K';
+  }
+  return tokens.toString();
+}
+
+function estimateWords(tokens) {
+  return Math.round(tokens * 0.75);
+}
+
+function updateTable() {
+  const providerFilter = document.getElementById('providerFilter').value;
+  const sortBy = document.getElementById('sortBy').value;
+
+  let filtered = modelData.filter(m => !providerFilter || m.provider === providerFilter);
+
+  if (sortBy === 'context-desc') {
+    filtered.sort((a, b) => b.tokens - a.tokens);
+  } else if (sortBy === 'context-asc') {
+    filtered.sort((a, b) => a.tokens - b.tokens);
+  } else if (sortBy === 'release-desc') {
+    filtered.sort((a, b) => new Date(b.release) - new Date(a.release));
+  } else if (sortBy === 'price-asc') {
+    filtered.sort((a, b) => a.inputPrice - b.inputPrice);
+  }
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  filtered.forEach(model => {
+    const tierClass = model.tier === 'enterprise' ? 'tier-enterprise' : model.tier === 'pro' ? 'tier-pro' : 'tier-base';
+    const words = estimateWords(model.tokens);
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>
+        <div class="model-name">${model.name}</div>
+        <div class="provider">${model.provider}</div>
+      </td>
+      <td><span class="tier-badge ${tierClass}">${model.tier.toUpperCase()}</span></td>
+      <td><div class="tokens">${formatTokens(model.tokens)}</div></td>
+      <td><div class="words-est">~${words.toLocaleString()} words</div></td>
+      <td><div class="price-in">$${model.inputPrice.toFixed(2)}</div></td>
+      <td><div class="price-out">$${model.outputPrice.toFixed(2)}</div></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function resetFilters() {
+  document.getElementById('providerFilter').value = '';
+  document.getElementById('sortBy').value = 'context-desc';
+  updateTable();
+}
+
+function convertTokensToWords() {
+  const tokens = parseInt(document.getElementById('tokenInput').value) || 0;
+  const words = estimateWords(tokens);
+  document.getElementById('wordOutput').textContent = words.toLocaleString() + ' words';
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function() {
+  updateTable();
+});
+</script>
+
+</body>
+</html>

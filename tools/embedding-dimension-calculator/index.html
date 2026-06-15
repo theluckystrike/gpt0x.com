@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Embedding Dimension Calculator — Free Tool | GPT0x</title>
+<meta name="description" content="Calculate optimal embedding dimensions for your AI models. Fast, free embedding size calculator based on vocabulary, dataset, and use case.">
+<meta name="robots" content="index, follow">
+<meta name="language" content="English">
+<link rel="canonical" href="https://gpt0x.com/tools/embedding-dimension-calculator/">
+<meta property="og:title" content="Embedding Dimension Calculator — GPT0x">
+<meta property="og:description" content="Calculate optimal embedding dimensions for AI models in seconds. Free online tool.">
+<meta property="og:url" content="https://gpt0x.com/tools/embedding-dimension-calculator/">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a0a0a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Embedding Dimension Calculator",
+  "url": "https://gpt0x.com/tools/embedding-dimension-calculator/",
+  "applicationCategory": "Utility",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0"
+  }
+}
+</script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #0a0a0a;
+  color: #e8e8e8;
+  line-height: 1.6;
+  padding: 20px;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px 0;
+  border-bottom: 1px solid #2d2d2d;
+}
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  color: #3b82f6;
+}
+.subtitle {
+  color: #a0a0a0;
+  font-size: 1rem;
+}
+.input-section {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+.input-group {
+  margin-bottom: 24px;
+}
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #e8e8e8;
+  font-size: 0.95rem;
+}
+.label-hint {
+  color: #808080;
+  font-size: 0.85rem;
+  margin-left: 2px;
+}
+input[type="number"],
+select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  background: #0f0f0f;
+  color: #e8e8e8;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+input[type="number"]:focus,
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+button {
+  flex: 1;
+  padding: 14px 24px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-calculate {
+  background: #3b82f6;
+  color: #fff;
+}
+.btn-calculate:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+.btn-reset {
+  background: #2d2d2d;
+  color: #e8e8e8;
+}
+.btn-reset:hover {
+  background: #3d3d3d;
+}
+.results {
+  display: none;
+  background: #1a1a1a;
+  border: 1px solid #2d7d2d;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+.results.show {
+  display: block;
+}
+.result-item {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #2d2d2d;
+}
+.result-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.result-label {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+.result-value {
+  font-size: 1.8rem;
+  color: #3b82f6;
+  font-weight: 700;
+}
+.result-info {
+  color: #808080;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+.recommendation {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 4px solid #3b82f6;
+  padding: 16px;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+.recommendation-title {
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+.recommendation-text {
+  color: #c0c0c0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.partner-box {
+  margin: 30px auto;
+  max-width: 728px;
+  text-align: center;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border: 1px solid #334155;
+  border-radius: 10px;
+}
+.partner-box p {
+  margin: 0;
+}
+.partner-box p:first-child {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+.partner-box a {
+  color: #38bdf8;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-decoration: none;
+  display: inline-block;
+}
+.partner-box a:hover {
+  text-decoration: underline;
+}
+.partner-box p:last-child {
+  margin-top: 6px;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+.ad-unit {
+  margin: 20px auto;
+  max-width: 728px;
+  text-align: center;
+}
+footer {
+  border-top: 1px solid #2d2d2d;
+  padding: 20px 0;
+  text-align: center;
+  color: #808080;
+  font-size: 0.9rem;
+}
+footer a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+  display: none;
+}
+.error.show {
+  display: block;
+}
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+  .input-row {
+    grid-template-columns: 1fr;
+  }
+  .button-group {
+    flex-direction: column;
+  }
+  .result-value {
+    font-size: 1.4rem;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Embedding Dimension Calculator</h1>
+    <p class="subtitle">Find optimal embedding dimensions for your AI models</p>
+  </header>
+
+  <div class="input-section">
+    <div class="input-group">
+      <label>Vocabulary Size <span class="label-hint">(number of unique tokens)</span></label>
+      <input type="number" id="vocabSize" value="50000" min="1" max="10000000">
+    </div>
+
+    <div class="input-row">
+      <div class="input-group">
+        <label>Dataset Size <span class="label-hint">(training samples)</span></label>
+        <input type="number" id="datasetSize" value="100000" min="1" max="100000000">
+      </div>
+      <div class="input-group">
+        <label>Use Case</label>
+        <select id="useCase">
+          <option value="search">Semantic Search</option>
+          <option value="classification">Text Classification</option>
+          <option value="clustering">Document Clustering</option>
+          <option value="recommendation">Recommendation System</option>
+          <option value="general">General Purpose</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>Model Size</label>
+      <select id="modelSize">
+        <option value="small">Small (BERT-base)</option>
+        <option value="medium" selected>Medium (BERT-large)</option>
+        <option value="large">Large (GPT-2, GPT-3)</option>
+        <option value="xlarge">Extra Large (GPT-3.5, Claude)</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label>Target Accuracy</label>
+      <select id="accuracy">
+        <option value="baseline">Baseline (~75%)</option>
+        <option value="good" selected>Good (~85%)</option>
+        <option value="excellent">Excellent (~95%)</option>
+      </select>
+    </div>
+
+    <div class="button-group">
+      <button class="btn-calculate" onclick="calculateEmbedding()">Calculate Dimensions</button>
+      <button class="btn-reset" onclick="resetForm()">Reset</button>
+    </div>
+    <div class="error" id="error"></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="result-item">
+      <div class="result-label">Recommended Embedding Dimension</div>
+      <div class="result-value" id="dimension">—</div>
+      <div class="result-info" id="dimensionInfo"></div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label">Memory per Embedding (float32)</div>
+      <div class="result-value" id="memoryPerEmbed">—</div>
+      <div class="result-info">Single vector in 32-bit float format</div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label">Total Storage (Full Corpus)</div>
+      <div class="result-value" id="totalStorage">—</div>
+      <div class="result-info" id="storageInfo"></div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label">Inference Speed Impact</div>
+      <div class="result-value" id="speedImpact">—</div>
+      <div class="result-info">Relative latency vs. 300-dim baseline</div>
+    </div>
+
+    <div class="recommendation">
+      <div class="recommendation-title">Recommendation</div>
+      <div class="recommendation-text" id="recommendationText"></div>
+    </div>
+  </div>
+
+  <div class="partner-box">
+    <p>Recommended by our team</p>
+    <a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener">BeLikeNative.com</a>
+    <p>The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
+  </div>
+
+  <div class="ad-unit">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 GPT0x. <a href="https://gpt0x.com/tools/">More AI Tools</a></p>
+  </footer>
+</div>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+
+<script>
+function calculateEmbedding() {
+  const errorEl = document.getElementById('error');
+  errorEl.classList.remove('show');
+
+  const vocabSize = parseInt(document.getElementById('vocabSize').value);
+  const datasetSize = parseInt(document.getElementById('datasetSize').value);
+  const useCase = document.getElementById('useCase').value;
+  const modelSize = document.getElementById('modelSize').value;
+  const accuracy = document.getElementById('accuracy').value;
+
+  if (!vocabSize || !datasetSize) {
+    errorEl.textContent = 'Please enter valid values for all fields.';
+    errorEl.classList.add('show');
+    return;
+  }
+
+  if (vocabSize < 100 || datasetSize < 100) {
+    errorEl.textContent = 'Vocabulary and dataset size must be at least 100.';
+    errorEl.classList.add('show');
+    return;
+  }
+
+  let baseDimension = 0;
+  let multiplier = 1;
+
+  // Base dimension calculation
+  baseDimension = Math.log2(vocabSize) * 50;
+
+  // Use case multipliers
+  const useCaseMultipliers = {
+    search: 1.2,
+    classification: 0.8,
+    clustering: 1.0,
+    recommendation: 1.1,
+    general: 1.0
+  };
+  multiplier *= useCaseMultipliers[useCase] || 1.0;
+
+  // Model size multipliers
+  const modelMultipliers = {
+    small: 0.7,
+    medium: 1.0,
+    large: 1.3,
+    xlarge: 1.5
+  };
+  multiplier *= modelMultipliers[modelSize] || 1.0;
+
+  // Accuracy multipliers
+  const accuracyMultipliers = {
+    baseline: 0.8,
+    good: 1.0,
+    excellent: 1.3
+  };
+  multiplier *= accuracyMultipliers[accuracy] || 1.0;
+
+  // Dataset size adjustment
+  if (datasetSize < 10000) {
+    multiplier *= 0.8;
+  } else if (datasetSize > 1000000) {
+    multiplier *= 1.15;
+  }
+
+  let dimension = Math.round(baseDimension * multiplier);
+
+  // Snap to common values
+  const commonDims = [64, 128, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096];
+  const closest = commonDims.reduce((prev, curr) =>
+    Math.abs(curr - dimension) < Math.abs(prev - dimension) ? curr : prev
+  );
+
+  // Memory calculations
+  const memPerEmbed = (closest * 4) / 1024; // KB for float32
+  const totalMemory = (closest * datasetSize * 4) / (1024 * 1024 * 1024); // GB
+
+  // Inference speed (relative to 300-dim)
+  const speedRatio = (closest / 300).toFixed(2);
+  const speedLabel = speedRatio < 0.8 ? 'Faster' : speedRatio > 1.3 ? 'Slower' : 'Comparable';
+
+  // Populate results
+  document.getElementById('dimension').textContent = closest;
+  document.getElementById('dimensionInfo').textContent = `Based on ${vocabSize.toLocaleString()} vocabulary size and ${useCase} use case`;
+
+  document.getElementById('memoryPerEmbed').textContent = memPerEmbed.toFixed(2) + ' KB';
+  document.getElementById('totalStorage').textContent = totalMemory.toFixed(2) + ' GB';
+  document.getElementById('storageInfo').textContent = `For ${datasetSize.toLocaleString()} embeddings`;
+
+  document.getElementById('speedImpact').textContent = speedLabel + ` (${(speedRatio * 100).toFixed(0)}%)`;
+
+  // Recommendation logic
+  let recommendationText = `${closest}-dimensional embeddings are optimal for your configuration. `;
+
+  if (useCase === 'search') {
+    recommendationText += 'Semantic search benefits from higher dimensions. Monitor recall-latency tradeoff.';
+  } else if (useCase === 'classification') {
+    recommendationText += 'This dimension balances expressiveness and computational cost for classification tasks.';
+  } else if (useCase === 'clustering') {
+    recommendationText += 'Good for clustering. Higher dimensions may benefit from dimensionality reduction post-embedding.';
+  }
+
+  if (totalMemory > 50) {
+    recommendationText += ` Consider quantization (int8) to reduce ${(totalMemory / 4).toFixed(1)} GB storage footprint.`;
+  }
+
+  document.getElementById('recommendationText').textContent = recommendationText;
+  document.getElementById('results').classList.add('show');
+}
+
+function resetForm() {
+  document.getElementById('vocabSize').value = '50000';
+  document.getElementById('datasetSize').value = '100000';
+  document.getElementById('useCase').value = 'search';
+  document.getElementById('modelSize').value = 'medium';
+  document.getElementById('accuracy').value = 'good';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('error').classList.remove('show');
+}
+
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') calculateEmbedding();
+});
+</script>
+
+</body>
+</html>

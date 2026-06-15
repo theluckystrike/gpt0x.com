@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fine-tuning Dataset Estimator — Free Tool | GPT0x</title>
+<meta name="description" content="Estimate dataset size needed for fine-tuning. Calculate training samples required for your AI model based on task complexity.">
+<meta name="robots" content="index, follow">
+<meta name="language" content="English">
+<link rel="canonical" href="https://gpt0x.com/tools/fine-tuning-dataset-estimator/">
+<meta property="og:title" content="Fine-tuning Dataset Estimator — GPT0x">
+<meta property="og:description" content="Calculate how much training data you need for fine-tuning. Free dataset size estimator for AI models.">
+<meta property="og:url" content="https://gpt0x.com/tools/fine-tuning-dataset-estimator/">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a0a0a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Fine-tuning Dataset Estimator",
+  "url": "https://gpt0x.com/tools/fine-tuning-dataset-estimator/",
+  "applicationCategory": "Utility",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0"
+  }
+}
+</script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #0a0a0a;
+  color: #e8e8e8;
+  line-height: 1.6;
+  padding: 20px;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px 0;
+  border-bottom: 1px solid #2d2d2d;
+}
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  color: #3b82f6;
+}
+.subtitle {
+  color: #a0a0a0;
+  font-size: 1rem;
+}
+.input-section {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+.input-group {
+  margin-bottom: 24px;
+}
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #e8e8e8;
+  font-size: 0.95rem;
+}
+.label-hint {
+  color: #808080;
+  font-size: 0.85rem;
+  margin-left: 2px;
+}
+input[type="number"],
+select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  background: #0f0f0f;
+  color: #e8e8e8;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+input[type="number"]:focus,
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+button {
+  flex: 1;
+  padding: 14px 24px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-calculate {
+  background: #3b82f6;
+  color: #fff;
+}
+.btn-calculate:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+.btn-reset {
+  background: #2d2d2d;
+  color: #e8e8e8;
+}
+.btn-reset:hover {
+  background: #3d3d3d;
+}
+.results {
+  display: none;
+  background: #1a1a1a;
+  border: 1px solid #2d7d2d;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+.results.show {
+  display: block;
+}
+.result-item {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #2d2d2d;
+}
+.result-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.result-label {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+.result-value {
+  font-size: 1.8rem;
+  color: #3b82f6;
+  font-weight: 700;
+}
+.result-info {
+  color: #808080;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+.breakdown {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 4px solid #3b82f6;
+  padding: 16px;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+.breakdown-title {
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 12px;
+}
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #c0c0c0;
+  font-size: 0.95rem;
+}
+.breakdown-item:last-child {
+  margin-bottom: 0;
+}
+.progress-bar {
+  background: #2d2d2d;
+  border-radius: 4px;
+  height: 6px;
+  margin-top: 20px;
+  overflow: hidden;
+}
+.progress-fill {
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+.estimate-note {
+  background: #1a1a1a;
+  border: 1px solid #3d3d3d;
+  padding: 16px;
+  border-radius: 6px;
+  margin-top: 20px;
+}
+.estimate-note-title {
+  font-weight: 600;
+  color: #e8e8e8;
+  margin-bottom: 8px;
+}
+.estimate-note-text {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.partner-box {
+  margin: 30px auto;
+  max-width: 728px;
+  text-align: center;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border: 1px solid #334155;
+  border-radius: 10px;
+}
+.partner-box p {
+  margin: 0;
+}
+.partner-box p:first-child {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+.partner-box a {
+  color: #38bdf8;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-decoration: none;
+  display: inline-block;
+}
+.partner-box a:hover {
+  text-decoration: underline;
+}
+.partner-box p:last-child {
+  margin-top: 6px;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+.ad-unit {
+  margin: 20px auto;
+  max-width: 728px;
+  text-align: center;
+}
+footer {
+  border-top: 1px solid #2d2d2d;
+  padding: 20px 0;
+  text-align: center;
+  color: #808080;
+  font-size: 0.9rem;
+}
+footer a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+  display: none;
+}
+.error.show {
+  display: block;
+}
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+  .input-row {
+    grid-template-columns: 1fr;
+  }
+  .button-group {
+    flex-direction: column;
+  }
+  .result-value {
+    font-size: 1.4rem;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Fine-tuning Dataset Estimator</h1>
+    <p class="subtitle">Calculate optimal training dataset size for your AI models</p>
+  </header>
+
+  <div class="input-section">
+    <div class="input-group">
+      <label>Task Type</label>
+      <select id="taskType">
+        <option value="classification">Text Classification</option>
+        <option value="summarization">Summarization</option>
+        <option value="generation">Content Generation</option>
+        <option value="qa">Question Answering</option>
+        <option value="translation">Translation</option>
+        <option value="nER">Named Entity Recognition</option>
+      </select>
+    </div>
+
+    <div class="input-row">
+      <div class="input-group">
+        <label>Target Accuracy</label>
+        <select id="targetAccuracy">
+          <option value="70">70% (Baseline)</option>
+          <option value="80">80% (Good)</option>
+          <option value="90" selected>90% (High)</option>
+          <option value="95">95% (Very High)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Model Size</label>
+        <select id="modelSize">
+          <option value="small">Small (1B-3B params)</option>
+          <option value="medium" selected>Medium (7B-13B params)</option>
+          <option value="large">Large (30B-70B params)</option>
+          <option value="xlarge">Extra Large (100B+ params)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-group">
+        <label>Output Classes/Complexity <span class="label-hint">(for classification)</span></label>
+        <input type="number" id="complexity" value="5" min="1" max="1000">
+      </div>
+      <div class="input-group">
+        <label>Data Quality</label>
+        <select id="dataQuality">
+          <option value="poor">Poor (Noisy)</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High (Clean)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="btn-calculate" onclick="estimateDataset()">Estimate Dataset</button>
+      <button class="btn-reset" onclick="resetForm()">Reset</button>
+    </div>
+    <div class="error" id="error"></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="result-item">
+      <div class="result-label">Recommended Training Samples</div>
+      <div class="result-value" id="trainingSamples">—</div>
+      <div class="result-info" id="trainingInfo"></div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label">Validation Set Size</div>
+      <div class="result-value" id="validationSize">—</div>
+      <div class="result-info">Typically 10-20% of training set</div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label">Test Set Size</div>
+      <div class="result-value" id="testSize">—</div>
+      <div class="result-info">Typically 10-20% of training set</div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label">Expected Training Time</div>
+      <div class="result-value" id="trainingTime">—</div>
+      <div class="result-info">On single GPU (estimates vary by hardware)</div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-title">Dataset Breakdown</div>
+      <div class="breakdown-item">
+        <span>Training Set:</span>
+        <span id="trainPercent">—</span>
+      </div>
+      <div class="breakdown-item">
+        <span>Validation Set:</span>
+        <span id="valPercent">—</span>
+      </div>
+      <div class="breakdown-item">
+        <span>Test Set:</span>
+        <span id="testPercent">—</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 70%"></div>
+      </div>
+    </div>
+
+    <div class="estimate-note">
+      <div class="estimate-note-title">Estimation Note</div>
+      <div class="estimate-note-text" id="noteText"></div>
+    </div>
+  </div>
+
+  <div class="partner-box">
+    <p>Recommended by our team</p>
+    <a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener">BeLikeNative.com</a>
+    <p>The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
+  </div>
+
+  <div class="ad-unit">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 GPT0x. <a href="https://gpt0x.com/tools/">More AI Tools</a></p>
+  </footer>
+</div>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+
+<script>
+const datasetMultipliers = {
+  classification: 50,
+  summarization: 200,
+  generation: 300,
+  qa: 100,
+  translation: 150,
+  nER: 80
+};
+
+const accuracyAdjustment = {
+  70: 0.5,
+  80: 0.8,
+  90: 1.0,
+  95: 1.5
+};
+
+const modelAdjustment = {
+  small: 0.7,
+  medium: 1.0,
+  large: 1.2,
+  xlarge: 1.5
+};
+
+const qualityAdjustment = {
+  poor: 1.5,
+  medium: 1.0,
+  high: 0.7
+};
+
+function estimateDataset() {
+  const errorEl = document.getElementById('error');
+  errorEl.classList.remove('show');
+
+  const taskType = document.getElementById('taskType').value;
+  const targetAccuracy = parseInt(document.getElementById('targetAccuracy').value);
+  const modelSize = document.getElementById('modelSize').value;
+  const complexity = parseInt(document.getElementById('complexity').value);
+  const dataQuality = document.getElementById('dataQuality').value;
+
+  if (!complexity || complexity < 1) {
+    errorEl.textContent = 'Please enter valid values for all fields.';
+    errorEl.classList.add('show');
+    return;
+  }
+
+  // Base calculation
+  let baseSize = datasetMultipliers[taskType];
+  let multiplier = accuracyAdjustment[targetAccuracy] * modelAdjustment[modelSize] * qualityAdjustment[dataQuality];
+  let complexityFactor = Math.log2(complexity) * 10;
+
+  let trainingSize = Math.round(baseSize * multiplier * (1 + complexityFactor / 100));
+
+  // Adjust for minimum sizes
+  if (trainingSize < 50) trainingSize = 50;
+  if (trainingSize > 500000) trainingSize = 500000;
+
+  const validationSize = Math.round(trainingSize * 0.15);
+  const testSize = Math.round(trainingSize * 0.15);
+  const totalSize = trainingSize + validationSize + testSize;
+
+  // Training time estimation (very rough, GPU-dependent)
+  let hoursPerThousand = 1;
+  if (taskType === 'summarization' || taskType === 'generation') hoursPerThousand = 2;
+  if (taskType === 'translation') hoursPerThousand = 1.5;
+  const estimatedHours = Math.round((trainingSize / 1000) * hoursPerThousand);
+  const trainingTimeLabel = estimatedHours < 1 ? '<1 hour' : estimatedHours + ' hours';
+
+  // Update results
+  document.getElementById('trainingSamples').textContent = trainingSize.toLocaleString();
+  document.getElementById('trainingInfo').textContent = `For ${taskType} with ${targetAccuracy}% target accuracy`;
+
+  document.getElementById('validationSize').textContent = validationSize.toLocaleString();
+  document.getElementById('testSize').textContent = testSize.toLocaleString();
+  document.getElementById('trainingTime').textContent = trainingTimeLabel;
+
+  document.getElementById('trainPercent').textContent = `${Math.round((trainingSize / totalSize) * 100)}% (${trainingSize.toLocaleString()} samples)`;
+  document.getElementById('valPercent').textContent = `${Math.round((validationSize / totalSize) * 100)}% (${validationSize.toLocaleString()} samples)`;
+  document.getElementById('testPercent').textContent = `${Math.round((testSize / totalSize) * 100)}% (${testSize.toLocaleString()} samples)`;
+
+  // Note
+  let noteText = `Start with ${trainingSize.toLocaleString()} training samples. `;
+  if (trainingSize < 100) {
+    noteText += 'This is a small dataset - consider data augmentation. ';
+  }
+  if (trainingSize > 100000) {
+    noteText += 'This is a large dataset - ensure sufficient GPU memory. ';
+  }
+  noteText += 'Actual requirements may vary; monitor validation accuracy during training and add more data if needed.';
+
+  document.getElementById('noteText').textContent = noteText;
+  document.getElementById('results').classList.add('show');
+}
+
+function resetForm() {
+  document.getElementById('taskType').value = 'classification';
+  document.getElementById('targetAccuracy').value = '90';
+  document.getElementById('modelSize').value = 'medium';
+  document.getElementById('complexity').value = '5';
+  document.getElementById('dataQuality').value = 'medium';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('error').classList.remove('show');
+}
+
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') estimateDataset();
+});
+</script>
+
+</body>
+</html>

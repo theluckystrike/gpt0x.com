@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vector Database Sizing Calculator — Free Tool | GPT0x</title>
+<meta name="description" content="Calculate storage and memory requirements for vector databases. Estimate sizing for Pinecone, Weaviate, Milvus, and Qdrant.">
+<meta name="robots" content="index, follow">
+<meta name="language" content="English">
+<link rel="canonical" href="https://gpt0x.com/tools/vector-database-sizing/">
+<meta property="og:title" content="Vector Database Sizing Calculator — GPT0x">
+<meta property="og:description" content="Calculate vector database storage needs for embeddings. Free sizing tool for RAG systems.">
+<meta property="og:url" content="https://gpt0x.com/tools/vector-database-sizing/">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a0a0a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Vector Database Sizing Calculator",
+  "url": "https://gpt0x.com/tools/vector-database-sizing/",
+  "applicationCategory": "Utility",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0"
+  }
+}
+</script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #0a0a0a;
+  color: #e8e8e8;
+  line-height: 1.6;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px 0;
+  border-bottom: 1px solid #2d2d2d;
+}
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  color: #3b82f6;
+}
+.subtitle {
+  color: #a0a0a0;
+  font-size: 1rem;
+}
+.input-section {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+.input-group {
+  margin-bottom: 24px;
+}
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #e8e8e8;
+  font-size: 0.95rem;
+}
+.label-hint {
+  color: #808080;
+  font-size: 0.85rem;
+  margin-left: 2px;
+}
+input[type="number"],
+select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  background: #0f0f0f;
+  color: #e8e8e8;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+input[type="number"]:focus,
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+button {
+  flex: 1;
+  padding: 14px 24px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-calculate {
+  background: #3b82f6;
+  color: #fff;
+}
+.btn-calculate:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+.btn-reset {
+  background: #2d2d2d;
+  color: #e8e8e8;
+}
+.btn-reset:hover {
+  background: #3d3d3d;
+}
+.results {
+  display: none;
+}
+.results.show {
+  display: block;
+}
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.metric-card {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+.metric-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+.metric-label {
+  color: #a0a0a0;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.metric-value {
+  font-size: 1.8rem;
+  color: #3b82f6;
+  font-weight: 700;
+}
+.metric-unit {
+  color: #808080;
+  font-size: 0.85rem;
+}
+.cost-breakdown {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 30px;
+}
+.cost-breakdown-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e8e8e8;
+  margin-bottom: 20px;
+}
+.cost-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #2d2d2d;
+}
+.cost-item:last-child {
+  border-bottom: none;
+}
+.cost-label {
+  color: #c0c0c0;
+}
+.cost-value {
+  color: #3b82f6;
+  font-weight: 600;
+}
+.provider-recommendation {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 4px solid #3b82f6;
+  padding: 16px;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+.recommendation-title {
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+.recommendation-text {
+  color: #c0c0c0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.provider-options {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 24px;
+  margin-top: 20px;
+}
+.provider-options-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e8e8e8;
+  margin-bottom: 16px;
+}
+.provider-item {
+  padding: 12px;
+  margin-bottom: 12px;
+  background: #0f0f0f;
+  border: 1px solid #2d2d2d;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+.provider-item:last-child {
+  margin-bottom: 0;
+}
+.provider-item-name {
+  font-weight: 600;
+  color: #e8e8e8;
+}
+.provider-item-detail {
+  color: #a0a0a0;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+.partner-box {
+  margin: 30px auto;
+  max-width: 728px;
+  text-align: center;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border: 1px solid #334155;
+  border-radius: 10px;
+}
+.partner-box p {
+  margin: 0;
+}
+.partner-box p:first-child {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+.partner-box a {
+  color: #38bdf8;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-decoration: none;
+  display: inline-block;
+}
+.partner-box a:hover {
+  text-decoration: underline;
+}
+.partner-box p:last-child {
+  margin-top: 6px;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+.ad-unit {
+  margin: 20px auto;
+  max-width: 728px;
+  text-align: center;
+}
+footer {
+  border-top: 1px solid #2d2d2d;
+  padding: 20px 0;
+  text-align: center;
+  color: #808080;
+  font-size: 0.9rem;
+}
+footer a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+  display: none;
+}
+.error.show {
+  display: block;
+}
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+  .input-row {
+    grid-template-columns: 1fr;
+  }
+  .button-group {
+    flex-direction: column;
+  }
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Vector Database Sizing Calculator</h1>
+    <p class="subtitle">Calculate storage and infrastructure needs for vector embeddings</p>
+  </header>
+
+  <div class="input-section">
+    <div class="input-row">
+      <div class="input-group">
+        <label>Number of Vectors <span class="label-hint">(embeddings to store)</span></label>
+        <input type="number" id="vectorCount" value="1000000" min="1" max="1000000000">
+      </div>
+      <div class="input-group">
+        <label>Embedding Dimension</label>
+        <select id="dimension">
+          <option value="384">384 (small)</option>
+          <option value="768" selected>768 (medium)</option>
+          <option value="1024">1024 (large)</option>
+          <option value="1536">1536 (OpenAI ada)</option>
+          <option value="3072">3072 (OpenAI 3-large)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-group">
+        <label>Index Type</label>
+        <select id="indexType">
+          <option value="flat">Flat (Exhaustive Search)</option>
+          <option value="ivf" selected>IVF (Inverted Index)</option>
+          <option value="hnsw">HNSW (Graph-based)</option>
+          <option value="lsh">LSH (Hash-based)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Metadata per Vector (bytes)</label>
+        <input type="number" id="metadataSize" value="256" min="0" max="10000">
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>Vector Quantization</label>
+      <select id="quantization">
+        <option value="none">None (float32)</option>
+        <option value="fp16">FP16 (50% reduction)</option>
+        <option value="int8" selected>INT8 (75% reduction)</option>
+        <option value="binary">Binary (99% reduction)</option>
+      </select>
+    </div>
+
+    <div class="button-group">
+      <button class="btn-calculate" onclick="calculateSizing()">Calculate Sizing</button>
+      <button class="btn-reset" onclick="resetForm()">Reset</button>
+    </div>
+    <div class="error" id="error"></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="results-grid">
+      <div class="metric-card">
+        <div class="metric-label">Raw Vector Storage</div>
+        <div class="metric-value" id="vectorStorage">—</div>
+        <div class="metric-unit">GB</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Metadata Storage</div>
+        <div class="metric-value" id="metadataStorage">—</div>
+        <div class="metric-unit">GB</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Index Overhead</div>
+        <div class="metric-value" id="indexOverhead">—</div>
+        <div class="metric-unit">GB</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total Storage</div>
+        <div class="metric-value" id="totalStorage">—</div>
+        <div class="metric-unit">GB</div>
+      </div>
+    </div>
+
+    <div class="cost-breakdown">
+      <div class="cost-breakdown-title">Provider Cost Comparison (Monthly)</div>
+      <div class="cost-item">
+        <span class="cost-label">Pinecone (p1 pod)</span>
+        <span class="cost-value" id="pineconePrice">—</span>
+      </div>
+      <div class="cost-item">
+        <span class="cost-label">Weaviate Cloud (on-demand)</span>
+        <span class="cost-value" id="weaviatePrice">—</span>
+      </div>
+      <div class="cost-item">
+        <span class="cost-label">Milvus Cloud</span>
+        <span class="cost-value" id="milvusPrice">—</span>
+      </div>
+      <div class="cost-item">
+        <span class="cost-label">Self-hosted (1-year TCO/12)</span>
+        <span class="cost-value" id="selfHostedPrice">—</span>
+      </div>
+    </div>
+
+    <div class="provider-recommendation">
+      <div class="recommendation-title">Recommended Approach</div>
+      <div class="recommendation-text" id="recommendationText"></div>
+    </div>
+
+    <div class="provider-options">
+      <div class="provider-options-title">Provider Options</div>
+      <div class="provider-item">
+        <div class="provider-item-name">Pinecone</div>
+        <div class="provider-item-detail">Managed, high uptime SLA, pay-per-pod</div>
+      </div>
+      <div class="provider-item">
+        <div class="provider-item-name">Weaviate Cloud</div>
+        <div class="provider-item-detail">Open-source compatible, flexible pricing, multi-tenancy</div>
+      </div>
+      <div class="provider-item">
+        <div class="provider-item-name">Milvus Cloud</div>
+        <div class="provider-item-detail">Open-source, cost-effective, full control</div>
+      </div>
+      <div class="provider-item">
+        <div class="provider-item-name">Qdrant Cloud</div>
+        <div class="provider-item-detail">High performance HNSW, good for real-time search</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="partner-box">
+    <p>Recommended by our team</p>
+    <a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener">BeLikeNative.com</a>
+    <p>The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
+  </div>
+
+  <div class="ad-unit">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 GPT0x. <a href="https://gpt0x.com/tools/">More AI Tools</a></p>
+  </footer>
+</div>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+
+<script>
+function calculateSizing() {
+  const errorEl = document.getElementById('error');
+  errorEl.classList.remove('show');
+
+  const vectorCount = parseInt(document.getElementById('vectorCount').value);
+  const dimension = parseInt(document.getElementById('dimension').value);
+  const indexType = document.getElementById('indexType').value;
+  const metadataSize = parseInt(document.getElementById('metadataSize').value);
+  const quantization = document.getElementById('quantization').value;
+
+  if (!vectorCount || !dimension) {
+    errorEl.textContent = 'Please enter valid values for all fields.';
+    errorEl.classList.add('show');
+    return;
+  }
+
+  // Calculate vector storage (float32 = 4 bytes per dimension)
+  let bytesPerVector = dimension * 4;
+
+  // Apply quantization
+  const quantReduction = {
+    'none': 1.0,
+    'fp16': 0.5,
+    'int8': 0.25,
+    'binary': 0.0125
+  };
+  bytesPerVector *= quantReduction[quantization];
+
+  const vectorStorageGB = (vectorCount * bytesPerVector) / (1024 * 1024 * 1024);
+
+  // Metadata storage
+  const metadataStorageGB = (vectorCount * metadataSize) / (1024 * 1024 * 1024);
+
+  // Index overhead (varies by index type)
+  const indexMultipliers = {
+    'flat': 0.1,      // 10% overhead
+    'ivf': 0.2,       // 20% overhead
+    'hnsw': 0.3,      // 30% overhead for graph pointers
+    'lsh': 0.15       // 15% overhead
+  };
+  const indexOverheadGB = vectorStorageGB * indexMultipliers[indexType];
+
+  const totalStorageGB = vectorStorageGB + metadataStorageGB + indexOverheadGB;
+
+  // Provider pricing estimates
+  const pineconePrice = (totalStorageGB / 10) * 70 + 100; // ~$70 per 10GB pod + base
+  const weaviatePrice = totalStorageGB * 0.5 + 50; // ~$0.50 per GB
+  const milvusPrice = totalStorageGB * 0.3 + 30; // ~$0.30 per GB
+  const selfHostedPrice = ((totalStorageGB * 100 + 500) * 12) / 12; // Rough hardware cost
+
+  // Display results
+  document.getElementById('vectorStorage').textContent = vectorStorageGB.toFixed(2);
+  document.getElementById('metadataStorage').textContent = metadataStorageGB.toFixed(2);
+  document.getElementById('indexOverhead').textContent = indexOverheadGB.toFixed(2);
+  document.getElementById('totalStorage').textContent = totalStorageGB.toFixed(2);
+
+  document.getElementById('pineconePrice').textContent = '$' + Math.ceil(pineconePrice);
+  document.getElementById('weaviatePrice').textContent = '$' + Math.ceil(weaviatePrice);
+  document.getElementById('milvusPrice').textContent = '$' + Math.ceil(milvusPrice);
+  document.getElementById('selfHostedPrice').textContent = '$' + Math.ceil(selfHostedPrice);
+
+  // Recommendation logic
+  let recommendationText = '';
+  if (totalStorageGB < 10) {
+    recommendationText = 'Your dataset is small. Consider Pinecone starter or Weaviate Cloud for simplicity. Self-hosting not recommended.';
+  } else if (totalStorageGB < 100) {
+    recommendationText = 'Managed services are cost-effective. Pinecone or Weaviate Cloud offer good balance of cost and features.';
+  } else if (totalStorageGB < 500) {
+    recommendationText = 'Consider Milvus Cloud for cost efficiency. Self-hosting becomes viable with proper DevOps support.';
+  } else {
+    recommendationText = 'Self-hosting is likely most cost-effective at this scale. Ensure adequate infrastructure and monitoring.';
+  }
+
+  if (dimension > 2000) {
+    recommendationText += ' Consider quantization (INT8) to reduce storage requirements.';
+  }
+
+  document.getElementById('recommendationText').textContent = recommendationText;
+  document.getElementById('results').classList.add('show');
+}
+
+function resetForm() {
+  document.getElementById('vectorCount').value = '1000000';
+  document.getElementById('dimension').value = '768';
+  document.getElementById('indexType').value = 'ivf';
+  document.getElementById('metadataSize').value = '256';
+  document.getElementById('quantization').value = 'int8';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('error').classList.remove('show');
+}
+
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') calculateSizing();
+});
+</script>
+
+</body>
+</html>

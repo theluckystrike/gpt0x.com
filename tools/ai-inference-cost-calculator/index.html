@@ -1,490 +1,490 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>AI Inference Cost Calculator — Compare Cloud GPU Pricing</title>
-  <meta name="description" content="Compare API vs self-hosted GPU inference costs. Calculate per-request, daily, monthly cost & break-even for GPT-4, GPT-3.5, Claude, open-source models.">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://gpt0x.com/tools/ai-inference-cost-calculator">
-  <!-- JSON-LD FAQ -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "How is inference cost calculated?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "For API models, cost = (input tokens * input price + output tokens * output price) * requests. For self-hosted, cost = GPU hourly rate / max throughput (requests per hour)."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What is break-even?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Break-even shows the number of requests per day where self-hosted total cost equals API cost. Above that, self-hosted may be cheaper."
-        }
-      }
-    ]
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Inference Cost Calculator — Free Tool | GPT0x</title>
+<meta name="description" content="Compare AI inference costs across OpenAI, Anthropic, Google, and self-hosted options. Calculate pricing per request instantly.">
+<meta name="robots" content="index, follow">
+<meta name="language" content="English">
+<link rel="canonical" href="https://gpt0x.com/tools/ai-inference-cost-calculator/">
+<meta property="og:title" content="AI Inference Cost Calculator — GPT0x">
+<meta property="og:description" content="Calculate and compare AI inference costs across all major providers. Free cost comparison tool.">
+<meta property="og:url" content="https://gpt0x.com/tools/ai-inference-cost-calculator/">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a0a0a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AI Inference Cost Calculator",
+  "url": "https://gpt0x.com/tools/ai-inference-cost-calculator/",
+  "applicationCategory": "Utility",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0"
   }
-  </script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      background: #0f172a;
-      color: #e2e8f0;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      padding: 1.5rem 1rem;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .container {
-      max-width: 1200px;
-      width: 100%;
-    }
-    h1 {
-      font-size: 2rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.25rem;
-      color: #f1f5f9;
-    }
-    .subhead {
-      color: #94a3b8;
-      margin-bottom: 2rem;
-      border-left: 4px solid #38bdf8;
-      padding-left: 1rem;
-      font-size: 1rem;
-    }
-    .card {
-      background: #1e293b;
-      border-radius: 24px;
-      padding: 1.5rem 1.8rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      border: 1px solid #334155;
-    }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.8rem;
-    }
-    .input-group {
-      margin-bottom: 1.2rem;
-    }
-    label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-bottom: 0.3rem;
-      color: #cbd5e1;
-    }
-    input, select {
-      width: 100%;
-      padding: 0.7rem 1rem;
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      color: #f1f5f9;
-      font-size: 1rem;
-      transition: 0.2s;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 3px rgba(56,189,248,0.2);
-    }
-    .inline-hint {
-      font-size: 0.8rem;
-      color: #64748b;
-      margin-top: 0.2rem;
-    }
-    .stat-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 0.8rem;
-      margin: 1.5rem 0 0.5rem;
-    }
-    .stat-card {
-      background: #0f172a;
-      border-radius: 18px;
-      padding: 0.8rem 1.2rem;
-      flex: 1 1 120px;
-      border: 1px solid #2d3a4e;
-    }
-    .stat-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #94a3b8;
-    }
-    .stat-value {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #e2e8f0;
-      margin-top: 0.2rem;
-    }
-    .stat-value small {
-      font-weight: 400;
-      font-size: 0.75rem;
-      color: #94a3b8;
-    }
-    .accent {
-      color: #38bdf8;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.2rem 0 0.5rem;
-      font-size: 0.9rem;
-    }
-    th {
-      text-align: left;
-      padding: 0.6rem 0.4rem;
-      color: #94a3b8;
-      font-weight: 500;
-      border-bottom: 1px solid #2d3a4e;
-    }
-    td {
-      padding: 0.6rem 0.4rem;
-      border-bottom: 1px solid #1e293b;
-    }
-    .highlight-row {
-      background: #1a2538;
-      border-radius: 12px;
-    }
-    .badge {
-      background: #2d3a4e;
-      padding: 0.2rem 0.8rem;
-      border-radius: 30px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: #b9c7db;
-    }
-    .break-even-box {
-      background: #0f172a;
-      border-radius: 20px;
-      padding: 1rem 1.5rem;
-      margin-top: 1.2rem;
-      border: 1px solid #2d3a4e;
-    }
-    .footer {
-      margin-top: 3rem;
-      text-align: center;
-      color: #475569;
-      font-size: 0.9rem;
-      border-top: 1px solid #1e293b;
-      padding-top: 2rem;
-    }
-    @media (max-width: 700px) {
-      .grid-2 {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-      }
-      .card {
-        padding: 1.2rem;
-      }
-      h1 {
-        font-size: 1.6rem;
-      }
-      .stat-row {
-        flex-direction: column;
-      }
-    }
-    .btn-link {
-      color: #38bdf8;
-      text-decoration: none;
-    }
-    .mt-2 { margin-top: 1rem; }
-  </style>
-
-    <meta property="og:title" content="AI Inference Cost Calculator — Compare Cloud GPU Pricing">
-    <meta property="og:description" content="Compare API vs self-hosted GPU inference costs. Calculate per-request, daily, monthly cost & break-even for GPT-4, GPT-3.5, Claude, open-source models.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gpt0x.com/tools/ai-inference-cost-calculator">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+}
+</script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #0a0a0a;
+  color: #e8e8e8;
+  line-height: 1.6;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px 0;
+  border-bottom: 1px solid #2d2d2d;
+}
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  color: #3b82f6;
+}
+.subtitle {
+  color: #a0a0a0;
+  font-size: 1rem;
+}
+.input-section {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+.input-group {
+  margin-bottom: 24px;
+}
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #e8e8e8;
+  font-size: 0.95rem;
+}
+.label-hint {
+  color: #808080;
+  font-size: 0.85rem;
+  margin-left: 2px;
+}
+input[type="number"],
+select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  background: #0f0f0f;
+  color: #e8e8e8;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+input[type="number"]:focus,
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+button {
+  flex: 1;
+  padding: 14px 24px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-calculate {
+  background: #3b82f6;
+  color: #fff;
+}
+.btn-calculate:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+.btn-reset {
+  background: #2d2d2d;
+  color: #e8e8e8;
+}
+.btn-reset:hover {
+  background: #3d3d3d;
+}
+.results {
+  display: none;
+}
+.results.show {
+  display: block;
+}
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.provider-card {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 24px;
+  transition: all 0.2s;
+}
+.provider-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+.provider-card.cheapest {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+}
+.provider-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e8e8e8;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge {
+  background: #10b981;
+  color: #0a0a0a;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.cost-item {
+  margin-bottom: 12px;
+}
+.cost-label {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+.cost-value {
+  font-size: 1.6rem;
+  color: #3b82f6;
+  font-weight: 700;
+}
+.cost-unit {
+  color: #808080;
+  font-size: 0.85rem;
+}
+.monthly-estimate {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 4px solid #3b82f6;
+  padding: 16px;
+  border-radius: 4px;
+  margin-top: 16px;
+}
+.monthly-estimate-label {
+  color: #a0a0a0;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+.monthly-estimate-value {
+  font-size: 1.3rem;
+  color: #3b82f6;
+  font-weight: 700;
+}
+.comparison-note {
+  background: #1a1a1a;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+.comparison-note-title {
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+.comparison-note-text {
+  color: #c0c0c0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.partner-box {
+  margin: 30px auto;
+  max-width: 728px;
+  text-align: center;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border: 1px solid #334155;
+  border-radius: 10px;
+}
+.partner-box p {
+  margin: 0;
+}
+.partner-box p:first-child {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+.partner-box a {
+  color: #38bdf8;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-decoration: none;
+  display: inline-block;
+}
+.partner-box a:hover {
+  text-decoration: underline;
+}
+.partner-box p:last-child {
+  margin-top: 6px;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+.ad-unit {
+  margin: 20px auto;
+  max-width: 728px;
+  text-align: center;
+}
+footer {
+  border-top: 1px solid #2d2d2d;
+  padding: 20px 0;
+  text-align: center;
+  color: #808080;
+  font-size: 0.9rem;
+}
+footer a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+  display: none;
+}
+.error.show {
+  display: block;
+}
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+  .input-row {
+    grid-template-columns: 1fr;
+  }
+  .button-group {
+    flex-direction: column;
+  }
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
 </head>
 <body>
 <div class="container">
-  <h1>⚡ AI Inference Cost Calculator</h1>
-  <div class="subhead">Compare cloud GPU pricing · API vs self‑hosted · break‑even analysis</div>
+  <header>
+    <h1>AI Inference Cost Calculator</h1>
+    <p class="subtitle">Compare costs across OpenAI, Anthropic, Google, and more</p>
+  </header>
 
-  <!-- Inputs -->
-  <div class="card">
-    <div class="grid-2">
-      <div>
-        <div class="input-group">
-          <label for="requests">Requests per day</label>
-          <input type="number" id="requests" value="1000" min="1" step="1">
-          <div class="inline-hint">Total API calls / day</div>
-        </div>
-        <div class="input-group">
-          <label for="inputTokens">Avg input tokens / request</label>
-          <input type="number" id="inputTokens" value="500" min="1" step="10">
-        </div>
-        <div class="input-group">
-          <label for="outputTokens">Avg output tokens / request</label>
-          <input type="number" id="outputTokens" value="300" min="1" step="10">
-        </div>
+  <div class="input-section">
+    <div class="input-row">
+      <div class="input-group">
+        <label>Input Tokens <span class="label-hint">(per request)</span></label>
+        <input type="number" id="inputTokens" value="1000" min="1" max="10000000">
       </div>
-      <div>
-        <div class="input-group">
-          <label for="modelCategory">Model category</label>
-          <select id="modelCategory">
-            <option value="gpt4">GPT-4 class (API)</option>
-            <option value="gpt35">GPT-3.5 class (API)</option>
-            <option value="claudeOpus">Claude Opus class (API)</option>
-            <option value="claudeSonnet">Claude Sonnet class (API)</option>
-            <option value="opensource">Open‑source self‑hosted</option>
-          </select>
-        </div>
-        <div class="input-group" id="gpuSelectGroup" style="display: none;">
-          <label for="gpuType">GPU type (self‑hosted)</label>
-          <select id="gpuType">
-            <option value="A100-80">A100 80GB ($3.50/hr)</option>
-            <option value="H100">H100 ($4.50/hr)</option>
-            <option value="L40S">L40S ($2.80/hr)</option>
-            <option value="RTX4090">RTX 4090 ($1.20/hr)</option>
-          </select>
-          <div class="inline-hint">Estimated throughput depends on model size</div>
-        </div>
-        <div class="input-group" style="margin-top: 0.8rem;">
-          <label style="opacity:0.7;">Self‑hosted throughput (req/hr) <span id="throughputLabel">~900</span></label>
-          <div style="background:#0f172a; border-radius:16px; padding:0.5rem 1rem; border:1px solid #2d3a4e; color:#b9c7db;" id="throughputDisplay">900 req/hr (estimated)</div>
-        </div>
+      <div class="input-group">
+        <label>Output Tokens <span class="label-hint">(per request)</span></label>
+        <input type="number" id="outputTokens" value="500" min="1" max="10000000">
       </div>
     </div>
+
+    <div class="input-row">
+      <div class="input-group">
+        <label>Requests per Month</label>
+        <input type="number" id="requestsPerMonth" value="10000" min="1" max="100000000">
+      </div>
+      <div class="input-group">
+        <label>Model Tier</label>
+        <select id="modelTier">
+          <option value="base" selected>Base Models</option>
+          <option value="pro">Pro/Advanced</option>
+          <option value="premium">Premium/Flagship</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="btn-calculate" onclick="calculateCosts()">Calculate Costs</button>
+      <button class="btn-reset" onclick="resetForm()">Reset</button>
+    </div>
+    <div class="error" id="error"></div>
   </div>
 
-  <!-- Results: per request, daily, monthly, per 1M tokens -->
-  <div class="card">
-    <h3 style="font-weight:500; margin-bottom:0.5rem;">📊 Cost summary</h3>
-    <div class="stat-row">
-      <div class="stat-card"><div class="stat-label">Cost / request</div><div class="stat-value" id="costPerRequest">$0.0012</div></div>
-      <div class="stat-card"><div class="stat-label">Daily cost</div><div class="stat-value" id="dailyCost">$1.20</div></div>
-      <div class="stat-card"><div class="stat-label">Monthly cost (30d)</div><div class="stat-value" id="monthlyCost">$36.00</div></div>
-      <div class="stat-card"><div class="stat-label">Cost / 1M tokens</div><div class="stat-value" id="costPer1MTokens">$1.50</div></div>
+  <div class="results" id="results">
+    <div class="results-grid" id="resultsGrid"></div>
+    <div class="comparison-note">
+      <div class="comparison-note-title">Cost Comparison Notes</div>
+      <div class="comparison-note-text" id="comparisonText"></div>
     </div>
   </div>
 
-  <!-- Comparison table & break-even -->
-  <div class="card">
-    <h3 style="font-weight:500; margin-bottom:0.2rem;">📋 All options comparison</h3>
-    <div style="overflow-x: auto;">
-      <table id="comparisonTable">
-        <thead><tr><th>Model</th><th>Cost/req</th><th>Daily cost</th><th>Monthly</th><th>Cost/1M tok</th></tr></thead>
-        <tbody id="comparisonBody"></tbody>
-      </table>
-    </div>
-    <div class="break-even-box" id="breakEvenBox">
-      <span style="font-weight:500;">⚖️ Break‑even analysis (API vs self‑hosted): </span>
-      <span id="breakEvenText">At <strong>~2,100 requests/day</strong> self‑hosted matches API cost.</span>
-    </div>
+  <div class="partner-box">
+    <p>Recommended by our team</p>
+    <a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener">BeLikeNative.com</a>
+    <p>The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
   </div>
 
-  <div class="footer">© 2025 gpt0x.com — <a href="https://gpt0x.com/tools/ai-inference-cost-calculator" class="btn-link">canonical</a></div>
+  <div class="ad-unit">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 GPT0x. <a href="https://gpt0x.com/tools/">More AI Tools</a></p>
+  </footer>
 </div>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
 
 <script>
-  (function() {
-    // ----- pricing definitions -----
-    const API_PRICING = {
-      gpt4: { input: 0.03, output: 0.06 },        // per 1K tokens
-      gpt35: { input: 0.0015, output: 0.002 },
-      claudeOpus: { input: 0.015, output: 0.075 },
-      claudeSonnet: { input: 0.003, output: 0.015 }
-    };
+const pricingData = {
+  base: {
+    'OpenAI GPT-4': { input: 0.00003, output: 0.00006 },
+    'OpenAI GPT-3.5': { input: 0.0000005, output: 0.0000015 },
+    'Anthropic Claude 3 Haiku': { input: 0.00000025, output: 0.00000125 },
+    'Google Gemini 1.5': { input: 0.000000075, output: 0.0000003 },
+    'Mistral Medium': { input: 0.00000027, output: 0.00000081 }
+  },
+  pro: {
+    'OpenAI GPT-4 Turbo': { input: 0.00001, output: 0.00003 },
+    'Anthropic Claude 3 Sonnet': { input: 0.000003, output: 0.000015 },
+    'Google Gemini Pro': { input: 0.0000005, output: 0.0000015 },
+    'Mistral Large': { input: 0.0000081, output: 0.0000243 }
+  },
+  premium: {
+    'OpenAI GPT-4 Vision': { input: 0.00003, output: 0.00006 },
+    'Anthropic Claude 3 Opus': { input: 0.000015, output: 0.000075 },
+    'Google Gemini Ultra': { input: 0.000002, output: 0.000006 }
+  }
+};
 
-    // GPU pricing & throughput (req/hr) for open-source self-hosted (approx)
-    const GPU_OPTIONS = {
-      'A100-80': { hourlyRate: 3.50, throughput: 1200, label: 'A100 80GB' },
-      'H100': { hourlyRate: 4.50, throughput: 1800, label: 'H100' },
-      'L40S': { hourlyRate: 2.80, throughput: 900, label: 'L40S' },
-      'RTX4090': { hourlyRate: 1.20, throughput: 400, label: 'RTX 4090' }
-    };
+function calculateCosts() {
+  const errorEl = document.getElementById('error');
+  errorEl.classList.remove('show');
 
-    // DOM refs
-    const requestsInput = document.getElementById('requests');
-    const inputTokensInput = document.getElementById('inputTokens');
-    const outputTokensInput = document.getElementById('outputTokens');
-    const modelCategory = document.getElementById('modelCategory');
-    const gpuSelect = document.getElementById('gpuType');
-    const gpuSelectGroup = document.getElementById('gpuSelectGroup');
-    const throughputDisplay = document.getElementById('throughputDisplay');
-    const throughputLabel = document.getElementById('throughputLabel');
+  const inputTokens = parseInt(document.getElementById('inputTokens').value);
+  const outputTokens = parseInt(document.getElementById('outputTokens').value);
+  const requestsPerMonth = parseInt(document.getElementById('requestsPerMonth').value);
+  const modelTier = document.getElementById('modelTier').value;
 
-    const costPerRequestEl = document.getElementById('costPerRequest');
-    const dailyCostEl = document.getElementById('dailyCost');
-    const monthlyCostEl = document.getElementById('monthlyCost');
-    const costPer1MTokensEl = document.getElementById('costPer1MTokens');
-    const comparisonBody = document.getElementById('comparisonBody');
-    const breakEvenText = document.getElementById('breakEvenText');
+  if (!inputTokens || !outputTokens || !requestsPerMonth) {
+    errorEl.textContent = 'Please enter valid values for all fields.';
+    errorEl.classList.add('show');
+    return;
+  }
 
-    // helper: format currency
-    const fmt = (num) => {
-      if (Math.abs(num) < 0.0001) return '$0.0000';
-      if (Math.abs(num) < 0.01) return '$' + num.toFixed(4);
-      if (Math.abs(num) < 1) return '$' + num.toFixed(3);
-      return '$' + num.toFixed(2);
-    };
+  const models = pricingData[modelTier];
+  const results = [];
 
-    // compute cost for a given API config
-    function computeAPICost(inputPricePer1K, outputPricePer1K, inputTokens, outputTokens, requestsPerDay) {
-      const costPerReq = (inputTokens / 1000) * inputPricePer1K + (outputTokens / 1000) * outputPricePer1K;
-      const daily = costPerReq * requestsPerDay;
-      const monthly = daily * 30;
-      const totalTokensPerReq = inputTokens + outputTokens;
-      const costPer1M = (totalTokensPerReq > 0) ? (costPerReq / totalTokensPerReq) * 1_000_000 : 0;
-      return { costPerReq, daily, monthly, costPer1M };
-    }
+  for (const [modelName, pricing] of Object.entries(models)) {
+    const costPerRequest = (inputTokens * pricing.input) + (outputTokens * pricing.output);
+    const monthlyCost = costPerRequest * requestsPerMonth;
+    const annualCost = monthlyCost * 12;
 
-    // compute self-hosted
-    function computeSelfHosted(gpuKey, inputTokens, outputTokens, requestsPerDay) {
-      const gpu = GPU_OPTIONS[gpuKey];
-      if (!gpu) return null;
-      const throughput = gpu.throughput; // req/hr
-      const hourlyRate = gpu.hourlyRate;
-      const costPerReq = hourlyRate / throughput;
-      const daily = costPerReq * requestsPerDay;
-      const monthly = daily * 30;
-      const totalTokensPerReq = inputTokens + outputTokens;
-      const costPer1M = (totalTokensPerReq > 0) ? (costPerReq / totalTokensPerReq) * 1_000_000 : 0;
-      return { costPerReq, daily, monthly, costPer1M, throughput, hourlyRate };
-    }
-
-    // main update
-    function updateAll() {
-      const requests = parseInt(requestsInput.value, 10) || 0;
-      const inputTok = parseInt(inputTokensInput.value, 10) || 0;
-      const outputTok = parseInt(outputTokensInput.value, 10) || 0;
-      const category = modelCategory.value;
-      const isSelfHosted = (category === 'opensource');
-      let selectedGPU = gpuSelect.value;
-
-      // show/hide gpu selector
-      gpuSelectGroup.style.display = isSelfHosted ? 'block' : 'none';
-
-      // update throughput display if self-hosted
-      let currentThroughput = 900;
-      if (isSelfHosted) {
-        const gpuInfo = GPU_OPTIONS[selectedGPU];
-        if (gpuInfo) {
-          currentThroughput = gpuInfo.throughput;
-          throughputDisplay.innerText = `${currentThroughput} req/hr (${gpuInfo.label})`;
-          throughputLabel.innerText = `~${currentThroughput}`;
-        }
-      } else {
-        throughputDisplay.innerText = `— (API mode)`;
-        throughputLabel.innerText = '—';
-      }
-
-      // --- compute main selected model cost ---
-      let mainCost = null;
-      if (isSelfHosted) {
-        mainCost = computeSelfHosted(selectedGPU, inputTok, outputTok, requests);
-      } else {
-        const pricing = API_PRICING[category];
-        if (pricing) {
-          mainCost = computeAPICost(pricing.input, pricing.output, inputTok, outputTok, requests);
-        }
-      }
-
-      if (mainCost) {
-        costPerRequestEl.innerText = fmt(mainCost.costPerReq);
-        dailyCostEl.innerText = fmt(mainCost.daily);
-        monthlyCostEl.innerText = fmt(mainCost.monthly);
-        costPer1MTokensEl.innerText = fmt(mainCost.costPer1M);
-      } else {
-        costPerRequestEl.innerText = '$0.00';
-        dailyCostEl.innerText = '$0.00';
-        monthlyCostEl.innerText = '$0.00';
-        costPer1MTokensEl.innerText = '$0.00';
-      }
-
-      // --- build comparison table (all models) ---
-      const allModels = [
-        { key: 'gpt4', label: 'GPT-4 class' },
-        { key: 'gpt35', label: 'GPT-3.5 class' },
-        { key: 'claudeOpus', label: 'Claude Opus' },
-        { key: 'claudeSonnet', label: 'Claude Sonnet' },
-      ];
-      let rowsHtml = '';
-      // API models
-      for (const m of allModels) {
-        const p = API_PRICING[m.key];
-        const cost = computeAPICost(p.input, p.output, inputTok, outputTok, requests);
-        rowsHtml += `<tr><td>${m.label}</td><td>${fmt(cost.costPerReq)}</td><td>${fmt(cost.daily)}</td><td>${fmt(cost.monthly)}</td><td>${fmt(cost.costPer1M)}</td></tr>`;
-      }
-      // self-hosted options
-      for (const [gpuKey, gpu] of Object.entries(GPU_OPTIONS)) {
-        const cost = computeSelfHosted(gpuKey, inputTok, outputTok, requests);
-        if (cost) {
-          rowsHtml += `<tr><td>Self‑hosted ${gpu.label}</td><td>${fmt(cost.costPerReq)}</td><td>${fmt(cost.daily)}</td><td>${fmt(cost.monthly)}</td><td>${fmt(cost.costPer1M)}</td></tr>`;
-        }
-      }
-      comparisonBody.innerHTML = rowsHtml;
-
-      // --- break-even: find requests per day where self-hosted (best GPU) equals cheapest API (GPT-3.5) ---
-      // Use cheapest API: GPT-3.5
-      const cheapestAPI = API_PRICING.gpt35;
-      const costPerReqAPI = (inputTok / 1000) * cheapestAPI.input + (outputTok / 1000) * cheapestAPI.output;
-      // best self-hosted: pick highest throughput GPU (H100 typically) but we can compute break-even for each? Show for H100 as reference.
-      const bestGPU = GPU_OPTIONS['H100']; // high throughput
-      const costPerReqSelf = bestGPU.hourlyRate / bestGPU.throughput;
-      let breakEvenReq = 0;
-      if (costPerReqAPI > 0 && costPerReqSelf > 0) {
-        // break-even daily requests where daily cost equal: req * costPerReqAPI = req * costPerReqSelf + fixed? Actually self-hosted has no fixed cost in this simple model (hourly cost scales with hours? but we assume 24h usage? For fair comparison, we assume 24h usage for self-hosted. 
-        // daily cost self = (hourlyRate * 24) if we run 24h? But we compute daily cost as costPerReq * requests. That assumes we only pay for actual usage. For self-hosted, if we run 24h, cost = hourlyRate*24 regardless of requests. To make break-even meaningful, we compare: API daily = req * costPerReqAPI; Self daily = max(req * costPerReqSelf, hourlyRate*24?) Actually simpler: we compare per-request cost. Break-even requests where total cost equal if we assume we can scale down? We'll use the approach: self-hosted daily cost = max(requests * costPerReqSelf, hourlyRate * 24) but that's complex. Let's do standard: self-hosted cost per day = (requests / throughput) * hourlyRate (only pay for hours used). That's what we used in daily cost. So break-even: req * costPerReqAPI = req * costPerReqSelf => req cancels? That gives no break-even. So we need to incorporate fixed 24h? Many calculators assume 24/7. We'll assume self-hosted runs 24h, cost = 24 * hourlyRate. Then break-even req = (24 * hourlyRate) / (costPerReqAPI - costPerReqSelf). That is more realistic.
-        const selfFixedDaily = 24 * bestGPU.hourlyRate; // running 24h
-        const costPerReqSelfVar = bestGPU.hourlyRate / bestGPU.throughput; // variable if we only pay per hour used? But we already used that. For break-even with fixed cost: 
-        // If we run 24h, total self cost = 24 * hourlyRate, capacity = throughput * 24 requests max. So if requests <= capacity, cost = 24*hourlyRate. Then break-even: req * costPerReqAPI = 24*hourlyRate => req = (24*hourlyRate) / costPerReqAPI.
-        // That's more common. Let's implement that.
-        if (costPerReqAPI > 0) {
-          breakEvenReq = (24 * bestGPU.hourlyRate) / costPerReqAPI;
-        }
-      }
-      if (breakEvenReq > 0 && isFinite(breakEvenReq)) {
-        breakEvenText.innerHTML = `At <strong>~${Math.round(breakEvenReq)} requests/day</strong>, self‑hosted (H100, 24h) equals GPT‑3.5 API cost. Above that, self‑hosted may be cheaper (if throughput sufficient).`;
-      } else {
-        breakEvenText.innerHTML = `Break-even not available (check inputs).`;
-      }
-
-      // if self-hosted selected, highlight row? optional
-    }
-
-    // event listeners
-    [requestsInput, inputTokensInput, outputTokensInput, modelCategory, gpuSelect].forEach(el => {
-      el.addEventListener('input', updateAll);
-      el.addEventListener('change', updateAll);
+    results.push({
+      name: modelName,
+      costPerRequest: costPerRequest,
+      monthlyCost: monthlyCost,
+      annualCost: annualCost
     });
+  }
 
-    // initial update
-    updateAll();
-  })();
+  results.sort((a, b) => a.monthlyCost - b.monthlyCost);
+
+  const grid = document.getElementById('resultsGrid');
+  grid.innerHTML = '';
+
+  results.forEach((result, index) => {
+    const isCheapest = index === 0;
+    const card = document.createElement('div');
+    card.className = 'provider-card' + (isCheapest ? ' cheapest' : '');
+
+    const savings = isCheapest ? '' : ` (Save $${(results[0].monthlyCost - result.monthlyCost).toFixed(2)}/mo vs ${results[0].name})`;
+
+    card.innerHTML = `
+      <div class="provider-name">
+        ${result.name}
+        ${isCheapest ? '<span class="badge">CHEAPEST</span>' : ''}
+      </div>
+      <div class="cost-item">
+        <div class="cost-label">Cost per Request</div>
+        <div class="cost-value">$${result.costPerRequest.toFixed(6)}</div>
+      </div>
+      <div class="monthly-estimate">
+        <div class="monthly-estimate-label">Monthly Estimate</div>
+        <div class="monthly-estimate-value">$${result.monthlyCost.toFixed(2)}</div>
+      </div>
+      <div class="cost-item" style="margin-top: 12px;">
+        <div class="cost-label">Annual Cost</div>
+        <div class="cost-value">$${result.annualCost.toFixed(2)}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  const cheapest = results[0];
+  const most_expensive = results[results.length - 1];
+  const savings = most_expensive.monthlyCost - cheapest.monthlyCost;
+
+  let comparisonText = `Using ${cheapest.name} would cost $${cheapest.monthlyCost.toFixed(2)}/month. `;
+  comparisonText += `Switching from ${most_expensive.name} would save $${savings.toFixed(2)}/month or $${(savings * 12).toFixed(2)}/year. `;
+  comparisonText += 'Pricing accurate as of June 2026. Consider rate limits, latency, and quality when choosing providers.';
+
+  document.getElementById('comparisonText').textContent = comparisonText;
+  document.getElementById('results').classList.add('show');
+}
+
+function resetForm() {
+  document.getElementById('inputTokens').value = '1000';
+  document.getElementById('outputTokens').value = '500';
+  document.getElementById('requestsPerMonth').value = '10000';
+  document.getElementById('modelTier').value = 'base';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('error').classList.remove('show');
+}
+
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') calculateCosts();
+});
 </script>
 
-    <footer style="text-align:center;padding:2rem 1rem;margin-top:2rem;border-top:1px solid #334155;color:#94a3b8;font-size:0.85rem;">
-        <p>&copy; 2025 gpt0x.com &mdash; Free online tool. No data stored.</p>
-    </footer>
-<div style="margin:20px auto;max-width:728px;text-align:center">
-<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-</div>
-<div style="margin:30px auto;max-width:728px;text-align:center;padding:18px 24px;background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:10px">
-<p style="margin:0 0 6px;color:#94a3b8;font-size:0.85rem">Recommended by our team</p>
-<a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener" style="color:#38bdf8;font-weight:600;font-size:1.05rem;text-decoration:none">BeLikeNative.com</a>
-<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
-</div>
 </body>
 </html>
