@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Tokens Per Second Calculator</title>
+<meta name="description" content="Estimate LLM inference speed in tokens per second from GPU memory bandwidth, model size and quantization level.">
+<link rel="canonical" href="https://gpt0x.com/tools/llm-tokens-per-second-calculator">
+<meta property="og:title" content="LLM Tokens Per Second Calculator">
+<meta property="og:description" content="Estimate LLM inference speed in tokens per second from GPU memory bandwidth, model size and quantization level.">
+<meta property="og:url" content="https://gpt0x.com/tools/llm-tokens-per-second-calculator">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "LLM Tokens Per Second Calculator",
+      "url": "https://gpt0x.com/tools/llm-tokens-per-second-calculator",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "LLM Tokens Per Second Calculator", "item": "https://gpt0x.com/tools/llm-tokens-per-second-calculator" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --bg:#0c0f17; --panel:#141a26; --panel2:#1b2433; --line:#26324a;
+    --ink:#e8edf6; --mut:#93a0b8; --acc:#5fd0ff; --acc2:#8b7dff; --good:#46e3a0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    line-height:1.6; font-size:16px;
+  }
+  nav{
+    display:flex; gap:18px; padding:14px 20px; background:#080b12;
+    border-bottom:1px solid var(--line); flex-wrap:wrap; align-items:center;
+  }
+  nav a{color:var(--acc); text-decoration:none; font-weight:600; font-size:14px}
+  nav a:hover{text-decoration:underline}
+  main{max-width:880px; margin:0 auto; padding:26px 20px 60px}
+  h1{font-size:1.7rem; line-height:1.25; margin:.2em 0 .35em}
+  h2{font-size:1.25rem; margin:1.8em 0 .5em; border-left:3px solid var(--acc2); padding-left:10px}
+  .intro{color:var(--mut); margin:0 0 1.4em}
+  #tool{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:16px}
+  label{display:block; font-size:13px; font-weight:600; color:var(--mut); margin-bottom:6px}
+  input[type=number], select{
+    width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--ink);
+    border-radius:9px; padding:10px 12px; font-size:15px; font-family:inherit;
+  }
+  input[type=range]{width:100%; accent-color:var(--acc)}
+  .rngval{color:var(--acc); font-weight:700}
+  input:focus, select:focus{outline:none; border-color:var(--acc)}
+  .out{
+    margin-top:20px; background:linear-gradient(160deg,#10233a,#161f30);
+    border:1px solid var(--line); border-radius:12px; padding:18px;
+  }
+  .big{font-size:2.4rem; font-weight:800; color:var(--good); letter-spacing:-.5px}
+  .big small{font-size:1rem; color:var(--mut); font-weight:600}
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:14px}
+  .stat{background:#0e1622; border:1px solid var(--line); border-radius:10px; padding:11px 13px}
+  .stat .k{font-size:12px; color:var(--mut)}
+  .stat .v{font-size:1.15rem; font-weight:700; margin-top:2px}
+  .note{font-size:13px; color:var(--mut); margin-top:12px}
+  .prose p{margin:.7em 0}
+  .prose code{background:var(--panel2); padding:2px 6px; border-radius:5px; font-size:13px; color:var(--acc)}
+  .related a{
+    display:inline-block; margin:6px 8px 0 0; background:var(--panel2);
+    border:1px solid var(--line); border-radius:8px; padding:8px 13px;
+    color:var(--acc); text-decoration:none; font-size:14px; font-weight:600;
+  }
+  .related a:hover{border-color:var(--acc)}
+  footer{border-top:1px solid var(--line); padding:22px 20px; text-align:center; color:var(--mut); font-size:13px}
+  footer a{color:var(--acc); text-decoration:none; margin:0 8px}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">gpt0x.com</a>
+  <a href="/tools/">All Tools</a>
+</nav>
+<main>
+  <h1>Estimate LLM Inference Throughput in Tokens/Second</h1>
+  <p class="intro">Memory-bandwidth-bound estimator for local and server LLM decoding speed. Set your GPU bandwidth, model parameters and quantization to see the theoretical and realistic tokens-per-second ceiling.</p>
+
+  <section id="tool">
+    <div class="grid">
+      <div>
+        <label for="bw">GPU memory bandwidth (GB/s)</label>
+        <input type="number" id="bw" value="1008" min="10" step="1">
+      </div>
+      <div>
+        <label for="params">Model size (billion parameters)</label>
+        <input type="number" id="params" value="8" min="0.1" step="0.1">
+      </div>
+      <div>
+        <label for="quant">Quantization (bits per weight)</label>
+        <select id="quant">
+          <option value="16">FP16 / BF16 (16-bit)</option>
+          <option value="8" selected>INT8 / Q8 (8-bit)</option>
+          <option value="6">Q6_K (6-bit)</option>
+          <option value="5">Q5_K (5-bit)</option>
+          <option value="4">Q4_K_M (4-bit)</option>
+          <option value="3">Q3_K (3-bit)</option>
+          <option value="2">Q2_K (2-bit)</option>
+        </select>
+      </div>
+      <div>
+        <label for="eff">Memory efficiency / MFU <span class="rngval" id="effv">75%</span></label>
+        <input type="range" id="eff" min="20" max="95" value="75" step="1">
+      </div>
+      <div>
+        <label for="ctx">KV-cache context (active tokens)</label>
+        <input type="number" id="ctx" value="2048" min="0" step="128">
+      </div>
+      <div>
+        <label for="batch">Batch size (parallel requests)</label>
+        <input type="number" id="batch" value="1" min="1" step="1">
+      </div>
+    </div>
+
+    <div class="out">
+      <div class="big"><span id="tps">--</span> <small>tokens / sec (per request)</small></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Aggregate throughput</div><div class="v" id="agg">--</div></div>
+        <div class="stat"><div class="k">Bytes read per token</div><div class="v" id="bpt">--</div></div>
+        <div class="stat"><div class="k">Weight memory</div><div class="v" id="wmem">--</div></div>
+        <div class="stat"><div class="k">Latency per token</div><div class="v" id="lat">--</div></div>
+        <div class="stat"><div class="k">Time for 500 tokens</div><div class="v" id="t500">--</div></div>
+      </div>
+      <p class="note" id="note"></p>
+    </div>
+  </section>
+
+  <section class="prose">
+    <h2>How the tokens-per-second estimate works</h2>
+    <p>Autoregressive decoding is <strong>memory-bandwidth bound</strong>, not compute bound: to generate one token the GPU must stream every model weight (plus the KV cache) from VRAM through the chip exactly once. That single fact lets us predict speed without running the model. The core formula this calculator uses is:</p>
+    <p><code>tokens/sec ≈ (bandwidth × efficiency) ÷ bytes_per_token</code></p>
+    <p>Bytes-per-token is dominated by the weights: <code>bytes_weights = params × 1e9 × (bits ÷ 8)</code>. So an 8B model at 4-bit (Q4) needs ~4&nbsp;GB read per token, while the same model at FP16 needs ~16&nbsp;GB — which is exactly why quantization roughly doubles or quadruples your speed. We add a KV-cache term, <code>bytes_kv ≈ context × 2 × layers × hidden × 2&nbsp;bytes</code>, approximated here from parameter count, because long contexts add real per-token reads that flatten throughput as the conversation grows.</p>
+    <p>The <strong>efficiency</strong> slider models Model FLOPs / bandwidth Utilization (MFU). Real kernels never hit 100% of the spec-sheet bandwidth — 60-80% is typical for well-tuned inference (llama.cpp, vLLM, TensorRT-LLM), lower for unoptimized paths. Batching multiple requests reuses the same weight read across several sequences, so <strong>aggregate</strong> throughput scales nearly linearly with batch size even though each individual request stays at the single-stream rate (until you become compute-bound). That is the information most spec pages hide: a 4090 doing 50 tok/s for one user can serve 8 users at ~45 tok/s each, ~360 tok/s aggregate, because the bandwidth bottleneck is shared. Use these numbers as an upper-bound sanity check before you buy a GPU or pick a deployment tier — measured speed will land within ~10-20% if your serving stack is healthy.</p>
+  </section>
+
+  <section class="related">
+    <h2>Related Tools</h2>
+    <a href="/tools/ai-inference-cost-calculator">AI Inference Cost Calculator</a>
+    <a href="/tools/gpu-vram-calculator">GPU VRAM Calculator</a>
+    <a href="/tools/ai-batch-calculator">AI Batch Calculator</a>
+  </section>
+</main>
+
+<footer>
+  <div>
+    <a href="/">Home</a> ·
+    <a href="/tools/">All Tools</a> ·
+    <a href="/tools/gpu-vram-calculator">VRAM Calculator</a>
+  </div>
+  <div style="margin-top:8px">© 2026 gpt0x.com — built by <a href="https://zovo.one">Michael Lip</a></div>
+</footer>
+
+<script>
+(function(){
+  var ids = ['bw','params','quant','eff','ctx','batch'];
+  var el = {};
+  ids.forEach(function(i){ el[i] = document.getElementById(i); });
+  var out = {
+    tps: document.getElementById('tps'),
+    agg: document.getElementById('agg'),
+    bpt: document.getElementById('bpt'),
+    wmem: document.getElementById('wmem'),
+    lat: document.getElementById('lat'),
+    t500: document.getElementById('t500'),
+    note: document.getElementById('note'),
+    effv: document.getElementById('effv')
+  };
+
+  function fmt(n, d){
+    if(!isFinite(n)) return '--';
+    if(n >= 1000) return (n/1000).toFixed(d||1) + 'k';
+    if(n >= 100) return n.toFixed(0);
+    if(n >= 10) return n.toFixed(1);
+    return n.toFixed(d===undefined?2:d);
+  }
+  function gb(bytes){ return (bytes/1e9).toFixed(2) + ' GB'; }
+
+  function calc(){
+    var bw = Math.max(1, +el.bw.value || 0);       // GB/s
+    var P = Math.max(0.001, +el.params.value || 0); // billions
+    var bits = +el.quant.value;
+    var eff = Math.min(95, Math.max(5, +el.eff.value)) / 100;
+    var ctx = Math.max(0, +el.ctx.value || 0);
+    var batch = Math.max(1, Math.floor(+el.batch.value || 1));
+
+    out.effv.textContent = Math.round(eff*100) + '%';
+
+    // weight bytes per forward pass
+    var bytesWeights = P * 1e9 * (bits / 8);
+
+    // crude KV-cache read estimate scaled from param count.
+    // layers ~ 9 * P^(1/3) rounded family; hidden ~ sqrt(P*1e9/ (layers*12))
+    var layers = Math.max(8, Math.round(9 * Math.cbrt(P)));
+    var hidden = Math.max(256, Math.round(Math.sqrt(P * 1e9 / (layers * 12))));
+    // KV bytes per token read at FP16 (2 bytes): 2(k&v) * layers * hidden * 2 bytes * ctx
+    var bytesKV = ctx * 2 * layers * hidden * 2;
+
+    var bytesPerToken = bytesWeights + bytesKV;
+
+    var effBandwidth = bw * 1e9 * eff;            // bytes/s
+    var tps = effBandwidth / bytesPerToken;       // tokens/s single stream
+    var aggregate = tps * batch;
+    var latency = 1000 / tps;                      // ms/token
+
+    out.tps.textContent = fmt(tps);
+    out.agg.textContent = fmt(aggregate) + ' tok/s';
+    out.bpt.textContent = gb(bytesPerToken);
+    out.wmem.textContent = gb(bytesWeights);
+    out.lat.textContent = latency < 1 ? latency.toFixed(2)+' ms' : latency.toFixed(1)+' ms';
+    out.t500.textContent = (500 / aggregate).toFixed(1) + ' s';
+
+    var msg = '';
+    if(tps < 5) msg = 'Very slow — model too large for this bandwidth at this precision. Try a lower-bit quant or a higher-bandwidth GPU.';
+    else if(tps < 15) msg = 'Below comfortable reading speed (~15 tok/s). Usable for batch jobs, sluggish for chat.';
+    else if(tps < 40) msg = 'Interactive — faster than a human reads. Good single-user experience.';
+    else msg = 'Fast — well above reading speed; headroom for batching or longer outputs.';
+    msg += ' Assumes ' + layers + ' layers, ~' + hidden + ' hidden dim. Real measured speed typically lands within 10-20%.';
+    out.note.textContent = msg;
+  }
+
+  ids.forEach(function(i){
+    el[i].addEventListener('input', calc);
+    el[i].addEventListener('change', calc);
+  });
+  calc();
+})();
+</script>
+</body>
+</html>

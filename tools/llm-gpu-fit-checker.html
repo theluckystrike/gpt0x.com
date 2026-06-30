@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM GPU Fit Checker</title>
+<meta name="description" content="Check if a model fits your GPU. Pick a card, model size and quantization to see whether it runs and how much VRAM headroom is left.">
+<link rel="canonical" href="https://gpt0x.com/tools/llm-gpu-fit-checker">
+<meta property="og:title" content="LLM GPU Fit Checker">
+<meta property="og:description" content="Check if a model fits your GPU. Pick a card, model size and quantization to see whether it runs and how much VRAM headroom is left.">
+<meta property="og:url" content="https://gpt0x.com/tools/llm-gpu-fit-checker">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "LLM GPU Fit Checker",
+      "url": "https://gpt0x.com/tools/llm-gpu-fit-checker",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "LLM GPU Fit Checker", "item": "https://gpt0x.com/tools/llm-gpu-fit-checker" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root{
+  --bg:#0c0f17;--panel:#151a26;--panel2:#1c2333;--line:#2a3346;
+  --text:#e7ecf5;--muted:#94a3b8;--accent:#6ea8ff;--good:#34d399;--bad:#f87171;--warn:#fbbf24;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;line-height:1.6}
+nav{display:flex;gap:18px;padding:16px 20px;border-bottom:1px solid var(--line);font-size:14px}
+nav a,footer a{color:var(--accent);text-decoration:none}
+nav a:hover,footer a:hover{text-decoration:underline}
+main{max-width:860px;margin:0 auto;padding:24px 20px 60px}
+h1{font-size:28px;line-height:1.25;margin:18px 0 8px}
+h2{font-size:20px;margin:34px 0 12px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.lead{color:var(--muted);font-size:16px;margin-bottom:8px}
+#tool{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:18px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600;letter-spacing:.02em}
+select,input[type=number]{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:15px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.field{margin-bottom:4px}
+.rngrow{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+#out{margin-top:20px;padding:18px;border-radius:12px;border:1px solid var(--line);background:var(--panel2)}
+.verdict{font-size:22px;font-weight:700;margin-bottom:6px}
+.bar{height:18px;border-radius:9px;background:#0a0d14;border:1px solid var(--line);overflow:hidden;margin:12px 0 6px}
+.fill{height:100%;width:0;transition:width .15s ease}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+@media(max-width:560px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stat .k{font-size:12px;color:var(--muted)}
+.stat .v{font-size:18px;font-weight:700}
+.note{font-size:13px;color:var(--muted);margin-top:10px}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);margin-left:8px;vertical-align:middle}
+p{color:#cdd6e6}
+.rel a{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 14px;margin:6px 8px 0 0;color:var(--accent);text-decoration:none;font-size:14px}
+.rel a:hover{border-color:var(--accent)}
+footer{border-top:1px solid var(--line);padding:24px 20px;color:var(--muted);font-size:14px;text-align:center}
+footer a{margin:0 8px}
+code{background:#0a0d14;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:13px}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">gpt0x.com</a>
+  <a href="/tools/">All Tools</a>
+</nav>
+<main>
+  <h1>Will this model fit on my GPU?</h1>
+  <p class="lead">Pick your graphics card, the model parameter count and a quantization format. The checker estimates total VRAM needed for weights, KV cache and overhead, then tells you if it runs and how much headroom is left.</p>
+
+  <section id="tool">
+    <div class="grid">
+      <div class="field">
+        <label for="gpu">GPU (VRAM)</label>
+        <select id="gpu">
+          <option value="8">RTX 3060 Ti / 3070 — 8 GB</option>
+          <option value="12" selected>RTX 3060 / 4070 — 12 GB</option>
+          <option value="16">RTX 4060 Ti / 4080 — 16 GB</option>
+          <option value="24">RTX 3090 / 4090 — 24 GB</option>
+          <option value="32">RTX 5090 — 32 GB</option>
+          <option value="48">RTX A6000 / L40S — 48 GB</option>
+          <option value="80">A100 / H100 — 80 GB</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="vramcustom">Custom VRAM (GB)</label>
+        <input type="number" id="vramcustom" min="1" max="640" step="1" value="12" disabled>
+      </div>
+      <div class="field">
+        <label for="params">Model size — parameters (billions)</label>
+        <input type="number" id="params" min="0.1" max="700" step="0.1" value="7">
+      </div>
+      <div class="field">
+        <label for="quant">Quantization</label>
+        <select id="quant">
+          <option value="2">FP16 / BF16 — 16-bit (2 bytes)</option>
+          <option value="1">INT8 / Q8 — 8-bit (1 byte)</option>
+          <option value="0.75">Q6_K — ~6-bit</option>
+          <option value="0.625" selected>Q5_K_M — ~5-bit</option>
+          <option value="0.5">Q4_K_M / INT4 — 4-bit</option>
+          <option value="0.375">Q3_K — ~3-bit</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="ctx">Context length (tokens): <span id="ctxv">8192</span></label>
+        <input type="range" id="ctx" min="512" max="131072" step="512" value="8192">
+        <div class="rngrow"><span>512</span><span>128k</span></div>
+      </div>
+      <div class="field">
+        <label for="layers">KV cache precision</label>
+        <select id="layers">
+          <option value="2">FP16 KV cache</option>
+          <option value="1" selected>8-bit KV cache</option>
+          <option value="0.5">4-bit KV cache</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="out" aria-live="polite">
+      <div class="verdict" id="verdict">—</div>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="rngrow"><span id="usedlbl">0 GB used</span><span id="caplbl">cap</span></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Weights</div><div class="v" id="sW">–</div></div>
+        <div class="stat"><div class="k">KV cache</div><div class="v" id="sK">–</div></div>
+        <div class="stat"><div class="k">Overhead</div><div class="v" id="sO">–</div></div>
+        <div class="stat"><div class="k">Total needed</div><div class="v" id="sT">–</div></div>
+        <div class="stat"><div class="k">Headroom</div><div class="v" id="sH">–</div></div>
+        <div class="stat"><div class="k">Max context</div><div class="v" id="sC">–</div></div>
+      </div>
+      <div class="note" id="note"></div>
+    </div>
+  </section>
+
+  <h2>How the fit estimate works</h2>
+  <p>Most "will it run" disappointments come from forgetting that weights are only part of the budget. This checker adds three terms the way an inference runtime actually allocates them.</p>
+  <p><strong>1. Weight memory.</strong> Each parameter occupies a number of bytes set by the quantization format: 2 bytes at FP16, 1 at INT8, and roughly 0.5 at 4-bit. So <code>weights_GB = params_billion × bytes_per_param</code>. A 7B model at Q4_K_M is about 7 × 0.5 = 3.5 GB.</p>
+  <p><strong>2. KV cache.</strong> Every token you keep in context stores a key and a value vector for each transformer layer, and this grows linearly with context length. We approximate it from the parameter count (which scales hidden size × layers) as <code>kv_GB ≈ params_billion × ctx_tokens × kv_bytes × 5.2e-5</code>. At long context this term can dwarf the weights — a 32k window on a 13B model can need 6–10 GB on its own, which is why an 8-bit or 4-bit KV cache option matters.</p>
+  <p><strong>3. Runtime overhead.</strong> CUDA context, activation buffers, the allocator's fragmentation slack and framework reservations cost a roughly fixed amount plus a small fraction of the weights. We use <code>overhead_GB = 0.8 + 0.06 × weights_GB</code>.</p>
+  <p>The total is the sum of all three. We compare it to your card's VRAM minus a 7% safety reserve (drivers and the desktop compositor never give you the full sticker number). If the total is under that usable budget it fits; if it is within 10% we flag it as tight, since long generations push allocation higher. The "max context" figure solves the same equation backwards: how many tokens of KV cache the remaining VRAM allows after weights and overhead. The math is deliberately conservative — treat a green result as "should load with room for normal generation," not a guarantee for every batch size.</p>
+
+  <section>
+    <h2>Related Tools</h2>
+    <div class="rel">
+      <a href="/tools/gpu-vram-calculator">GPU VRAM Calculator</a>
+      <a href="/tools/quantization-vram-savings-calculator">Quantization VRAM Savings Calculator</a>
+      <a href="/tools/ai-model-benchmark-tracker">AI Model Benchmark Tracker</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div>
+    <a href="/">Home</a>
+    <a href="/tools/">All Tools</a>
+    <a href="/tools/gpu-vram-calculator">VRAM Calculator</a>
+  </div>
+  <div>© 2026 gpt0x.com</div>
+</footer>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var gpu=$('gpu'),vc=$('vramcustom'),params=$('params'),quant=$('quant'),
+      ctx=$('ctx'),ctxv=$('ctxv'),kvsel=$('layers');
+
+  var KV_K=5.2e-5;      // GB per (billion-param × token × kv-byte)
+  var RESERVE=0.07;     // driver/desktop reserve fraction
+  var OVH_BASE=0.8, OVH_FRAC=0.06;
+
+  function vram(){
+    if(gpu.value==='custom') return Math.max(1, parseFloat(vc.value)||0);
+    return parseFloat(gpu.value);
+  }
+  function fmt(g){ return (g>=10?g.toFixed(1):g.toFixed(2))+' GB'; }
+
+  function compute(){
+    vc.disabled = (gpu.value!=='custom');
+    if(gpu.value!=='custom') vc.value = gpu.value;
+
+    var cap=vram();
+    var usable=cap*(1-RESERVE);
+    var p=Math.max(0.1, parseFloat(params.value)||0);
+    var bpp=parseFloat(quant.value);
+    var ctok=parseInt(ctx.value,10);
+    var kvb=parseFloat(kvsel.value);
+    ctxv.textContent = ctok>=1024 ? (ctok/1024)+'k' : ctok;
+
+    var W=p*bpp;
+    var K=p*ctok*kvb*KV_K;
+    var O=OVH_BASE + OVH_FRAC*W;
+    var T=W+K+O;
+    var head=usable-T;
+
+    // solve max context: usable = W + O + p*ctx*kvb*KV_K
+    var room=usable-W-O;
+    var maxCtx = room>0 ? Math.floor(room/(p*kvb*KV_K)) : 0;
+
+    $('sW').textContent=fmt(W);
+    $('sK').textContent=fmt(K);
+    $('sO').textContent=fmt(O);
+    $('sT').textContent=fmt(T);
+    $('sH').textContent=(head>=0?'+':'')+fmt(head);
+    $('sC').textContent = maxCtx<=0 ? '0' : (maxCtx>=1024?(maxCtx/1024).toFixed(0)+'k':maxCtx)+' tok';
+
+    var pct=Math.min(100, T/usable*100);
+    var fill=$('fill');
+    fill.style.width=pct.toFixed(1)+'%';
+
+    var verdict=$('verdict'), note=$('note'), color;
+    if(T<=usable*0.9){
+      color='var(--good)';
+      verdict.innerHTML='Fits comfortably <span class="tag" style="color:var(--good);border-color:var(--good)">RUNS</span>';
+      note.textContent='Needs '+fmt(T)+' of '+fmt(usable)+' usable. Plenty of room for normal generation.';
+    } else if(T<=usable){
+      color='var(--warn)';
+      verdict.innerHTML='Tight fit <span class="tag" style="color:var(--warn);border-color:var(--warn)">RISKY</span>';
+      note.textContent='Needs '+fmt(T)+' of '+fmt(usable)+' usable — under 10% spare. Long outputs or larger batches may trigger out-of-memory. Try a lower-bit KV cache or shorter context.';
+    } else {
+      color='var(--bad)';
+      verdict.innerHTML='Will not fit <span class="tag" style="color:var(--bad);border-color:var(--bad)">OOM</span>';
+      var short=T-usable;
+      note.textContent='Over budget by '+fmt(short)+'. Drop to a smaller quant, cut context to ~'+(maxCtx>=1024?(maxCtx/1024).toFixed(0)+'k':maxCtx)+' tokens, or use a bigger card.';
+    }
+    fill.style.background=color;
+    verdict.style.color=color;
+    $('sH').style.color = head>=0?'var(--good)':'var(--bad)';
+    $('usedlbl').textContent=fmt(T)+' used';
+    $('caplbl').textContent=fmt(usable)+' usable / '+fmt(cap)+' card';
+  }
+
+  ['change','input'].forEach(function(ev){
+    [gpu,vc,params,quant,ctx,kvsel].forEach(function(el){ el.addEventListener(ev,compute); });
+  });
+  compute();
+})();
+</script>
+</body>
+</html>

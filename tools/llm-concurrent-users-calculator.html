@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Concurrent Users Calculator</title>
+<meta name="description" content="Estimate how many concurrent users one GPU can serve based on VRAM, KV cache per session and context length for LLM inference.">
+<link rel="canonical" href="https://gpt0x.com/tools/llm-concurrent-users-calculator">
+<meta property="og:title" content="LLM Concurrent Users Calculator">
+<meta property="og:description" content="Estimate how many concurrent users one GPU can serve based on VRAM, KV cache per session and context length for LLM inference.">
+<meta property="og:url" content="https://gpt0x.com/tools/llm-concurrent-users-calculator">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "LLM Concurrent Users Calculator",
+      "description": "Estimate how many concurrent users one GPU can serve based on VRAM, KV cache per session and context length for LLM inference.",
+      "url": "https://gpt0x.com/tools/llm-concurrent-users-calculator",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "LLM Concurrent Users Calculator", "item": "https://gpt0x.com/tools/llm-concurrent-users-calculator" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root{
+  --bg:#0c1018; --panel:#141a26; --panel2:#1b2433; --line:#26303f;
+  --text:#e6edf6; --muted:#93a1b5; --accent:#4ade80; --accent2:#38bdf8; --warn:#fbbf24;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  line-height:1.6;
+}
+nav{
+  display:flex; gap:1.25rem; padding:1rem 1.25rem; border-bottom:1px solid var(--line);
+  background:#0a0e15; flex-wrap:wrap;
+}
+nav a{color:var(--accent2); text-decoration:none; font-weight:600; font-size:.95rem}
+nav a:hover{text-decoration:underline}
+main{max-width:880px; margin:0 auto; padding:1.5rem 1.25rem 3rem}
+h1{font-size:1.7rem; line-height:1.25; margin:1.2rem 0 .4rem}
+h2{font-size:1.25rem; margin:2rem 0 .6rem}
+.intro{color:var(--muted); font-size:1.02rem}
+section#tool{
+  background:var(--panel); border:1px solid var(--line); border-radius:14px;
+  padding:1.3rem; margin:1.5rem 0;
+}
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem}
+.field label{display:block; font-size:.85rem; color:var(--muted); margin-bottom:.35rem; font-weight:600}
+.field input,.field select{
+  width:100%; padding:.6rem .7rem; background:var(--panel2); color:var(--text);
+  border:1px solid var(--line); border-radius:9px; font-size:1rem; font-family:inherit;
+}
+.field input:focus,.field select:focus{outline:2px solid var(--accent2); outline-offset:0}
+.hint{font-size:.74rem; color:#6b7a8f; margin-top:.25rem}
+.out{
+  margin-top:1.3rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.9rem;
+}
+.card{background:var(--panel2); border:1px solid var(--line); border-radius:11px; padding:1rem; text-align:center}
+.card .num{font-size:1.9rem; font-weight:700; color:var(--accent)}
+.card .lbl{font-size:.78rem; color:var(--muted); margin-top:.2rem}
+.card.alt .num{color:var(--accent2)}
+.card.warnc .num{color:var(--warn)}
+.bar{height:14px; background:var(--panel2); border-radius:8px; overflow:hidden; margin:1.1rem 0 .3rem; border:1px solid var(--line)}
+.bar span{display:block; height:100%; background:linear-gradient(90deg,#38bdf8,#4ade80)}
+.msg{font-size:.88rem; color:var(--muted); margin-top:.5rem}
+table{width:100%; border-collapse:collapse; margin:.6rem 0; font-size:.92rem}
+th,td{border:1px solid var(--line); padding:.5rem .6rem; text-align:left}
+th{background:var(--panel2); color:var(--muted)}
+code{background:#0a0e15; padding:.12rem .4rem; border-radius:5px; color:var(--accent2); font-size:.9em}
+.formula{background:#0a0e15; border:1px solid var(--line); border-radius:10px; padding:.9rem 1rem; overflow-x:auto; font-size:.92rem}
+p{color:#cdd7e3}
+.related a{
+  display:inline-block; margin:.3rem .5rem .3rem 0; padding:.55rem .85rem;
+  background:var(--panel2); border:1px solid var(--line); border-radius:9px;
+  color:var(--accent2); text-decoration:none; font-weight:600; font-size:.92rem;
+}
+.related a:hover{border-color:var(--accent2)}
+footer{border-top:1px solid var(--line); padding:1.5rem 1.25rem; text-align:center; color:var(--muted); font-size:.9rem}
+footer a{color:var(--accent2); text-decoration:none; margin:0 .5rem}
+footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">gpt0x.com</a>
+  <a href="/tools/">All Tools</a>
+</nav>
+<main>
+  <h1>How Many Concurrent Users Can One GPU Serve?</h1>
+  <p class="intro">Estimate the realistic concurrent-session capacity of a single GPU running an LLM, derived from free VRAM after model weights and the KV cache footprint each active context consumes.</p>
+
+  <section id="tool">
+    <div class="grid">
+      <div class="field">
+        <label for="vram">GPU VRAM (GB)</label>
+        <input id="vram" type="number" value="80" min="1" step="1">
+        <div class="hint">e.g. A100 80, H100 80, RTX 4090 24, L40S 48</div>
+      </div>
+      <div class="field">
+        <label for="params">Model size (billion params)</label>
+        <input id="params" type="number" value="70" min="0.1" step="0.5">
+      </div>
+      <div class="field">
+        <label for="qbits">Weight quantization</label>
+        <select id="qbits">
+          <option value="16">FP16 / BF16 (16-bit)</option>
+          <option value="8" selected>INT8 / FP8 (8-bit)</option>
+          <option value="4">INT4 / Q4 (4-bit)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="layers">Transformer layers</label>
+        <input id="layers" type="number" value="80" min="1" step="1">
+      </div>
+      <div class="field">
+        <label for="kvheads">KV heads (GQA)</label>
+        <input id="kvheads" type="number" value="8" min="1" step="1">
+        <div class="hint">Use head count of grouped-query KV, not total attention heads</div>
+      </div>
+      <div class="field">
+        <label for="headdim">Head dimension</label>
+        <input id="headdim" type="number" value="128" min="1" step="1">
+      </div>
+      <div class="field">
+        <label for="ctx">Context length per user (tokens)</label>
+        <input id="ctx" type="number" value="4096" min="128" step="128">
+      </div>
+      <div class="field">
+        <label for="kvbytes">KV cache precision</label>
+        <select id="kvbytes">
+          <option value="2" selected>FP16 (2 bytes)</option>
+          <option value="1">FP8 / INT8 (1 byte)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="overhead">Reserved overhead (GB)</label>
+        <input id="overhead" type="number" value="4" min="0" step="0.5">
+        <div class="hint">Activations, CUDA graphs, fragmentation buffer</div>
+      </div>
+      <div class="field">
+        <label for="util">Usable VRAM fraction (%)</label>
+        <input id="util" type="number" value="90" min="10" max="100" step="1">
+      </div>
+    </div>
+
+    <div class="bar"><span id="bar" style="width:0%"></span></div>
+    <div class="msg" id="breakdown"></div>
+
+    <div class="out">
+      <div class="card"><div class="num" id="oUsers">0</div><div class="lbl">Concurrent users / GPU</div></div>
+      <div class="card alt"><div class="num" id="oKv">0</div><div class="lbl">KV cache / user (GB)</div></div>
+      <div class="card warnc"><div class="num" id="oWeights">0</div><div class="lbl">Model weights (GB)</div></div>
+      <div class="card"><div class="num" id="oFree">0</div><div class="lbl">VRAM left for KV (GB)</div></div>
+    </div>
+  </section>
+
+  <h2>The formula this tool uses</h2>
+  <div class="formula">
+    weights_GB = params_B &times; (quant_bits / 8)<br>
+    kv_per_token_bytes = 2 &times; layers &times; kv_heads &times; head_dim &times; kv_bytes<br>
+    kv_per_user_GB = kv_per_token_bytes &times; context_tokens / 1024&sup3;<br>
+    usable_GB = VRAM &times; (usable_fraction) &minus; weights_GB &minus; overhead_GB<br>
+    <strong>concurrent_users = floor( usable_GB / kv_per_user_GB )</strong>
+  </div>
+
+  <p>Most "tokens per second" benchmarks ignore the harder ceiling on a production endpoint: memory, not compute. Once the model weights are resident, every additional concurrent session must keep its own key/value cache in VRAM for the full length of its conversation. That KV cache, not the GPU's FLOPS, is what caps how many users a single card can hold at once.</p>
+
+  <p>The leading factor of <code>2</code> in the per-token formula accounts for storing both the key and the value tensor. We multiply by the number of transformer layers, the number of KV heads (use the grouped-query value, which is why modern models like Llama-3 70B fit far more sessions than their total head count would suggest), and the head dimension. Multiplying by the bytes per element gives the memory a single token occupies; scaling by the context length gives one user's footprint.</p>
+
+  <p>Available memory is whatever remains after weights and a reserved overhead slice for activations, CUDA graphs, and allocator fragmentation. We also apply a usable-fraction discount because no inference server safely fills 100% of VRAM. Dividing the remainder by the per-user KV cost and taking the floor yields a defensible concurrency estimate. Quantizing weights to INT4 frees room for the cache, while an 8-bit KV cache roughly doubles the sessions you can host. Treat the result as a steady-state ceiling at full context; with shorter average prompts or paged-attention reuse, real throughput is usually higher.</p>
+
+  <section class="related">
+    <h2>Related Tools</h2>
+    <a href="/tools/kv-cache-memory-calculator">KV Cache Memory Calculator</a>
+    <a href="/tools/ai-inference-cost-calculator">AI Inference Cost Calculator</a>
+    <a href="/tools/gpu-vram-calculator">GPU VRAM Calculator</a>
+  </section>
+</main>
+
+<footer>
+  <div>
+    <a href="/">Home</a>
+    <a href="/tools/">All Tools</a>
+  </div>
+  <div style="margin-top:.6rem">© 2026 gpt0x.com · Built by Michael Lip</div>
+</footer>
+
+<script>
+(function(){
+  var ids = ["vram","params","qbits","layers","kvheads","headdim","ctx","kvbytes","overhead","util"];
+  var el = {};
+  ids.forEach(function(id){ el[id] = document.getElementById(id); });
+
+  function num(id){ var v = parseFloat(el[id].value); return isNaN(v) ? 0 : v; }
+  function fmt(n, d){ return n.toLocaleString(undefined, {maximumFractionDigits: d===undefined?2:d}); }
+
+  function compute(){
+    var vram = num("vram");
+    var params = num("params");
+    var qbits = num("qbits");
+    var layers = num("layers");
+    var kvheads = num("kvheads");
+    var headdim = num("headdim");
+    var ctx = num("ctx");
+    var kvbytes = num("kvbytes");
+    var overhead = num("overhead");
+    var util = Math.min(Math.max(num("util"), 0), 100) / 100;
+
+    var GiB = 1073741824; // 1024^3
+
+    // Model weights in GB
+    var weightsGB = params * (qbits / 8);
+
+    // KV cache per token (bytes): 2 (K+V) * layers * kv_heads * head_dim * bytes_per_elem
+    var kvPerTokenBytes = 2 * layers * kvheads * headdim * kvbytes;
+    var kvPerUserGB = (kvPerTokenBytes * ctx) / GiB;
+
+    // Usable VRAM for KV
+    var usableGB = vram * util - weightsGB - overhead;
+    if (usableGB < 0) usableGB = 0;
+
+    var users = (kvPerUserGB > 0) ? Math.floor(usableGB / kvPerUserGB) : 0;
+
+    document.getElementById("oUsers").textContent = fmt(users, 0);
+    document.getElementById("oKv").textContent = fmt(kvPerUserGB, 3);
+    document.getElementById("oWeights").textContent = fmt(weightsGB, 1);
+    document.getElementById("oFree").textContent = fmt(usableGB, 1);
+
+    // Memory bar: weights vs overhead vs kv-used vs slack
+    var totalUsable = vram * util;
+    var kvUsed = users * kvPerUserGB;
+    var fillPct = totalUsable > 0 ? Math.min((weightsGB + overhead + kvUsed) / vram * 100, 100) : 0;
+    document.getElementById("bar").style.width = fillPct.toFixed(1) + "%";
+
+    var msg;
+    if (weightsGB + overhead >= vram * util) {
+      msg = "Model weights (" + fmt(weightsGB,1) + " GB) plus overhead exceed usable VRAM — this GPU cannot host the model. Try heavier quantization or a smaller model.";
+    } else if (users === 0) {
+      msg = "Weights fit, but no room left for even one full-context session. Reduce context length or KV precision.";
+    } else {
+      msg = "Each session holds " + fmt(kvPerUserGB,3) + " GB of KV cache at " + fmt(ctx,0) +
+            " tokens. After " + fmt(weightsGB,1) + " GB weights + " + fmt(overhead,1) +
+            " GB overhead, " + fmt(usableGB,1) + " GB serves about " + fmt(users,0) + " users.";
+    }
+    document.getElementById("breakdown").textContent = msg;
+  }
+
+  ids.forEach(function(id){
+    el[id].addEventListener("input", compute);
+    el[id].addEventListener("change", compute);
+  });
+
+  compute();
+})();
+</script>
+</body>
+</html>

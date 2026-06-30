@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantization VRAM Savings Calculator</title>
+<meta name="description" content="Compare VRAM for FP16, INT8, INT4 and GGUF quantization. See exactly how much GPU memory each quant level saves for any LLM.">
+<link rel="canonical" href="https://gpt0x.com/tools/quantization-vram-savings-calculator">
+<meta property="og:title" content="Quantization VRAM Savings Calculator">
+<meta property="og:description" content="Compare VRAM for FP16, INT8, INT4 and GGUF quantization. See exactly how much GPU memory each quant level saves for any LLM.">
+<meta property="og:url" content="https://gpt0x.com/tools/quantization-vram-savings-calculator">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Quantization VRAM Savings Calculator",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "Quantization VRAM Savings Calculator", "item": "https://gpt0x.com/tools/quantization-vram-savings-calculator" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root{--bg:#0c1018;--card:#151b28;--card2:#1b2433;--ink:#e7ecf5;--mut:#93a0b8;--acc:#4f9cff;--good:#34d399;--warn:#fbbf24;--bord:#26303f}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+nav{display:flex;gap:18px;padding:16px 22px;background:#0a0e15;border-bottom:1px solid var(--bord);font-size:14px}
+nav a{color:var(--acc);text-decoration:none;font-weight:600}
+nav a:hover{text-decoration:underline}
+main{max-width:880px;margin:0 auto;padding:26px 18px 60px}
+h1{font-size:27px;line-height:1.25;margin:14px 0 8px}
+h2{font-size:20px;margin:34px 0 12px;border-left:3px solid var(--acc);padding-left:10px}
+.intro{color:var(--mut);font-size:16px;margin-bottom:8px}
+#tool{background:var(--card);border:1px solid var(--bord);border-radius:14px;padding:22px;margin-top:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:13px;font-weight:600;color:var(--mut);margin-bottom:6px;letter-spacing:.2px}
+input,select{width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--bord);background:var(--card2);color:var(--ink);font-size:15px;font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--acc)}
+.hint{font-size:12px;color:var(--mut);margin-top:5px}
+.out{margin-top:22px;background:var(--card2);border:1px solid var(--bord);border-radius:12px;padding:18px}
+.big{font-size:34px;font-weight:800;color:var(--good)}
+.big span{font-size:16px;color:var(--mut);font-weight:600}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+th,td{text-align:right;padding:9px 10px;border-bottom:1px solid var(--bord)}
+th:first-child,td:first-child{text-align:left}
+thead th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+.tagsave{color:var(--good);font-weight:700}
+.fit-yes{color:var(--good);font-weight:700}
+.fit-no{color:#f87171;font-weight:700}
+.row-sel{background:rgba(79,156,255,.10)}
+.bars{margin-top:16px}
+.bar{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+.bar b{width:64px;color:var(--mut);font-weight:600}
+.barfill{height:18px;border-radius:5px;background:linear-gradient(90deg,#4f9cff,#34d399);min-width:3px}
+.note{font-size:13px;color:var(--mut);margin-top:14px;padding-top:12px;border-top:1px dashed var(--bord)}
+section p{color:#cdd6e6}
+.related a{display:inline-block;margin:6px 10px 0 0;padding:9px 14px;background:var(--card2);border:1px solid var(--bord);border-radius:9px;color:var(--acc);text-decoration:none;font-size:14px;font-weight:600}
+.related a:hover{border-color:var(--acc)}
+footer{border-top:1px solid var(--bord);padding:24px 18px;text-align:center;color:var(--mut);font-size:14px}
+footer a{color:var(--acc);text-decoration:none;margin:0 9px;font-weight:600}
+code{background:#0a0e15;padding:2px 6px;border-radius:5px;font-size:13px;color:#9ecbff}
+</style>
+</head>
+<body>
+<nav>
+<a href="/">gpt0x.com</a>
+<a href="/tools/">All Tools</a>
+</nav>
+<main>
+<h1>Estimate GPU Memory Saved by Quantizing Your LLM</h1>
+<p class="intro">Set your model size and pick a quantization level to see VRAM for FP16, INT8, INT4 and GGUF formats side by side — including weights, KV cache and runtime overhead.</p>
+
+<section id="tool">
+<div class="grid">
+<div>
+<label for="params">Model size (billion parameters)</label>
+<input id="params" type="number" min="0.1" max="1000" step="0.1" value="13">
+<div class="hint">e.g. 7, 13, 70 — the "B" in the model name</div>
+</div>
+<div>
+<label for="quant">Target quantization</label>
+<select id="quant">
+<option value="16">FP16 / BF16 (16-bit, full)</option>
+<option value="8" selected>INT8 (8-bit)</option>
+<option value="6">GGUF Q6_K (~6.6-bit)</option>
+<option value="5">GGUF Q5_K_M (~5.5-bit)</option>
+<option value="4">GGUF Q4_K_M / INT4 (~4.5-bit)</option>
+<option value="3">GGUF Q3_K_M (~3.4-bit)</option>
+<option value="2">GGUF Q2_K (~2.6-bit)</option>
+</select>
+</div>
+<div>
+<label for="ctx">Context length (tokens)</label>
+<input id="ctx" type="number" min="0" max="1000000" step="512" value="4096">
+<div class="hint">Drives the KV cache size</div>
+</div>
+<div>
+<label for="vram">Your GPU VRAM (GB, optional)</label>
+<input id="vram" type="number" min="0" max="2000" step="1" value="24">
+<div class="hint">Check what fits — set 0 to ignore</div>
+</div>
+</div>
+
+<div class="out" id="out"></div>
+</section>
+
+<section>
+<h2>How this VRAM calculator works</h2>
+<p>Large language models store one number per weight. At full precision each weight is 16 bits (2 bytes), so the raw weight memory is simply <code>params × bytes_per_weight</code>. Quantization shrinks <em>bytes_per_weight</em> by packing each value into fewer bits, which is why an INT4 model is roughly a quarter the size of its FP16 original.</p>
+<p>The core formula this tool uses for weight memory is:</p>
+<p><code>weight_GB = (params_B × 1e9 × bits_per_weight / 8) / 1024³</code></p>
+<p>GGUF "K-quants" are not clean power-of-two widths — they mix block scales and a few higher-precision tensors, so their <em>effective</em> bits-per-weight land between the labels: Q4_K_M is about 4.5 bpw, Q5_K_M about 5.5, Q6_K about 6.6, and Q2_K about 2.6. This calculator uses those measured effective widths rather than the nominal bit count, which is the detail most simple estimators get wrong and the reason real GGUF files are larger than a naive "params ÷ 2" guess.</p>
+<p>Weights are only part of the budget. Inference also needs a <strong>KV cache</strong> that grows with context length. We approximate it as <code>kv_GB = 2 × layers × hidden × ctx × 2 bytes</code>, deriving layers and hidden width from the parameter count, and the cache is held in FP16 regardless of weight quantization. On top of that we add a fixed ~15% runtime overhead for activations, CUDA context and fragmentation. The "savings" figure compares each quant level's total against the FP16 baseline, so you can see the exact GB and percentage each step buys you. Lower precision trades memory for a small accuracy loss — Q4_K_M is the usual sweet spot, while Q2_K is best reserved for fitting a model that otherwise will not load at all.</p>
+</section>
+
+<section>
+<h2>Related Tools</h2>
+<div class="related">
+<a href="/tools/gpu-vram-calculator">GPU VRAM Calculator</a>
+<a href="/tools/model-size-converter">Model Size Converter</a>
+<a href="/tools/ai-inference-cost-calculator">AI Inference Cost Calculator</a>
+</div>
+</section>
+</main>
+
+<footer>
+<a href="/">Home</a> · <a href="/tools/">All Tools</a><br>
+© 2026 gpt0x.com — built by Michael Lip
+</footer>
+
+<script>
+(function(){
+  var LEVELS=[
+    {k:"FP16/BF16",bpw:16},
+    {k:"INT8",bpw:8},
+    {k:"Q6_K",bpw:6.6},
+    {k:"Q5_K_M",bpw:5.5},
+    {k:"Q4_K_M",bpw:4.5},
+    {k:"Q3_K_M",bpw:3.4},
+    {k:"Q2_K",bpw:2.6}
+  ];
+  var pe=document.getElementById('params'),
+      qe=document.getElementById('quant'),
+      ce=document.getElementById('ctx'),
+      ve=document.getElementById('vram'),
+      out=document.getElementById('out');
+
+  function clamp(v,lo,hi){return v<lo?lo:(v>hi?hi:v);}
+
+  // crude architecture estimate from param count
+  function arch(pB){
+    var layers, hidden;
+    if(pB<=1.5){layers=22;hidden=2048;}
+    else if(pB<=4){layers=26;hidden=3072;}
+    else if(pB<=9){layers=32;hidden=4096;}
+    else if(pB<=16){layers=40;hidden=5120;}
+    else if(pB<=40){layers=60;hidden=6656;}
+    else if(pB<=80){layers=80;hidden=8192;}
+    else {layers=96;hidden=12288;}
+    return {layers:layers,hidden:hidden};
+  }
+
+  function weightGB(pB,bpw){
+    return (pB*1e9*bpw/8)/Math.pow(1024,3);
+  }
+  function kvGB(pB,ctx){
+    var a=arch(pB);
+    // 2 (K+V) * layers * hidden * ctx * 2 bytes(fp16)
+    return (2*a.layers*a.hidden*ctx*2)/Math.pow(1024,3);
+  }
+
+  function fmt(x){
+    if(x>=100)return x.toFixed(0);
+    if(x>=10)return x.toFixed(1);
+    return x.toFixed(2);
+  }
+
+  function render(){
+    var pB=clamp(parseFloat(pe.value)||0.1,0.1,1000);
+    var ctx=clamp(parseFloat(ce.value)||0,0,1000000);
+    var vram=clamp(parseFloat(ve.value)||0,0,2000);
+    var selBpw=parseFloat(qe.value);
+
+    var kv=kvGB(pB,ctx);
+    var fp16w=weightGB(pB,16);
+    var fp16tot=(fp16w+kv)*1.15;
+
+    var rows="", maxTot=0, results=[];
+    LEVELS.forEach(function(L){
+      var w=weightGB(pB,L.bpw);
+      var tot=(w+kv)*1.15;
+      if(tot>maxTot)maxTot=tot;
+      results.push({k:L.k,bpw:L.bpw,w:w,tot:tot});
+    });
+
+    results.forEach(function(r){
+      var save=fp16tot-r.tot;
+      var pct=fp16tot>0?(save/fp16tot*100):0;
+      var sel=Math.abs(r.bpw-selBpw)<0.01;
+      var fit="";
+      if(vram>0){fit=r.tot<=vram?'<span class="fit-yes">fits</span>':'<span class="fit-no">no</span>';}
+      rows+='<tr class="'+(sel?'row-sel':'')+'">'+
+        '<td>'+r.k+(sel?' ◄':'')+'</td>'+
+        '<td>'+fmt(r.w)+'</td>'+
+        '<td>'+fmt(r.tot)+'</td>'+
+        '<td class="tagsave">'+(r.bpw>=16?'—':(fmt(save)+' ('+pct.toFixed(0)+'%)'))+'</td>'+
+        (vram>0?'<td>'+fit+'</td>':'')+
+      '</tr>';
+    });
+
+    var sel=results.filter(function(r){return Math.abs(r.bpw-selBpw)<0.01;})[0]||results[0];
+    var selSave=fp16tot-sel.tot;
+    var selPct=fp16tot>0?(selSave/fp16tot*100):0;
+
+    var bars="";
+    results.forEach(function(r){
+      var pctw=maxTot>0?(r.tot/maxTot*100):0;
+      bars+='<div class="bar"><b>'+r.k.replace('/BF16','')+'</b>'+
+        '<div class="barfill" style="width:'+pctw.toFixed(1)+'%"></div>'+
+        '<span style="color:var(--mut)">'+fmt(r.tot)+' GB</span></div>';
+    });
+
+    var vramMsg="";
+    if(vram>0){
+      vramMsg = sel.tot<=vram
+        ? '<div class="note">✓ Your '+vram+' GB GPU can run this model at '+sel.k+' ('+fmt(vram-sel.tot)+' GB headroom).</div>'
+        : '<div class="note">✗ This model needs '+fmt(sel.tot)+' GB at '+sel.k+', over your '+vram+' GB. Try a lower quant level above.</div>';
+    }
+
+    out.innerHTML=
+      '<div>Total VRAM at '+sel.k+'</div>'+
+      '<div class="big">'+fmt(sel.tot)+' <span>GB</span></div>'+
+      '<div style="color:var(--mut);font-size:14px;margin-top:4px">Saves '+(sel.bpw>=16?'0':fmt(selSave))+
+      ' GB vs FP16 ('+(sel.bpw>=16?'0':selPct.toFixed(0))+'% smaller) · weights '+fmt(sel.w)+
+      ' GB + KV cache '+fmt(kv)+' GB + 15% overhead</div>'+
+      '<table><thead><tr><th>Format</th><th>Weights</th><th>Total</th><th>Saved</th>'+(vram>0?'<th>Fit</th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table>'+
+      '<div class="bars">'+bars+'</div>'+
+      vramMsg;
+  }
+
+  [pe,qe,ce,ve].forEach(function(el){
+    el.addEventListener('input',render);
+    el.addEventListener('change',render);
+  });
+  render();
+})();
+</script>
+</body>
+</html>
