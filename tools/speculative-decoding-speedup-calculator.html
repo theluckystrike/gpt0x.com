@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speculative Decoding Speedup Calculator</title>
+<meta name="description" content="Estimate wall-clock speedup from speculative decoding. Enter draft acceptance rate, speculation length, and draft/target latency ratio to get expected">
+<link rel="canonical" href="https://gpt0x.com/tools/speculative-decoding-speedup-calculator">
+<meta property="og:title" content="Speculative Decoding Speedup Calculator">
+<meta property="og:description" content="Estimate wall-clock speedup from speculative decoding. Enter draft acceptance rate, speculation length, and draft/target latency ratio to get expected">
+<meta property="og:url" content="https://gpt0x.com/tools/speculative-decoding-speedup-calculator">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Speculative Decoding Speedup Calculator",
+      "url": "https://gpt0x.com/tools/speculative-decoding-speedup-calculator",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "description": "Estimate wall-clock speedup from speculative decoding using the standard acceptance-rate model, with optimal speculation-length sweep.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "Speculative Decoding Speedup Calculator", "item": "https://gpt0x.com/tools/speculative-decoding-speedup-calculator" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root {
+    --bg: #0d1017;
+    --panel: #161b25;
+    --panel2: #1d2431;
+    --border: #2a3444;
+    --fg: #e6ebf2;
+    --muted: #93a1b5;
+    --accent: #6fd3c8;
+    --accent2: #f2b96a;
+    --good: #63d29a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+  }
+  nav {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  nav a { color: var(--accent); text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  main { max-width: 860px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+  h1 { font-size: 1.7rem; line-height: 1.25; margin: 0.5rem 0 0.75rem; }
+  h2 { font-size: 1.25rem; margin: 2rem 0 0.75rem; }
+  p { color: var(--fg); }
+  .lead { color: var(--muted); font-size: 1.05rem; }
+  section#tool {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.25rem;
+  }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 0.35rem; }
+  label { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+  label .hint { font-weight: 400; color: #6f7d90; }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  input[type="number"] {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    border-radius: 8px;
+    padding: 0.5rem 0.6rem;
+    font-size: 1rem;
+    width: 100%;
+  }
+  .rowval { display: flex; justify-content: space-between; align-items: baseline; }
+  .rowval b { color: var(--accent); font-variant-numeric: tabular-nums; }
+  .out {
+    margin-top: 1.25rem;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+  }
+  .bignum {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--good);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .bignum span { font-size: 1rem; color: var(--muted); font-weight: 400; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 1rem; }
+  @media (max-width: 640px) { .stats { grid-template-columns: 1fr; } }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.7rem 0.8rem;
+  }
+  .stat .k { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+  .stat .v { font-size: 1.25rem; font-weight: 700; color: var(--fg); font-variant-numeric: tabular-nums; }
+  .note { font-size: 0.85rem; color: var(--muted); margin-top: 0.9rem; }
+  .sweep { margin-top: 1rem; }
+  .sweep table { width: 100%; border-collapse: collapse; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+  .sweep th, .sweep td { padding: 0.4rem 0.5rem; text-align: right; border-bottom: 1px solid var(--border); }
+  .sweep th:first-child, .sweep td:first-child { text-align: left; }
+  .sweep th { color: var(--muted); font-weight: 600; }
+  .sweep tr.best td { color: var(--accent2); font-weight: 700; }
+  .sweep .barcell { width: 40%; }
+  .bar { height: 8px; background: var(--accent); border-radius: 4px; }
+  code {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.9em;
+  }
+  .formula {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.92rem;
+    color: var(--accent);
+  }
+  a.inline { color: var(--accent); }
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 1.25rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .related a { display: inline-block; margin-right: 1rem; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">Home</a>
+  <a href="/tools/">Tools</a>
+</nav>
+<main>
+  <h1>How much faster is speculative decoding for your setup?</h1>
+  <p class="lead">Speculative decoding uses a small draft model to propose several tokens that a large target model verifies in a single forward pass. This calculator predicts the real wall-clock speedup from your draft acceptance rate, the speculation length, and how much cheaper the draft model is per token.</p>
+
+  <section id="tool">
+    <div class="grid">
+      <div class="field">
+        <label for="alpha">Draft acceptance rate α <span class="hint">(prob. a drafted token is kept)</span></label>
+        <div class="rowval"><span class="hint" style="font-size:.8rem;color:#6f7d90">0.05</span><b id="alphaVal">0.75</b><span class="hint" style="font-size:.8rem;color:#6f7d90">0.98</span></div>
+        <input type="range" id="alpha" min="0.05" max="0.98" step="0.01" value="0.75">
+      </div>
+      <div class="field">
+        <label for="gamma">Speculation length γ <span class="hint">(draft tokens per step)</span></label>
+        <input type="number" id="gamma" min="1" max="16" step="1" value="4">
+      </div>
+      <div class="field">
+        <label for="cratio">Draft / target latency ratio c <span class="hint">(draft cost as fraction of target)</span></label>
+        <div class="rowval"><span class="hint" style="font-size:.8rem;color:#6f7d90">0.01</span><b id="cVal">0.15</b><span class="hint" style="font-size:.8rem;color:#6f7d90">0.60</span></div>
+        <input type="range" id="cratio" min="0.01" max="0.60" step="0.01" value="0.15">
+      </div>
+      <div class="field">
+        <label for="baseTps">Baseline target tokens/sec <span class="hint">(vanilla autoregressive)</span></label>
+        <input type="number" id="baseTps" min="1" max="1000" step="1" value="40">
+      </div>
+    </div>
+
+    <div class="out">
+      <div class="bignum" id="speedup">1.00&times; <span>net speedup</span></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Accepted tokens / step (E)</div><div class="v" id="expTokens">1.00</div></div>
+        <div class="stat"><div class="k">Effective tokens/sec</div><div class="v" id="effTps">40</div></div>
+        <div class="stat"><div class="k">Optimal γ (for α, c)</div><div class="v" id="optGamma">4</div></div>
+      </div>
+      <div class="note" id="verdict"></div>
+      <div class="sweep">
+        <table id="sweepTable">
+          <thead><tr><th>γ</th><th>E tokens</th><th>Speedup</th><th class="barcell"></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <h2>The formula behind the number</h2>
+  <p>Each verification step, the draft model proposes <code>γ</code> tokens. Under the standard model each token is independently accepted with probability <code>α</code>, so acceptance stops at the first rejection. The <strong>expected number of tokens produced per step</strong> — accepted drafts plus the one bonus token the target always emits — is a truncated geometric series:</p>
+  <div class="formula">E = (1 &minus; α^(γ+1)) / (1 &minus; α)</div>
+  <p>The <strong>cost per step</strong>, measured in target-model forward passes, is one full target verification pass (cost 1) plus the draft model generating <code>γ</code> tokens at a per-token cost <code>c</code> relative to the target. That gives a wall-clock speedup versus vanilla decoding of:</p>
+  <div class="formula">speedup = E / (γ &middot; c + 1)</div>
+  <p>Two forces pull against each other. Raising <code>γ</code> lets a single verification pass accept a longer run of tokens, but every extra drafted token costs <code>c</code> whether it is accepted or not, and acceptance decays geometrically. The tool sweeps <code>γ</code> from 1 to 12 and reports the <strong>optimal speculation length</strong> for your <code>α</code> and <code>c</code> — the point where marginal draft cost overtakes the marginal accepted tokens. High acceptance and a cheap draft (small <code>c</code>) favor longer speculation; a mediocre draft or an expensive one favors <code>γ = 1&ndash;2</code>. If the speedup drops below 1.0, speculative decoding is a net loss and you should decode normally. Multiply the speedup by your measured baseline tokens/sec to get an effective throughput estimate; treat it as an upper bound, since batching, KV-cache pressure, and drafting overhead in real serving stacks shave off some of the theoretical win.</p>
+
+  <h2>Related Tools</h2>
+  <p class="related">
+    <a class="inline" href="/tools/kv-cache-memory-calculator">KV-Cache Memory Calculator</a>
+    <a class="inline" href="/tools/llm-inference-throughput-calculator">LLM Inference Throughput Calculator</a>
+    <a class="inline" href="/tools/gpu-vram-requirement-calculator">GPU VRAM Requirement Calculator</a>
+  </p>
+</main>
+
+<footer>
+  <p>&copy; 2026 gpt0x.com &middot; <a href="/tools/">All Tools</a> &middot; <a href="/">Home</a> &middot; Built by <a href="https://zovo.one">Michael Lip</a></p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var alphaEl = document.getElementById("alpha");
+  var gammaEl = document.getElementById("gamma");
+  var cEl = document.getElementById("cratio");
+  var baseEl = document.getElementById("baseTps");
+
+  var alphaValEl = document.getElementById("alphaVal");
+  var cValEl = document.getElementById("cVal");
+  var speedupEl = document.getElementById("speedup");
+  var expTokensEl = document.getElementById("expTokens");
+  var effTpsEl = document.getElementById("effTps");
+  var optGammaEl = document.getElementById("optGamma");
+  var verdictEl = document.getElementById("verdict");
+  var tbody = document.querySelector("#sweepTable tbody");
+
+  // Expected accepted+bonus tokens per verification step for acceptance alpha, draft length g.
+  function expectedTokens(alpha, g) {
+    if (alpha >= 0.999999) return g + 1;
+    return (1 - Math.pow(alpha, g + 1)) / (1 - alpha);
+  }
+
+  // Net speedup vs vanilla autoregressive decoding.
+  function speedup(alpha, g, c) {
+    return expectedTokens(alpha, g) / (g * c + 1);
+  }
+
+  function clampInt(v, lo, hi, def) {
+    var n = parseInt(v, 10);
+    if (isNaN(n)) n = def;
+    return Math.max(lo, Math.min(hi, n));
+  }
+  function clampFloat(v, lo, hi, def) {
+    var n = parseFloat(v);
+    if (isNaN(n)) n = def;
+    return Math.max(lo, Math.min(hi, n));
+  }
+
+  var SWEEP_MAX = 12;
+
+  function render() {
+    var alpha = clampFloat(alphaEl.value, 0.05, 0.98, 0.75);
+    var g = clampInt(gammaEl.value, 1, 16, 4);
+    var c = clampFloat(cEl.value, 0.01, 0.60, 0.15);
+    var base = clampFloat(baseEl.value, 1, 1000, 40);
+
+    alphaValEl.textContent = alpha.toFixed(2);
+    cValEl.textContent = c.toFixed(2);
+
+    var E = expectedTokens(alpha, g);
+    var s = speedup(alpha, g, c);
+    var effTps = base * s;
+
+    speedupEl.innerHTML = s.toFixed(2) + "&times; <span>net speedup</span>";
+    speedupEl.style.color = s >= 1.0 ? "var(--good)" : "var(--accent2)";
+    expTokensEl.textContent = E.toFixed(2);
+    effTpsEl.textContent = Math.round(effTps).toLocaleString();
+
+    // Sweep gamma to find the optimal speculation length and build the table.
+    var best = { g: 1, s: -Infinity };
+    var rows = [];
+    var maxS = 0;
+    for (var gi = 1; gi <= SWEEP_MAX; gi++) {
+      var si = speedup(alpha, gi, c);
+      var Ei = expectedTokens(alpha, gi);
+      rows.push({ g: gi, s: si, E: Ei });
+      if (si > best.s) { best = { g: gi, s: si }; }
+      if (si > maxS) maxS = si;
+    }
+    optGammaEl.textContent = best.g;
+
+    var html = "";
+    for (var r = 0; r < rows.length; r++) {
+      var row = rows[r];
+      var isBest = row.g === best.g;
+      var isCur = row.g === g;
+      var w = maxS > 0 ? (row.s / maxS * 100) : 0;
+      html += "<tr class='" + (isBest ? "best" : "") + "'>" +
+        "<td>" + row.g + (isCur ? " ◀" : "") + "</td>" +
+        "<td>" + row.E.toFixed(2) + "</td>" +
+        "<td>" + row.s.toFixed(2) + "&times;</td>" +
+        "<td class='barcell'><div class='bar' style='width:" + w.toFixed(1) + "%'></div></td>" +
+        "</tr>";
+    }
+    tbody.innerHTML = html;
+
+    var msg;
+    if (s < 1.0) {
+      msg = "At these settings speculative decoding is a net LOSS (" + s.toFixed(2) + "×). Draft overhead exceeds the accepted-token gain — decode normally, or lower γ toward " + best.g + " and/or use a cheaper/stronger draft model.";
+    } else {
+      var gain = ((s - 1) * 100).toFixed(0);
+      msg = "You gain about " + gain + "% throughput at γ=" + g + ". The optimal speculation length for α=" + alpha.toFixed(2) + ", c=" + c.toFixed(2) + " is γ=" + best.g + " (" + best.s.toFixed(2) + "×).";
+      if (best.g !== g) {
+        msg += " Set γ=" + best.g + " to capture the peak.";
+      }
+    }
+    verdictEl.textContent = msg;
+  }
+
+  [alphaEl, gammaEl, cEl, baseEl].forEach(function (el) {
+    el.addEventListener("input", render);
+    el.addEventListener("change", render);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

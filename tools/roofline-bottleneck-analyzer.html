@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Roofline Bottleneck Analyzer</title>
+<meta name="description" content="Find out if your LLM prefill or decode is memory-bandwidth-bound or compute-bound. Plots arithmetic intensity against a GPU roofline and shows the">
+<link rel="canonical" href="https://gpt0x.com/tools/roofline-bottleneck-analyzer">
+<meta property="og:title" content="LLM Roofline Bottleneck Analyzer">
+<meta property="og:description" content="Find out if your LLM prefill or decode is memory-bandwidth-bound or compute-bound. Plots arithmetic intensity against a GPU roofline and shows the">
+<meta property="og:url" content="https://gpt0x.com/tools/roofline-bottleneck-analyzer">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "LLM Roofline Bottleneck Analyzer",
+      "url": "https://gpt0x.com/tools/roofline-bottleneck-analyzer",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "description": "Find out if your LLM prefill or decode is memory-bandwidth-bound or compute-bound. Plots arithmetic intensity against a GPU roofline and shows the crossover batch size.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "LLM Roofline Bottleneck Analyzer", "item": "https://gpt0x.com/tools/roofline-bottleneck-analyzer" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#131824; --panel2:#1a2130; --line:#26303f;
+    --ink:#e6ebf2; --mut:#93a1b5; --acc:#5ac8fa; --acc2:#ffd479;
+    --mem:#ff6b6b; --cmp:#4cd964; --grid:#212a38;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;font-size:16px}
+  a{color:var(--acc);text-decoration:none}
+  a:hover{text-decoration:underline}
+  nav{display:flex;gap:18px;padding:14px 20px;border-bottom:1px solid var(--line);
+    font-size:14px;background:#0d1119;position:sticky;top:0;z-index:5}
+  .wrap{max-width:1000px;margin:0 auto;padding:22px 20px 60px}
+  h1{font-size:1.7rem;line-height:1.2;margin:18px 0 6px}
+  h2{font-size:1.2rem;margin:32px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  .lede{color:var(--mut);max-width:70ch}
+  section#tool{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:20px;margin-top:22px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+  label{display:block;font-size:12px;color:var(--mut);margin-bottom:5px;font-weight:600;
+    letter-spacing:.02em;text-transform:uppercase}
+  input,select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    border-radius:9px;padding:9px 10px;font-size:15px;font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--acc)}
+  .fieldnote{font-size:11px;color:#6c7a90;margin-top:4px}
+  .out{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.out{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .card h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut)}
+  .big{font-size:1.6rem;font-weight:700;line-height:1.1}
+  .verdict{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;
+    margin-top:8px}
+  .v-mem{background:rgba(255,107,107,.16);color:var(--mem);border:1px solid rgba(255,107,107,.4)}
+  .v-cmp{background:rgba(76,217,100,.16);color:var(--cmp);border:1px solid rgba(76,217,100,.4)}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+  th,td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--grid)}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase}
+  .chartwrap{margin-top:18px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:11px;padding:14px}
+  canvas{width:100%;height:auto;display:block;background:#0c111a;border-radius:8px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:10px}
+  .swatch{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .prose{max-width:74ch}
+  code{background:#0d1119;border:1px solid var(--line);border-radius:5px;padding:1px 6px;
+    font-size:.9em;color:var(--acc2)}
+  .kv{color:var(--mut)}
+  footer{border-top:1px solid var(--line);margin-top:44px;padding:22px 20px;color:var(--mut);
+    font-size:14px;text-align:center}
+  footer a{margin:0 8px}
+  .rel a{display:inline-block;margin-right:14px}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">Home</a>
+  <a href="/tools/">Tools</a>
+</nav>
+<div class="wrap">
+
+<h1>Is Your LLM Memory-Bound or Compute-Bound?</h1>
+<p class="lede">Plug in a model's dimensions and a GPU, and this analyzer computes the <strong>arithmetic intensity</strong> of the prefill and decode phases, places each on the hardware <strong>roofline</strong>, and solves for the exact batch size where decode stops wasting your tensor cores.</p>
+
+<section id="tool">
+  <div class="grid">
+    <div>
+      <label for="preset">Model preset</label>
+      <select id="preset">
+        <option value="custom">Custom</option>
+        <option value="7b">Llama-class 7B</option>
+        <option value="8b" selected>Llama-3 8B</option>
+        <option value="13b">13B</option>
+        <option value="70b">Llama-3 70B (GQA)</option>
+        <option value="mistral7b">Mistral 7B (GQA)</option>
+      </select>
+      <div class="fieldnote">Fills the four model fields below.</div>
+    </div>
+    <div>
+      <label for="hidden">Hidden size (d_model)</label>
+      <input id="hidden" type="number" min="1" step="1" value="4096">
+    </div>
+    <div>
+      <label for="layers">Layers</label>
+      <input id="layers" type="number" min="1" step="1" value="32">
+    </div>
+    <div>
+      <label for="ffn">FFN intermediate size</label>
+      <input id="ffn" type="number" min="1" step="1" value="14336">
+      <div class="fieldnote">MLP up-projection width.</div>
+    </div>
+    <div>
+      <label for="kvheads">KV heads (for GQA)</label>
+      <input id="kvheads" type="number" min="1" step="1" value="8">
+      <div class="fieldnote">= query heads if MHA.</div>
+    </div>
+    <div>
+      <label for="qheads">Query heads</label>
+      <input id="qheads" type="number" min="1" step="1" value="32">
+    </div>
+    <div>
+      <label for="batch">Batch size</label>
+      <input id="batch" type="number" min="1" step="1" value="1">
+    </div>
+    <div>
+      <label for="seq">Sequence / context length</label>
+      <input id="seq" type="number" min="1" step="1" value="2048">
+    </div>
+    <div>
+      <label for="bytes">Weight/activation bytes</label>
+      <select id="bytes">
+        <option value="2" selected>FP16 / BF16 (2 B)</option>
+        <option value="1">INT8 / FP8 (1 B)</option>
+        <option value="0.5">INT4 (0.5 B)</option>
+      </select>
+    </div>
+    <div>
+      <label for="gpu">GPU</label>
+      <select id="gpu">
+        <option value="a100-40">A100 40GB (SXM)</option>
+        <option value="a100-80" selected>A100 80GB (SXM)</option>
+        <option value="h100">H100 SXM</option>
+        <option value="h200">H200 SXM</option>
+        <option value="l40s">L40S</option>
+        <option value="l4">L4</option>
+        <option value="4090">RTX 4090</option>
+        <option value="mi300x">MI300X</option>
+        <option value="custom">Custom GPU</option>
+      </select>
+    </div>
+    <div>
+      <label for="tflops">Peak (dtype) TFLOP/s</label>
+      <input id="tflops" type="number" min="1" step="1" value="312">
+      <div class="fieldnote">Dense, matches chosen dtype.</div>
+    </div>
+    <div>
+      <label for="bw">Mem bandwidth (GB/s)</label>
+      <input id="bw" type="number" min="1" step="1" value="2039">
+    </div>
+  </div>
+
+  <div class="out">
+    <div class="card">
+      <h3>Prefill (compute the prompt)</h3>
+      <div class="big" id="pf-ai">—</div>
+      <div class="kv">FLOPs / byte (arithmetic intensity)</div>
+      <div id="pf-verdict" class="verdict">—</div>
+    </div>
+    <div class="card">
+      <h3>Decode (one token/step)</h3>
+      <div class="big" id="dc-ai">—</div>
+      <div class="kv">FLOPs / byte (arithmetic intensity)</div>
+      <div id="dc-verdict" class="verdict">—</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3>Roofline &amp; crossover</h3>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>GPU ridge point (I*)</td><td id="ridge">—</td></tr>
+      <tr><td>Decode arithmetic intensity</td><td id="dc-ai2">—</td></tr>
+      <tr><td>Achievable decode TFLOP/s (roofline cap)</td><td id="dc-cap">—</td></tr>
+      <tr><td>Min batch to make decode compute-bound</td><td id="xbatch">—</td></tr>
+      <tr><td>Est. decode weight-read time / step</td><td id="dc-time">—</td></tr>
+    </table>
+    <p id="summary" class="kv" style="margin-top:10px"></p>
+  </div>
+
+  <div class="chartwrap">
+    <canvas id="chart" width="900" height="440"></canvas>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--acc)"></span>Roofline (perf ceiling)</span>
+      <span><span class="swatch" style="background:var(--mem)"></span>Decode point</span>
+      <span><span class="swatch" style="background:var(--cmp)"></span>Prefill point</span>
+      <span><span class="swatch" style="background:var(--acc2)"></span>Ridge point I*</span>
+    </div>
+  </div>
+</section>
+
+<h2>How the roofline model works</h2>
+<div class="prose">
+<p>The <strong>roofline model</strong> answers one question: for a given operation, is the GPU limited by how fast it can <em>read data from memory</em>, or by how fast it can <em>do math</em>? The dividing line is <strong>arithmetic intensity</strong> — the ratio of floating-point operations to bytes moved from HBM:</p>
+<p><code>AI = FLOPs / bytes_moved</code></p>
+<p>Each accelerator has a <strong>ridge point</strong>, <code>I* = peak_FLOPS / memory_bandwidth</code> (both in matching units). If a kernel's intensity is below <code>I*</code> it is <strong>memory-bandwidth-bound</strong>: the tensor cores sit idle waiting on HBM, and the best achievable throughput is <code>AI × bandwidth</code>. Above <code>I*</code> it is <strong>compute-bound</strong> and runs at peak FLOP/s.</p>
+<p>For a transformer layer the dominant matmuls are the QKV, attention output, and two MLP projections. A useful approximation for the linear layers is <code>FLOPs ≈ 2 × batch × tokens × params_per_token</code> and <code>bytes ≈ dtype × (weights + activations)</code>. During <strong>prefill</strong> all prompt tokens stream through the weights at once, so every weight byte is reused across <code>batch × seq</code> tokens — intensity is high and prefill is almost always compute-bound. During <strong>decode</strong> you generate one token per request per step, so each weight matrix is read from HBM to serve only <code>batch</code> tokens; intensity scales roughly linearly with batch, which is why single-request decode is severely memory-bound and why batching is the primary throughput lever.</p>
+<p>The analyzer solves <code>AI(batch) = I*</code> for the <strong>crossover batch size</strong> — the point where decode finally saturates compute. Below it, adding batch is nearly free throughput; above it you are compute-limited and latency starts to climb. The numbers are first-order estimates (they ignore attention-score FLOPs beyond the KV read, kernel-fusion, and cache effects) but they capture the shape that governs real deployment decisions.</p>
+</div>
+
+<h2>Related Tools</h2>
+<p class="rel">
+  <a href="/tools/kv-cache-calculator">KV-Cache VRAM Calculator</a>
+  <a href="/tools/llm-throughput-estimator">LLM Throughput Estimator</a>
+  <a href="/tools/gpu-vram-fit">GPU VRAM Fit Checker</a>
+</p>
+
+</div>
+
+<footer>
+  <div>
+    <a href="/">Home</a>
+    <a href="/tools/">All Tools</a>
+    <a href="/tools/kv-cache-calculator">KV-Cache Calculator</a>
+    <a href="https://zovo.one">More by Michael Lip</a>
+  </div>
+  <div style="margin-top:10px">© 2026 gpt0x.com</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+
+  var GPUS={
+    "a100-40":{tflops:312,bw:1555},
+    "a100-80":{tflops:312,bw:2039},
+    "h100":{tflops:989,bw:3350},
+    "h200":{tflops:989,bw:4800},
+    "l40s":{tflops:362,bw:864},
+    "l4":{tflops:121,bw:300},
+    "4090":{tflops:330,bw:1008},
+    "mi300x":{tflops:1307,bw:5300}
+  };
+  // Peak TFLOPS above are dense FP16/BF16. Scale roughly for lower precision.
+  var DTYPE_SCALE={"2":1,"1":2,"0.5":4};
+
+  var MODELS={
+    "7b":{hidden:4096,layers:32,ffn:11008,qheads:32,kvheads:32},
+    "8b":{hidden:4096,layers:32,ffn:14336,qheads:32,kvheads:8},
+    "13b":{hidden:5120,layers:40,ffn:13824,qheads:40,kvheads:40},
+    "70b":{hidden:8192,layers:80,ffn:28672,qheads:64,kvheads:8},
+    "mistral7b":{hidden:4096,layers:32,ffn:14336,qheads:32,kvheads:8}
+  };
+
+  function num(id){var v=parseFloat($(id).value);return isFinite(v)&&v>0?v:0;}
+
+  function fmt(x){
+    if(!isFinite(x))return "—";
+    if(x===0)return "0";
+    var a=Math.abs(x);
+    if(a>=1e12)return (x/1e12).toFixed(2)+" T";
+    if(a>=1e9)return (x/1e9).toFixed(2)+" B";
+    if(a>=1e6)return (x/1e6).toFixed(2)+" M";
+    if(a>=1e3)return (x/1e3).toFixed(2)+" k";
+    if(a>=10)return x.toFixed(1);
+    if(a>=1)return x.toFixed(2);
+    return x.toFixed(3);
+  }
+
+  // Per-layer parameter counts (weights) for the linear projections.
+  function linearParams(hidden,ffn,qheads,kvheads){
+    var headDim=hidden/qheads;
+    var qProj=hidden*hidden;                 // W_q
+    var kvProj=2*hidden*(kvheads*headDim);   // W_k + W_v (GQA-aware)
+    var oProj=hidden*hidden;                 // W_o
+    var mlp=3*hidden*ffn;                     // gate + up + down (SwiGLU-ish)
+    return qProj+kvProj+oProj+mlp;           // params per layer
+  }
+
+  function compute(){
+    var hidden=num('hidden'), layers=num('layers'), ffn=num('ffn');
+    var qheads=num('qheads'), kvheads=num('kvheads');
+    var batch=num('batch'), seq=num('seq');
+    var dbytes=parseFloat($('bytes').value);
+    var tflops=num('tflops'), bw=num('bw');
+
+    if(!hidden||!layers||!ffn||!qheads||!kvheads||!batch||!seq||!tflops||!bw){
+      return null;
+    }
+
+    var perLayer=linearParams(hidden,ffn,qheads,kvheads);
+    var totalParams=perLayer*layers; // linear-layer params (approx model size)
+
+    // ---- FLOPs (forward, factor 2 for MAC) ----
+    // Prefill: all batch*seq tokens flow through weights.
+    var pfTokens=batch*seq;
+    var pfFlops=2*pfTokens*totalParams;
+    // Decode: one token per request per step -> batch tokens.
+    var dcTokens=batch;
+    var dcFlops=2*dcTokens*totalParams;
+
+    // ---- Bytes moved from HBM ----
+    // Weights read once per forward (dominant term). Activation traffic small vs weights; approximate.
+    var weightBytes=totalParams*dbytes;
+    // KV-cache read during decode: per step read whole cache for attention.
+    var headDim=hidden/qheads;
+    var kvBytesPerTokLayer=2*kvheads*headDim*dbytes; // K+V
+    var kvReadDecode=batch*seq*layers*kvBytesPerTokLayer;
+    // Prefill also writes KV but weight reuse dominates; include weight read once.
+    var pfBytes=weightBytes;                 // weights streamed once, reused across all tokens
+    var dcBytes=weightBytes+kvReadDecode;    // weights + KV cache read every step
+
+    var pfAI=pfFlops/pfBytes;
+    var dcAI=dcFlops/dcBytes;
+
+    // ---- Roofline ridge point ----
+    var peakFlops=tflops*1e12;
+    var bwBytes=bw*1e9;
+    var ridge=peakFlops/bwBytes; // I* = FLOPs per byte
+
+    // ---- Crossover batch: solve dcAI(b) = ridge ----
+    // dcAI(b) = 2*b*P / (P*db + b*seq*L*kvPerLayer)
+    // set = I* -> 2*b*P = I*(P*db + b*seq*L*kv)
+    // b*(2P - I**seq*L*kv) = I* * P * db
+    var kvPerReq=seq*layers*kvBytesPerTokLayer; // KV bytes per request per step
+    var denomTerm=2*totalParams - ridge*kvPerReq;
+    var xbatch;
+    if(denomTerm<=0){
+      xbatch=Infinity; // KV read grows too fast; never crosses
+    }else{
+      xbatch=(ridge*totalParams*dbytes)/denomTerm;
+    }
+
+    // Achievable decode throughput (roofline cap)
+    var dcAchievable=Math.min(dcAI*bwBytes, peakFlops); // FLOP/s
+
+    // Decode weight-read time per step (lower bound on latency from memory)
+    var dcTimeMs=(dcBytes/bwBytes)*1000;
+
+    return {
+      totalParams:totalParams, pfAI:pfAI, dcAI:dcAI, ridge:ridge,
+      xbatch:xbatch, dcAchievable:dcAchievable, dcTimeMs:dcTimeMs,
+      peakFlops:peakFlops, bwBytes:bwBytes, batch:batch,
+      kvReadDecode:kvReadDecode, weightBytes:weightBytes
+    };
+  }
+
+  function verdict(ai,ridge,el){
+    if(ai>=ridge){
+      el.textContent="COMPUTE-BOUND";
+      el.className="verdict v-cmp";
+    }else{
+      el.textContent="MEMORY-BOUND";
+      el.className="verdict v-mem";
+    }
+  }
+
+  function render(){
+    var r=compute();
+    if(!r){
+      $('pf-ai').textContent="—"; $('dc-ai').textContent="—";
+      $('summary').textContent="Enter valid positive values in every field.";
+      return;
+    }
+    $('pf-ai').textContent=fmt(r.pfAI);
+    $('dc-ai').textContent=fmt(r.dcAI);
+    verdict(r.pfAI,r.ridge,$('pf-verdict'));
+    verdict(r.dcAI,r.ridge,$('dc-verdict'));
+
+    $('ridge').textContent=fmt(r.ridge)+" FLOP/byte";
+    $('dc-ai2').textContent=fmt(r.dcAI)+" FLOP/byte";
+    $('dc-cap').textContent=fmt(r.dcAchievable/1e12)+" TFLOP/s  ("+
+      (100*r.dcAchievable/r.peakFlops).toFixed(1)+"% of peak)";
+    $('xbatch').textContent=(r.xbatch===Infinity||!isFinite(r.xbatch))
+      ? "never (KV read dominates — reduce seq len)"
+      : Math.max(1,Math.ceil(r.xbatch)).toLocaleString();
+    $('dc-time').textContent=r.dcTimeMs.toFixed(3)+" ms/step";
+
+    var xb=Math.max(1,Math.ceil(r.xbatch));
+    var s;
+    if(r.dcAI>=r.ridge){
+      s="At batch "+r.batch+", decode is already compute-bound — you're saturating the tensor cores. Larger batches only help latency/throughput trade-offs now.";
+    }else if(r.xbatch===Infinity||!isFinite(r.xbatch)){
+      s="Decode can't reach the compute-bound region at this context length: KV-cache reads grow with batch as fast as compute does. Shorten context, use GQA/MQA, or quantize the KV cache.";
+    }else{
+      s="Decode is memory-bound at batch "+r.batch+" (running at ~"+(100*r.dcAchievable/r.peakFlops).toFixed(1)+"% of peak FLOP/s). Batching up to ~"+xb+" would push it into the compute-bound region and roughly "+(xb/r.batch).toFixed(1)+"× your token throughput before compute becomes the limit. Prefill, by contrast, is compute-bound — that's why prompt processing is fast per token.";
+    }
+    $('summary').textContent=s;
+
+    draw(r);
+  }
+
+  function draw(r){
+    var c=$('chart'), ctx=c.getContext('2d');
+    var W=c.width, H=c.height;
+    ctx.clearRect(0,0,W,H);
+    var padL=64,padR=24,padT=24,padB=48;
+    var plotW=W-padL-padR, plotH=H-padT-padB;
+
+    // log-log axes. X = arithmetic intensity, Y = attainable TFLOP/s
+    var xmin=0.01, xmax=Math.max(r.ridge*20, r.pfAI*2, 1000);
+    var ymin=0.1, ymax=r.peakFlops/1e12*1.4;
+    var lx0=Math.log10(xmin), lx1=Math.log10(xmax);
+    var ly0=Math.log10(ymin), ly1=Math.log10(ymax);
+
+    function X(v){return padL+(Math.log10(v)-lx0)/(lx1-lx0)*plotW;}
+    function Y(v){return padT+plotH-(Math.log10(v)-ly0)/(ly1-ly0)*plotH;}
+
+    // grid
+    ctx.strokeStyle="#212a38"; ctx.fillStyle="#6c7a90";
+    ctx.font="11px -apple-system,sans-serif"; ctx.lineWidth=1;
+    var decX=Math.floor(lx0), decXe=Math.ceil(lx1);
+    for(var e=decX;e<=decXe;e++){
+      var xv=Math.pow(10,e); var px=X(xv);
+      if(px<padL-1||px>W-padR+1)continue;
+      ctx.beginPath();ctx.moveTo(px,padT);ctx.lineTo(px,padT+plotH);ctx.stroke();
+      ctx.textAlign="center";
+      ctx.fillText(xv>=1?xv.toLocaleString():xv.toString(),px,padT+plotH+16);
+    }
+    var decY=Math.floor(ly0), decYe=Math.ceil(ly1);
+    for(var e2=decY;e2<=decYe;e2++){
+      var yv=Math.pow(10,e2); var py=Y(yv);
+      if(py<padT-1||py>padT+plotH+1)continue;
+      ctx.beginPath();ctx.moveTo(padL,py);ctx.lineTo(padL+plotW,py);ctx.stroke();
+      ctx.textAlign="right";
+      ctx.fillText(yv>=1?yv.toLocaleString():yv.toString(),padL-8,py+3);
+    }
+    // axis titles
+    ctx.fillStyle="#93a1b5"; ctx.textAlign="center";
+    ctx.fillText("Arithmetic intensity (FLOP/byte)",padL+plotW/2,H-8);
+    ctx.save();ctx.translate(16,padT+plotH/2);ctx.rotate(-Math.PI/2);
+    ctx.fillText("Attainable TFLOP/s",0,0);ctx.restore();
+
+    // roofline: y = min(peak, AI*bw)
+    ctx.strokeStyle="#5ac8fa"; ctx.lineWidth=2.5; ctx.beginPath();
+    var peakT=r.peakFlops/1e12;
+    var first=true;
+    for(var i=0;i<=240;i++){
+      var lv=lx0+(lx1-lx0)*i/240;
+      var xv2=Math.pow(10,lv);
+      var yv2=Math.min(peakT, xv2*r.bwBytes/1e12);
+      var px=X(xv2), py=Y(Math.max(yv2,ymin));
+      if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+
+    // ridge point vertical guide
+    ctx.strokeStyle="rgba(255,212,121,.55)"; ctx.lineWidth=1.5;
+    ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(X(r.ridge),padT);ctx.lineTo(X(r.ridge),padT+plotH);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle="#ffd479"; ctx.textAlign="left"; ctx.font="11px -apple-system,sans-serif";
+    ctx.fillText("I* = "+fmt(r.ridge),X(r.ridge)+5,padT+13);
+
+    // operating points
+    function pt(ai,color,label){
+      var yv=Math.min(peakT, ai*r.bwBytes/1e12);
+      var px=X(Math.max(ai,xmin)), py=Y(Math.max(yv,ymin));
+      ctx.fillStyle=color;
+      ctx.beginPath();ctx.arc(px,py,6,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle="#0c111a";ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle="#e6ebf2";ctx.textAlign="left";ctx.font="12px -apple-system,sans-serif";
+      var tx=px+10; if(tx>W-90)tx=px-10-ctx.measureText(label).width;
+      ctx.fillText(label,tx,py-8);
+    }
+    pt(r.dcAI,"#ff6b6b","Decode");
+    pt(r.pfAI,"#4cd964","Prefill");
+  }
+
+  // preset wiring
+  $('preset').addEventListener('change',function(){
+    var m=MODELS[this.value];
+    if(m){
+      $('hidden').value=m.hidden;$('layers').value=m.layers;$('ffn').value=m.ffn;
+      $('qheads').value=m.qheads;$('kvheads').value=m.kvheads;
+    }
+    render();
+  });
+  $('gpu').addEventListener('change',function(){
+    var g=GPUS[this.value];
+    if(g){
+      var scale=DTYPE_SCALE[$('bytes').value]||1;
+      $('tflops').value=Math.round(g.tflops*scale);
+      $('bw').value=g.bw;
+    }
+    render();
+  });
+  $('bytes').addEventListener('change',function(){
+    var g=GPUS[$('gpu').value];
+    if(g){
+      var scale=DTYPE_SCALE[this.value]||1;
+      $('tflops').value=Math.round(g.tflops*scale);
+    }
+    render();
+  });
+
+  ['hidden','layers','ffn','kvheads','qheads','batch','seq','tflops','bw']
+    .forEach(function(id){ $(id).addEventListener('input',render); });
+
+  render();
+})();
+</script>
+</body>
+</html>

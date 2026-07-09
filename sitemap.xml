@@ -128,4 +128,7 @@
 <url><loc>https://gpt0x.com/tools/llm-gpu-fit-checker</loc><lastmod>2026-06-30</lastmod></url>
 <url><loc>https://gpt0x.com/tools/llm-tokens-per-second-calculator</loc><lastmod>2026-06-30</lastmod></url>
 <url><loc>https://gpt0x.com/tools/quantization-vram-savings-calculator</loc><lastmod>2026-06-30</lastmod></url>
+<url><loc>https://gpt0x.com/tools/roofline-bottleneck-analyzer</loc><lastmod>2026-07-09</lastmod></url>
+<url><loc>https://gpt0x.com/tools/speculative-decoding-speedup-calculator</loc><lastmod>2026-07-09</lastmod></url>
+<url><loc>https://gpt0x.com/tools/tensor-parallel-sharding-planner</loc><lastmod>2026-07-09</lastmod></url>
 </urlset>

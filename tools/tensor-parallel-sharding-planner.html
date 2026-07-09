@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tensor-Parallel GPU Sharding Planner</title>
+<meta name="description" content="Plan multi-GPU LLM serving. Validates TP/PP/DP topology, checks head divisibility, and computes per-GPU weight and KV shards plus all-reduce bytes per">
+<link rel="canonical" href="https://gpt0x.com/tools/tensor-parallel-sharding-planner">
+<meta property="og:title" content="Tensor-Parallel GPU Sharding Planner">
+<meta property="og:description" content="Validate TP/PP/DP topology and compute per-GPU weight, KV-cache shards, and all-reduce traffic per token for multi-GPU LLM serving.">
+<meta property="og:url" content="https://gpt0x.com/tools/tensor-parallel-sharding-planner">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Tensor-Parallel GPU Sharding Planner",
+  "url": "https://gpt0x.com/tools/tensor-parallel-sharding-planner",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gpt0x.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://gpt0x.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "Tensor-Parallel GPU Sharding Planner", "item": "https://gpt0x.com/tools/tensor-parallel-sharding-planner" }
+    ]
+  }
+}
+</script>
+<style>
+:root{
+  --bg:#0c0f14; --panel:#141922; --panel2:#1b212c; --line:#26303d;
+  --fg:#e7edf5; --mut:#93a1b3; --acc:#5dd6b0; --acc2:#6aa8ff;
+  --bad:#ff6b6b; --warn:#ffb454; --ok:#5dd6b0;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.55; font-size:16px;
+}
+nav{display:flex;gap:18px;padding:16px 20px;border-bottom:1px solid var(--line);font-size:14px}
+nav a{color:var(--acc2);text-decoration:none}
+nav a:hover{text-decoration:underline}
+main{max-width:940px;margin:0 auto;padding:26px 20px 60px}
+h1{font-size:26px;line-height:1.25;margin:14px 0 8px}
+h2{font-size:19px;margin:34px 0 12px;border-bottom:1px solid var(--line);padding-bottom:6px}
+p{color:var(--fg)}
+.lead{color:var(--mut);font-size:16px}
+#tool{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-top:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:5px}
+input,select{
+  width:100%;padding:9px 10px;background:var(--panel2);border:1px solid var(--line);
+  border-radius:8px;color:var(--fg);font-size:15px;font-family:inherit;
+}
+input:focus,select:focus{outline:none;border-color:var(--acc2)}
+.field{margin-bottom:2px}
+.hint{font-size:11px;color:var(--mut);margin-top:3px}
+#status{margin-top:20px;padding:12px 14px;border-radius:8px;font-weight:600;font-size:15px}
+.s-ok{background:rgba(93,214,176,.12);border:1px solid var(--ok);color:var(--ok)}
+.s-bad{background:rgba(255,107,107,.12);border:1px solid var(--bad);color:var(--bad)}
+.s-warn{background:rgba(255,180,84,.12);border:1px solid var(--warn);color:var(--warn)}
+#issues{margin:8px 0 0;padding-left:20px;font-size:14px;color:var(--warn)}
+#issues li{margin:2px 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:20px}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px}
+.card .k{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.card .v{font-size:22px;font-weight:700;margin-top:4px;color:var(--acc)}
+.card .sub{font-size:12px;color:var(--mut);margin-top:3px}
+table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+td.n{font-variant-numeric:tabular-nums;color:var(--fg)}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:13px;color:var(--acc)}
+.formula{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;overflow-x:auto;color:var(--fg)}
+.related a{color:var(--acc2);text-decoration:none}
+.related a:hover{text-decoration:underline}
+.related li{margin:6px 0}
+footer{border-top:1px solid var(--line);margin-top:44px;padding:22px 20px;text-align:center;color:var(--mut);font-size:13px}
+footer a{color:var(--acc2);text-decoration:none;margin:0 8px}
+@media(max-width:520px){h1{font-size:22px}.card .v{font-size:19px}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">Home</a>
+  <a href="/tools/">Tools</a>
+</nav>
+<main>
+  <h1>Plan a Multi-GPU Tensor-Parallel Mesh for LLM Serving</h1>
+  <p class="lead">Pick a GPU topology and instantly see whether it is even legal — then get per-GPU weight and KV-cache shards plus the all-reduce bytes flowing across your interconnect every token.</p>
+
+  <p>Sharding a transformer across GPUs is not free choice. Tensor parallelism (TP) splits attention heads and the hidden dimension, so the TP degree must <em>evenly divide both the head count and the hidden size</em> or your matmuls will not align. Pipeline parallelism (PP) slices the layer stack, so it must divide the layer count. Data parallelism (DP) just replicates. This planner enforces those rules and quantifies the cost of the mesh you chose before you rent 32 H100s and find out it stalls on NVLink.</p>
+
+  <section id="tool">
+    <div class="grid">
+      <div class="field">
+        <label for="params">Parameters (billions)</label>
+        <input id="params" type="number" min="0.01" step="0.1" value="70">
+        <div class="hint">Total model params, e.g. 70 = 70B</div>
+      </div>
+      <div class="field">
+        <label for="layers">Transformer layers</label>
+        <input id="layers" type="number" min="1" step="1" value="80">
+      </div>
+      <div class="field">
+        <label for="hidden">Hidden size (d_model)</label>
+        <input id="hidden" type="number" min="1" step="1" value="8192">
+      </div>
+      <div class="field">
+        <label for="qheads">Attention (query) heads</label>
+        <input id="qheads" type="number" min="1" step="1" value="64">
+      </div>
+      <div class="field">
+        <label for="kvheads">KV heads (GQA)</label>
+        <input id="kvheads" type="number" min="1" step="1" value="8">
+        <div class="hint">= query heads if not using GQA/MQA</div>
+      </div>
+      <div class="field">
+        <label for="dtype">Weight / activation dtype</label>
+        <select id="dtype">
+          <option value="2" selected>FP16 / BF16 (2 bytes)</option>
+          <option value="4">FP32 (4 bytes)</option>
+          <option value="1">FP8 / INT8 (1 byte)</option>
+          <option value="0.5">INT4 (0.5 byte)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="tp">Tensor-parallel degree (TP)</label>
+        <input id="tp" type="number" min="1" step="1" value="8">
+      </div>
+      <div class="field">
+        <label for="pp">Pipeline-parallel degree (PP)</label>
+        <input id="pp" type="number" min="1" step="1" value="2">
+      </div>
+      <div class="field">
+        <label for="dp">Data-parallel degree (DP)</label>
+        <input id="dp" type="number" min="1" step="1" value="1">
+      </div>
+      <div class="field">
+        <label for="seq">Context length (tokens)</label>
+        <input id="seq" type="number" min="1" step="1" value="8192">
+        <div class="hint">For KV-cache sizing</div>
+      </div>
+      <div class="field">
+        <label for="batch">Concurrent sequences (batch)</label>
+        <input id="batch" type="number" min="1" step="1" value="16">
+      </div>
+    </div>
+
+    <div id="status" class="s-ok">—</div>
+    <ul id="issues"></ul>
+
+    <div class="cards">
+      <div class="card"><div class="k">GPUs required</div><div class="v" id="c-gpus">—</div><div class="sub">TP × PP × DP</div></div>
+      <div class="card"><div class="k">Weight / GPU</div><div class="v" id="c-weight">—</div><div class="sub">params ÷ (TP × PP)</div></div>
+      <div class="card"><div class="k">KV cache / GPU</div><div class="v" id="c-kv">—</div><div class="sub">full batch × context</div></div>
+      <div class="card"><div class="k">Memory / GPU</div><div class="v" id="c-mem">—</div><div class="sub">weights + KV shard</div></div>
+      <div class="card"><div class="k">All-reduce / token</div><div class="v" id="c-ar">—</div><div class="sub">across TP group, all layers</div></div>
+      <div class="card"><div class="k">Interconnect @ batch</div><div class="v" id="c-traffic">—</div><div class="sub">per decoded token, all seqs</div></div>
+    </div>
+
+    <table>
+      <thead><tr><th>Derived quantity</th><th>Value</th></tr></thead>
+      <tbody id="derived"></tbody>
+    </table>
+  </section>
+
+  <h2>How the numbers are computed</h2>
+  <p>The planner runs three validation checks and four sizing formulas entirely in your browser. Validation: TP must divide the query-head count, the KV-head count, and the hidden size; PP must divide the layer count; TP × PP × DP is the total device count. If any divisibility fails the mesh is flagged <strong>invalid</strong> — those matmuls cannot be evenly partitioned. A warning is raised when a shard is badly imbalanced (for example TP not dividing head_dim cleanly) even if technically legal.</p>
+
+  <div class="formula">
+weight_per_gpu   = (params × dtype_bytes) / (TP × PP)
+kv_bytes_token   = 2 × layers × kv_heads × head_dim × dtype_bytes   (head_dim = hidden / q_heads)
+kv_per_gpu       = kv_bytes_token × seq_len × batch / (TP × PP)
+allreduce_token  = 2 × (TP − 1) / TP × hidden × dtype_bytes × (layers/PP) × 2
+  </div>
+
+  <p>Weight memory divides by TP × PP because tensor parallelism shards each layer's matrices while pipeline parallelism assigns disjoint layer groups to different stages — both reduce a single GPU's parameter footprint. The KV cache is likewise sharded across the same TP × PP group, and it scales with the KV-head count (GQA and MQA shrink it dramatically versus full multi-head attention). The all-reduce term is the classic ring cost: each transformer layer performs two all-reduces (after the attention projection and after the MLP), and a ring all-reduce moves <code>2(TP−1)/TP</code> of the activation tensor per participant. Multiplying by layers-per-stage gives the per-token cross-GPU traffic that your NVLink or InfiniBand fabric must sustain — the number that decides whether a topology is throughput-bound. Use it to compare an 8×TP single node against a 4×TP × 2×PP split before committing hardware.</p>
+
+  <h2>Related Tools</h2>
+  <ul class="related">
+    <li><a href="/tools/kv-cache-vram-calculator">KV-Cache VRAM Calculator</a> — size the attention cache for a batch and context window.</li>
+    <li><a href="/tools/llm-inference-throughput-estimator">LLM Inference Throughput Estimator</a> — tokens/sec from memory bandwidth and batch.</li>
+    <li><a href="/tools/quantization-memory-savings-calculator">Quantization Memory Savings Calculator</a> — compare FP16 vs INT8 vs INT4 footprints.</li>
+  </ul>
+</main>
+
+<footer>
+  <div>
+    <a href="/">Home</a>
+    <a href="/tools/">All Tools</a>
+    <a href="/tools/kv-cache-vram-calculator">KV-Cache Calculator</a>
+    <a href="https://zovo.one">By Michael Lip</a>
+  </div>
+  <p>© 2026 gpt0x.com — client-side GPU planning, no data leaves your browser.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var ids=["params","layers","hidden","qheads","kvheads","dtype","tp","pp","dp","seq","batch"];
+  var el={};
+  ids.forEach(function(id){ el[id]=document.getElementById(id); });
+
+  function num(x){ var v=parseFloat(x.value); return isFinite(v)?v:0; }
+  function isInt(v){ return isFinite(v) && v>0 && Math.floor(v)===v; }
+  function bytes(b){
+    if(b<=0) return "0 B";
+    var u=["B","KB","MB","GB","TB","PB"], i=0;
+    while(b>=1024 && i<u.length-1){ b/=1024; i++; }
+    return (b>=100?b.toFixed(0):b.toFixed(2))+" "+u[i];
+  }
+  function commas(n){ return n.toLocaleString("en-US"); }
+
+  function compute(){
+    var P=num(el.params)*1e9;
+    var L=Math.round(num(el.layers));
+    var H=Math.round(num(el.hidden));
+    var Q=Math.round(num(el.qheads));
+    var KV=Math.round(num(el.kvheads));
+    var db=parseFloat(el.dtype.value);
+    var TP=Math.round(num(el.tp));
+    var PP=Math.round(num(el.pp));
+    var DP=Math.round(num(el.dp));
+    var seq=Math.round(num(el.seq));
+    var batch=Math.round(num(el.batch));
+
+    var issues=[];
+    // structural validity
+    if(!isInt(TP)||!isInt(PP)||!isInt(DP)) issues.push("TP, PP and DP must be positive integers.");
+    if(!isInt(L)) issues.push("Layer count must be a positive integer.");
+    if(!isInt(Q)) issues.push("Query-head count must be a positive integer.");
+    if(!isInt(H)) issues.push("Hidden size must be a positive integer.");
+
+    var headDim = (Q>0)? H/Q : 0;
+    var warn=[];
+
+    if(isInt(TP)){
+      if(Q % TP !== 0) issues.push("TP="+TP+" does not evenly divide "+Q+" query heads.");
+      if(isInt(KV) && KV % TP !== 0) issues.push("TP="+TP+" does not evenly divide "+KV+" KV heads (GQA).");
+      if(H % TP !== 0) issues.push("TP="+TP+" does not evenly divide hidden size "+H+".");
+    }
+    if(isInt(PP) && isInt(L) && L % PP !== 0)
+      issues.push("PP="+PP+" does not evenly divide "+L+" layers.");
+    if(headDim>0 && Math.floor(headDim)!==headDim)
+      issues.push("Hidden size "+H+" is not divisible by "+Q+" query heads (head_dim not integer).");
+    if(isInt(KV) && isInt(Q) && Q % KV !== 0)
+      warn.push("Query heads ("+Q+") not a multiple of KV heads ("+KV+") — unusual GQA grouping.");
+
+    var status=document.getElementById("status");
+    var issueList=document.getElementById("issues");
+    var valid = issues.length===0;
+
+    // sizing (compute even if warn, but only if numerically safe)
+    var totalGPUs = TP*PP*DP;
+    var safe = valid && TP>0 && PP>0 && DP>0;
+
+    var weightPerGPU = safe ? (P*db)/(TP*PP) : 0;
+    // KV per token (both K and V): 2 * layers * kv_heads * head_dim * dtype
+    var kvTokenFull = (isInt(L)&&headDim>0&&isInt(KV)) ? 2*L*KV*headDim*db : 0;
+    var kvTotal = kvTokenFull*seq*batch;
+    var kvPerGPU = safe ? kvTotal/(TP*PP) : 0;
+    var memPerGPU = weightPerGPU + kvPerGPU;
+
+    // all-reduce per token: 2 all-reduces per layer, ring cost 2(TP-1)/TP of hidden activation
+    var layersPerStage = (isInt(PP)&&PP>0)? L/PP : L;
+    var arPerToken = (safe && TP>1) ? 2*(TP-1)/TP * H * db * layersPerStage * 2 : 0;
+    var trafficBatch = arPerToken * batch;
+
+    // render status
+    issueList.innerHTML="";
+    if(!valid){
+      status.className="s-bad";
+      status.textContent="✗ Invalid topology — this mesh cannot be sharded evenly.";
+      issues.forEach(function(m){ var li=document.createElement("li"); li.textContent=m; issueList.appendChild(li); });
+    } else if(warn.length){
+      status.className="s-warn";
+      status.textContent="⚠ Valid but imbalanced — "+totalGPUs+" GPUs ("+TP+"×"+PP+"×"+DP+").";
+      warn.forEach(function(m){ var li=document.createElement("li"); li.textContent=m; issueList.appendChild(li); });
+    } else {
+      status.className="s-ok";
+      status.textContent="✓ Valid topology — "+totalGPUs+" GPUs ("+TP+" TP × "+PP+" PP × "+DP+" DP). Ready to serve.";
+    }
+
+    // cards
+    document.getElementById("c-gpus").textContent = (isInt(TP)&&isInt(PP)&&isInt(DP))? commas(totalGPUs) : "—";
+    document.getElementById("c-weight").textContent = safe ? bytes(weightPerGPU) : "—";
+    document.getElementById("c-kv").textContent = safe ? bytes(kvPerGPU) : "—";
+    document.getElementById("c-mem").textContent = safe ? bytes(memPerGPU) : "—";
+    document.getElementById("c-ar").textContent = safe ? (TP>1?bytes(arPerToken):"0 B (TP=1)") : "—";
+    document.getElementById("c-traffic").textContent = safe ? (TP>1?bytes(trafficBatch):"0 B (TP=1)") : "—";
+
+    // derived table
+    var rows=[
+      ["head_dim (hidden ÷ query heads)", headDim>0? (Math.floor(headDim)===headDim? commas(headDim) : headDim.toFixed(2)) : "—"],
+      ["query heads per GPU (÷ TP)", (isInt(TP)&&Q%TP===0)? commas(Q/TP) : "not divisible"],
+      ["KV heads per GPU (÷ TP)", (isInt(TP)&&isInt(KV)&&KV%TP===0)? commas(KV/TP) : "not divisible"],
+      ["layers per pipeline stage (÷ PP)", (isInt(PP)&&isInt(L)&&L%PP===0)? commas(L/PP) : "not divisible"],
+      ["total model weights (all GPUs)", P>0? bytes(P*db) : "—"],
+      ["KV cache per token (full model)", kvTokenFull>0? bytes(kvTokenFull) : "—"],
+      ["KV cache total (batch × context)", kvTotal>0? bytes(kvTotal) : "—"],
+      ["model replicas (DP)", isInt(DP)? commas(DP) : "—"]
+    ];
+    var tb=document.getElementById("derived");
+    tb.innerHTML="";
+    rows.forEach(function(r){
+      var tr=document.createElement("tr");
+      var td1=document.createElement("td"); td1.textContent=r[0];
+      var td2=document.createElement("td"); td2.className="n"; td2.textContent=r[1];
+      tr.appendChild(td1); tr.appendChild(td2); tb.appendChild(tr);
+    });
+  }
+
+  ids.forEach(function(id){
+    el[id].addEventListener("input", compute);
+    el[id].addEventListener("change", compute);
+  });
+  compute();
+})();
+</script>
+</body>
+</html>
