@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Model Release Timeline — Every Major LLM Launch</title>
   <meta name="description" content="Interactive timeline of major LLM releases from GPT-1 (2018) to mid-2026. Filter by company, size, open/closed source. Click for details.">
-  <link rel="canonical" href="https://gpt0x.com/ai-model-release-timeline">
+  <link rel="canonical" href="https://gpt0x.com/tools/ai-model-release-timeline-every-major-llm-launch">
   <!-- JSON-LD structured data: Article + BreadcrumbList -->
   <script type="application/ld+json">
     {
@@ -437,9 +437,7 @@
     function applyZoom() {
       const bars = document.querySelectorAll('.model-bar');
       bars.forEach(bar => {
-        // base width from inline style? we override via style
-        const base = parseFloat(bar.style.width) || 30;
-        // but we recompute using zoom factor stored
+        // we recompute using zoom factor stored
         // simpler: adjust all bars by scaling width
         const currentWidth = parseFloat(bar.style.width) || 30;
         // we want to scale around original base; we'll just multiply by factor relative to 1
