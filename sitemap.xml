@@ -131,4 +131,8 @@
 <url><loc>https://gpt0x.com/tools/roofline-bottleneck-analyzer</loc><lastmod>2026-07-09</lastmod></url>
 <url><loc>https://gpt0x.com/tools/speculative-decoding-speedup-calculator</loc><lastmod>2026-07-09</lastmod></url>
 <url><loc>https://gpt0x.com/tools/tensor-parallel-sharding-planner</loc><lastmod>2026-07-09</lastmod></url>
+<url><loc>https://gpt0x.com/tools/ai-api-latency-budget-planner</loc><lastmod>2026-08-26</lastmod></url>
+<url><loc>https://gpt0x.com/tools/llm-benchmark-score-normalizer</loc><lastmod>2026-06-09</lastmod></url>
+<url><loc>https://gpt0x.com/tools/prompt-token-budget-optimizer</loc><lastmod>2026-06-09</lastmod></url>
+<url><loc>https://gpt0x.com/tools/tokens-per-second-calculator</loc><lastmod>2026-06-09</lastmod></url>
 </urlset>
