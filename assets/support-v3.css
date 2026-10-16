@@ -1,0 +1,22 @@
+/* Support v3 additions. Existing site buttons and colors stay in use. */
+.support-cta [hidden],.support-cta[hidden]{display:none!important}
+.support-cta .sct-maker{display:flex;align-items:center;gap:8px;margin:8px 0;min-width:0}
+.support-cta .sct-face{border-radius:50%;object-fit:cover;flex:0 0 auto;display:block}
+.support-cta .sct-variants{display:grid}
+.support-cta .sct-variants>[data-sct-variant]{grid-area:1/1;min-width:0}
+.support-cta .sct-variants>[hidden]{display:block!important;visibility:hidden;pointer-events:none}
+.support-cta [data-sct-uses]{display:inline-block;min-width:2ch;font-variant-numeric:tabular-nums}
+.support-cta .sct-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0 0}
+.support-cta .sct-card-rail{display:inline-flex;flex-direction:column;align-items:center;min-width:0}
+.support-cta .sct-card-rail small{font-size:12px;line-height:1.5;margin-top:3px;color:inherit}
+.support-cta button[data-sct-dismiss]{font:inherit;color:inherit;background:transparent;border:0;text-decoration:underline;min-height:44px;padding:8px;cursor:pointer;width:auto}
+.support-cta button[data-sct-dismiss]:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+[data-support-cta="support_page"] .sct-costs{width:100%;table-layout:fixed;border-collapse:collapse;font-size:inherit;margin:16px 0}
+[data-support-cta="support_page"] .sct-costs th,[data-support-cta="support_page"] .sct-costs td{padding:8px;text-align:left;border-bottom:1px solid var(--border,var(--line,#ddd));overflow-wrap:anywhere}
+[data-support-cta="support_page"] .sct-face{border-radius:50%;object-fit:cover}
+@media(max-width:480px){
+ .support-cta .sct-actions{align-items:stretch;gap:8px}
+ .support-cta .sct-actions>a,.support-cta .sct-card-rail{flex:1 1 100%;width:100%;box-sizing:border-box}
+ .support-cta .sct-card-rail>a{width:100%;box-sizing:border-box}
+ .support-cta .sct-actions a{min-width:0;white-space:normal;overflow-wrap:anywhere}
+}
