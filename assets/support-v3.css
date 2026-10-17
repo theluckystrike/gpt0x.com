@@ -20,3 +20,10 @@
  .support-cta .sct-card-rail>a{width:100%;box-sizing:border-box}
  .support-cta .sct-actions a{min-width:0;white-space:normal;overflow-wrap:anywhere}
 }
+
+/* GitHub Sponsors: quiet third rail, using this site's tokens. */
+[data-support-cta] a.sct-github{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-sizing:border-box;min-height:44px;max-width:100%;padding:8px 14px;background:transparent;color:var(--text-muted);border:1px solid var(--border);font-weight:400;line-height:1.35;text-decoration:none;white-space:normal}
+[data-support-cta] a.sct-github:hover{background:transparent;color:var(--text-muted);border-color:currentColor;text-decoration:underline}
+[data-support-cta] a.sct-github small{font-size:11px;font-weight:400;line-height:1.3;color:inherit}
+[data-support-cta] a.sct-github:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+[data-support-cta] .sct-github-intro{flex-basis:100%;width:100%;margin:12px 0 0}
