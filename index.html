@@ -43,16 +43,14 @@
     "url": "https://zovo.one"
   },
   "datePublished": "2026-04-05",
-  "dateModified": "2026-05-25",
+  "dateModified": "2026-10-28",
   "featureList": [
-    "Database of 40+ AI models with detailed specs",
-    "Filter by type (text, image, audio, multimodal)",
-    "Filter by provider (OpenAI, Anthropic, Google, Meta, Mistral, and more)",
-    "Filter by open-source status",
-    "Sort by name, parameters, context window, or release date",
-    "Detailed model cards with full specifications",
-    "Search across all model names and providers",
-    "Client-side — no data sent to servers"
+    "instant search across all model names and providers",
+    "filtering by model type and provider",
+    "sortable columns for every specification",
+    "detailed model cards accessible with a single click",
+    "open-source vs closed-source filtering",
+    "a clean responsive table that works on desktop and mobile"
   ]
 }
 </script>
@@ -90,7 +88,7 @@
       "name": "Is the AI model database free to use?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, gpt0x.com is completely free. No sign-up, no paywall, no usage limits. The database runs entirely in your browser — no data is sent to any server."
+        "text": "Yes, gpt0x.com is completely free. No sign-up, no paywall, no usage limits. The database runs entirely in your browser with no data sent to any server."
       }
     },
     {
@@ -106,7 +104,7 @@
       "name": "Which AI model has the largest context window?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "You can find this by sorting the database by the Context column. As of the latest update, Google's Gemini 1.5 Pro leads with a 2M token context window, followed by Claude 3.5 at 200K tokens. Sort the table by context window to see the full ranking."
+        "text": "You can find this by sorting the database by the Context column. As of the latest update, Google's Gemini 1.5 Pro leads with a 2M token context window, followed by Claude 3.5 at 200K tokens. Sort the table to see the full ranking."
       }
     },
     {
@@ -147,7 +145,12 @@
   </header>
 
   <main class="container">
-    <section class="hero">
+    <section class="page-answer" style="max-width:820px;margin:1rem auto 2rem;padding:1rem 1.25rem;border-left:4px solid currentColor;background:rgba(127,127,127,.08);border-radius:6px">
+      <p style="margin:0 0 .5rem;font-size:1.02rem;line-height:1.6">gpt0x.com is a free, browser-based database for comparing large language models. It lists 45 models from 16 providers, including OpenAI, Anthropic, Google, Meta and Mistral, with parameter count, context window, release date, open-source status and API availability. Search, filters and sorting run locally in your browser, so no account is needed and no query leaves your device.</p>
+<p class="page-answer-by" style="margin:.5rem 0 0;font-size:.85rem;opacity:.75">Checked by Michael Lip</p>
+      <p style="margin:.35rem 0 0;font-size:.85rem;opacity:.75">Updated <time datetime="2026-10-28">October 28, 2026</time></p>
+    </section>
+        <section class="hero">
       <h1>AI <span>Model</span> Database</h1>
       <p>Search and compare 40+ AI models. Filter by type, provider, parameters, and open-source status.</p>
     </section>

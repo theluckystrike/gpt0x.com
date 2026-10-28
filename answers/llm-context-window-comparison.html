@@ -132,6 +132,8 @@
     <p>For most tasks, staying under 50% of the context window provides the best balance of quality, cost, and output capacity. This leaves ample room for the model's response and avoids the quality degradation zone. For tasks that genuinely require full-context analysis (code review of entire files, summarization of complete documents), use the full window but verify the model's attention to middle sections by including test questions about information placed there.</p>
   </section>
 
+<p class="related-inline" style="max-width:780px;margin:1.5rem auto;padding:.9rem 1.1rem;border-left:3px solid currentColor;background:rgba(127,127,127,.08);line-height:1.6">A large window is not a quality guarantee. Read <a href="/answers/long-context-degradation.html">does model quality degrade in long contexts</a> for the position effect and a test grid you can run on your own documents.</p>
+
   <section class="faq-section">
     <h2>Frequently Asked Questions</h2>
     <details><summary>Which AI model has the largest context window?</summary><p>Gemini 2.5 Pro at 1 million tokens (~750,000 words, ~1,500 pages). Claude models support 200K tokens. GPT-4o supports 128K tokens.</p></details>

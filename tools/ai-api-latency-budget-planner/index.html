@@ -276,6 +276,11 @@
 <div class="container">
   <header>
     <h1>⏱️ AI API Latency Budget Planner</h1>
+<section class="page-answer" style="max-width:820px;margin:1rem auto 2rem;padding:1rem 1.25rem;border-left:4px solid currentColor;background:rgba(127,127,127,.08);border-radius:6px">
+  <p style="margin:0 0 .5rem;font-size:1.02rem;line-height:1.6">A latency budget planner starts from the user-facing SLA and subtracts every fixed cost: network round trip, auth, prompt construction and post-processing. What remains is the LLM budget. Split it between time to first token and generation, then check each candidate model's TTFT against that limit before you commit to a model.</p>
+  <p style="margin:0;font-size:.85rem;opacity:.75">Updated <time datetime="2026-10-28">October 28, 2026</time></p>
+</section>
+
     <span class="subhead">gpt0x.com</span>
   </header>
 
@@ -562,7 +567,7 @@
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI API Latency Budget Planner \u00b7 gpt0x", "description": "Interactive tool to plan and visualize AI API latency budgets: SLA breakdown, LLM budget, TTFT, generation TPS, traffic light, model compatibility, P95...", "url": "https://gpt0x.com/tools/ai-api-latency-budget-planner", "applicationCategory": "UtilityApplication", "operatingSystem": "Web Browser", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}<\/script>
 <link rel="stylesheet" href="/assets/support-v3.css?v=4-github-20261017">
-<script src="/assets/support-v3.js?v=3"></script>
+<script src="/assets/support-v3.js?v=3"><\/script>
 </head><body><div class="container">${content.innerHTML}</div>
 <div style="margin:30px auto;max-width:728px;text-align:center;padding:18px 24px;background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:10px">
 <p style="margin:0 0 6px;color:#94a3b8;font-size:0.85rem">Recommended by our team</p>

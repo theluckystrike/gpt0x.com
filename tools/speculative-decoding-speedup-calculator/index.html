@@ -291,6 +291,11 @@
 <div class="container">
   <header>
     <h1>⚡ Speculative Decoding Speedup</h1>
+<section class="page-answer" style="max-width:820px;margin:1rem auto 2rem;padding:1rem 1.25rem;border-left:4px solid currentColor;background:rgba(127,127,127,.08);border-radius:6px">
+  <p style="margin:0 0 .5rem;font-size:1.02rem;line-height:1.6">Speculative decoding has a small draft model propose several tokens per step, then the target model verifies them in one forward pass. Expected tokens per step is (1 - alpha^(gamma+1)) / (1 - alpha), where alpha is the acceptance rate and gamma the draft length. Wall-clock speedup also depends on the draft model's own latency.</p>
+  <p style="margin:0;font-size:.85rem;opacity:.75">Updated <time datetime="2026-10-28">October 28, 2026</time></p>
+</section>
+
     <div class="subhead">Based on Chen et al. 2023 · interactive analysis</div>
   </header>
 
@@ -364,7 +369,13 @@
 
   <footer class="footer">
     <p>© 2025 gpt0x.com — <a href="https://gpt0x.com/tools/speculative-decoding-speedup-calculator">Speculative Decoding Speedup Calculator</a></p>
-  <div class="support-cta-wrap"><aside class="support-cta" data-support-cta="footer" aria-label="Support gpt0x"><p class="support-cta__title">Made by Michael, one person and a lot of coffee.</p><p class="sct-maker"><img class="sct-face" src="/assets/michael-128.webp" width="44" height="44" loading="lazy" alt="Michael Lip"><span>If gpt0x has helped you, you can buy me a coffee. It honestly makes my day, and I read every note that comes with one.</span></p><div class="sct-actions"><span class="sct-card-rail"><a class="support-cta__btn" href="https://paypal.me/najzzz/5USD" target="_blank" rel="noopener" data-rail="paypal">Buy me a coffee · $5</a><small>via PayPal</small></span><a class="support-cta__btn support-cta__btn--alt" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" data-rail="bmc">Card, any amount or monthly</a><a class="support-cta__btn sct-github" href="https://github.com/sponsors/theluckystrike" data-rail="github" target="_blank" rel="noopener">Sponsor on GitHub<small>monthly or one-time</small></a><a class="support-cta__why" href="/support/">Why I ask</a></div></aside></div>
+  <section class="faq-section faq-visible" style="max-width:820px;margin:2rem auto">
+  <h2>Frequently asked questions</h2>
+      <details><summary>What is speculative decoding?</summary><p>Speculative decoding accelerates LLM inference by using a smaller draft model to generate multiple candidate tokens, which are then verified by the target model in parallel. This reduces latency while preserving output quality.</p></details>
+      <details><summary>How is speedup calculated?</summary><p>Speedup is computed using the Chen et al. 2023 formula: expected tokens per step = (1 - α^(γ+1))/(1 - α). Wall-time speedup = target_latency / ((draft_latency*γ + target_latency) / expected_tokens). The gauge shows speedup relative to target-only decoding.</p></details>
+      <details><summary>What are typical speedup ranges for Medusa and EAGLE?</summary><p>Medusa (multiple draft heads) typically achieves 2.0x-2.5x speedup. EAGLE (draft with feature alignment) reports 2.0x-3.0x speedup, depending on acceptance rate and draft size.</p></details>
+</section>
+<div class="support-cta-wrap"><aside class="support-cta" data-support-cta="footer" aria-label="Support gpt0x"><p class="support-cta__title">Made by Michael, one person and a lot of coffee.</p><p class="sct-maker"><img class="sct-face" src="/assets/michael-128.webp" width="44" height="44" loading="lazy" alt="Michael Lip"><span>If gpt0x has helped you, you can buy me a coffee. It honestly makes my day, and I read every note that comes with one.</span></p><div class="sct-actions"><span class="sct-card-rail"><a class="support-cta__btn" href="https://paypal.me/najzzz/5USD" target="_blank" rel="noopener" data-rail="paypal">Buy me a coffee · $5</a><small>via PayPal</small></span><a class="support-cta__btn support-cta__btn--alt" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" data-rail="bmc">Card, any amount or monthly</a><a class="support-cta__btn sct-github" href="https://github.com/sponsors/theluckystrike" data-rail="github" target="_blank" rel="noopener">Sponsor on GitHub<small>monthly or one-time</small></a><a class="support-cta__why" href="/support/">Why I ask</a></div></aside></div>
 </footer>
 </div>
 

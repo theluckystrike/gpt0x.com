@@ -29,10 +29,18 @@
   "headline": "AI API Rate Limit Comparison — OpenAI, Anthropic, Google & Mistral",
   "url": "https://gpt0x.com/answers/ai-api-rate-limits.html",
   "description": "Compare AI API rate limits across OpenAI, Anthropic, Google, and Mistral with interactive queue management calculator and throughput analyzer.",
-  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
-  "publisher": { "@type": "Organization", "name": "GPT0X", "url": "https://gpt0x.com" },
+  "author": {
+    "@type": "Person",
+    "name": "Michael Lip",
+    "url": "https://zovo.one"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "GPT0X",
+    "url": "https://gpt0x.com"
+  },
   "datePublished": "2026-05-25",
-  "dateModified": "2026-05-25",
+  "dateModified": "2026-10-28",
   "mainEntityOfPage": "https://gpt0x.com/answers/ai-api-rate-limits.html"
 }
 </script>
@@ -193,7 +201,11 @@
 </header>
 
 <main class="tool-container">
-  <div class="breadcrumb">
+    <section class="page-answer" style="max-width:820px;margin:1rem auto 2rem;padding:1rem 1.25rem;border-left:4px solid currentColor;background:rgba(127,127,127,.08);border-radius:6px">
+      <p style="margin:0 0 .5rem;font-size:1.02rem;line-height:1.6">Rate limits rise with your usage tier, and they apply per organization and per model, so two models in one account can carry separate caps. OpenAI counts requests and tokens per minute; Anthropic counts requests, input tokens and output tokens per minute. A request over the limit returns HTTP 429 with a retry-after header.</p>
+      <p style="margin:.35rem 0 0;font-size:.85rem;opacity:.75">Updated <time datetime="2026-10-28">October 28, 2026</time></p>
+    </section>
+      <div class="breadcrumb">
     <a href="/">Home</a> &rsaquo; <a href="/answers/">Answers</a> &rsaquo; AI API Rate Limits
   </div>
 

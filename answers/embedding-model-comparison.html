@@ -290,6 +290,8 @@
     <p>The total cost of an embedding-based system includes three components: embedding generation (one-time per document), vector storage (ongoing), and query processing (per search). Storage costs depend on vector dimensions, precision, and database choice. Using float16 instead of float32 halves storage with less than 1% quality loss. Binary quantization reduces storage by 32x but only works for reranking workflows where approximate search is refined by a second-stage retriever.</p>
   </section>
 
+<p class="related-inline" style="max-width:780px;margin:1.5rem auto;padding:.9rem 1.1rem;border-left:3px solid currentColor;background:rgba(127,127,127,.08);line-height:1.6">Switching to a different embedding model? Read <a href="/answers/switch-embedding-models.html">can you switch embedding models in an existing vector database</a> for the migration steps and the cost formula.</p>
+
   <section class="faq-section">
     <h2>Frequently Asked Questions</h2>
     <details><summary>What are the best embedding models in 2026?</summary><p>The top embedding models in 2026 are: OpenAI text-embedding-3-large (3072 dimensions, $0.13/1M tokens, strong general-purpose performance), Cohere Embed v4 (1024 dimensions, multilingual leader), Voyage AI voyage-3-large (1024 dimensions, top MTEB retrieval scores), and for open-source, NV-Embed-v2 and GTE-Qwen2. The best choice depends on your use case.</p></details>

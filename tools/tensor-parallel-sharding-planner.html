@@ -96,6 +96,11 @@ footer a{color:var(--acc2);text-decoration:none;margin:0 8px}
 </nav>
 <main>
   <h1>Plan a Multi-GPU Tensor-Parallel Mesh for LLM Serving</h1>
+<section class="page-answer" style="max-width:820px;margin:1rem auto 2rem;padding:1rem 1.25rem;border-left:4px solid currentColor;background:rgba(127,127,127,.08);border-radius:6px">
+  <p style="margin:0 0 .5rem;font-size:1.02rem;line-height:1.6">Tensor parallelism splits attention heads and the hidden dimension across GPUs, so the TP degree must divide both the head count and the hidden size. Pipeline parallelism slices layers, so it must divide the layer count. Each decoded token then costs an all-reduce across the TP group, and that traffic decides whether the mesh is worth it.</p>
+  <p style="margin:0;font-size:.85rem;opacity:.75">Updated <time datetime="2026-10-28">October 28, 2026</time></p>
+</section>
+
   <p class="lead">Pick a GPU topology and instantly see whether it is even legal — then get per-GPU weight and KV-cache shards plus the all-reduce bytes flowing across your interconnect every token.</p>
 
   <p>Sharding a transformer across GPUs is not free choice. Tensor parallelism (TP) splits attention heads and the hidden dimension, so the TP degree must <em>evenly divide both the head count and the hidden size</em> or your matmuls will not align. Pipeline parallelism (PP) slices the layer stack, so it must divide the layer count. Data parallelism (DP) just replicates. This planner enforces those rules and quantifies the cost of the mesh you chose before you rent 32 H100s and find out it stalls on NVLink.</p>

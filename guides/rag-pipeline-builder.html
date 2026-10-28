@@ -161,6 +161,8 @@
     <p>RAG costs come from three sources: embedding (one-time per document), storage (ongoing monthly), and generation (per query). Generation dominates ongoing costs — each query uses both retrieval and LLM inference. To optimize: use smaller, cheaper LLMs for simple queries and route complex queries to premium models. Cache frequent queries and their answers. Use metadata filters to narrow the search space before vector similarity (reducing false positives). Implement prompt compression to reduce the context window size — techniques like LLMLingua can compress retrieved passages by 50% while preserving answer quality.</p>
   </section>
 
+<p class="related-inline" style="max-width:780px;margin:1.5rem auto;padding:.9rem 1.1rem;border-left:3px solid currentColor;background:rgba(127,127,127,.08);line-height:1.6">Before you tune the pipeline, read <a href="/answers/rag-evaluation-metrics.html">how to evaluate a RAG pipeline</a> for the retrieval and generation metrics that separate a retrieval bug from a prompt bug.</p>
+
   <section class="faq-section">
     <h2>Frequently Asked Questions</h2>
     <details><summary>What is the best chunk size for RAG?</summary><p>The optimal chunk size depends on your document type. For general-purpose RAG, 512-1024 tokens with 50-100 token overlap works well. Smaller chunks (256) improve precision but lose context. Larger chunks (2048+) preserve context but reduce precision. Benchmark on your data to find the optimum.</p></details>
