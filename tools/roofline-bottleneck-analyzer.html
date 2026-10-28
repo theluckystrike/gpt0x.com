@@ -101,6 +101,11 @@
 <div class="wrap">
 
 <h1>Is Your LLM Memory-Bound or Compute-Bound?</h1>
+<section class="page-answer" style="max-width:820px;margin:1rem auto 2rem;padding:1rem 1.25rem;border-left:4px solid currentColor;background:rgba(127,127,127,.08);border-radius:6px">
+  <p style="margin:0 0 .5rem;font-size:1.02rem;line-height:1.6">The roofline model places an operation against the GPU's peak math throughput and memory bandwidth. Arithmetic intensity, the ratio of FLOPs to bytes moved, decides which ceiling applies. Prefill is usually compute-bound; decoding reads all weights per token, so it stays memory-bound until the batch is large enough to cross the ridge point.</p>
+  <p style="margin:0;font-size:.85rem;opacity:.75">Updated <time datetime="2026-10-28">October 28, 2026</time></p>
+</section>
+
 <p class="lede">Plug in a model's dimensions and a GPU, and this analyzer computes the <strong>arithmetic intensity</strong> of the prefill and decode phases, places each on the hardware <strong>roofline</strong>, and solves for the exact batch size where decode stops wasting your tensor cores.</p>
 
 <section id="tool">

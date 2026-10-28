@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-sct-site="gpt0x.com">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Does Model Quality Degrade in Long Contexts? | GPT0X</title>
+<meta name="description" content="Why long-context quality depends on where facts sit and how many facts you ask for, how advertised context differs from effective context, and how to test degradation on your own documents.">
+<meta name="keywords" content="long context degradation, RAG, embeddings, AI models">
+<link rel="canonical" href="https://gpt0x.com/answers/long-context-degradation.html">
+<link rel="alternate" hreflang="en" href="https://gpt0x.com/answers/long-context-degradation.html">
+<link rel="alternate" hreflang="x-default" href="https://gpt0x.com/answers/long-context-degradation.html">
+<link rel="alternate" type="application/atom+xml" title="GPT0X Blog Feed" href="/blog/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Does model quality degrade in long contexts?">
+<meta property="og:description" content="Why long-context quality depends on where facts sit and how many facts you ask for, how advertised context differs from effective context, and how to test degradation on your own documents.">
+<meta property="og:url" content="https://gpt0x.com/answers/long-context-degradation.html">
+<meta property="og:image" content="https://gpt0x.com/assets/og-image.png">
+<meta property="og:site_name" content="Zovo Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Does model quality degrade in long contexts?">
+<meta name="twitter:description" content="Why long-context quality depends on where facts sit and how many facts you ask for, how advertised context differs from effective context, and how to test degradation on your own documents.">
+<meta name="twitter:image" content="https://gpt0x.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<style>
+.tool-container{max-width:960px;margin:0 auto;padding:2rem 1rem}.breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:1.5rem}.breadcrumb a{color:var(--text-muted)}.breadcrumb a:hover{color:var(--accent)}
+.tool-hero h1{font-family:var(--font-display);font-size:1.9rem;margin-bottom:.5rem}.tool-hero h1 span{color:var(--accent)}.tool-hero p{color:var(--text-muted);max-width:640px;margin-bottom:2rem}
+.tool-privacy{display:inline-block;font-size:.75rem;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;margin-bottom:2rem}
+.cw-table-wrap{overflow-x:auto;margin-bottom:2rem}.cw-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.cw-table th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.3px;padding:.6rem .5rem;text-align:left;border:1px solid var(--border);white-space:nowrap}
+.cw-table td{padding:.5rem;border:1px solid var(--border);color:var(--text-muted)}.cw-table tr:hover td{background:var(--bg-card)}.cw-table .cw-hl{color:var(--accent);font-weight:600}
+.cw-bar{display:inline-block;height:16px;background:var(--accent);border-radius:3px;min-width:4px;opacity:.7}
+.cw-filters{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}.cw-filters select{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 12px;font-family:var(--font-body);font-size:.83rem}.cw-filters select:focus{outline:none;border-color:var(--accent)}
+.cw-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem}
+.cw-panel h3{font-size:.95rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}
+.cw-field{margin-bottom:1rem}.cw-field label{display:block;font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px}
+.cw-field input,.cw-field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-family:var(--font-body);font-size:.83rem}.cw-field input:focus,.cw-field select:focus{outline:none;border-color:var(--accent)}
+.cw-btn{padding:8px 20px;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;background:var(--accent);color:#000}.cw-btn:hover{opacity:.85}
+.cw-result{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-top:1rem;font-size:.85rem;color:var(--text-muted)}.cw-result strong{color:var(--accent)}
+.cw-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}@media(max-width:768px){.cw-grid{grid-template-columns:1fr}}
+.explainer{max-width:780px;margin:2.5rem auto;line-height:1.7}.explainer h2{font-size:1.25rem;color:var(--accent);margin:2rem 0 .75rem;font-family:var(--font-display)}.explainer h3{font-size:1.05rem;margin:1.5rem 0 .5rem}.explainer p{color:var(--text-muted);margin-bottom:1rem}.explainer ul{color:var(--text-muted);margin:0 0 1rem 1.5rem}.explainer li{margin-bottom:.4rem}
+.explainer table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}.explainer th,.explainer td{padding:.5rem .75rem;border:1px solid var(--border);text-align:left}.explainer th{background:var(--bg-card);color:var(--accent);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}.explainer td{color:var(--text-muted)}
+.faq-section{max-width:780px;margin:2.5rem auto}.faq-section h2{font-size:1.25rem;color:var(--accent);margin-bottom:1rem;font-family:var(--font-display)}.faq-section details{border-bottom:1px solid var(--border);padding:1rem 0}.faq-section summary{cursor:pointer;font-weight:600;color:var(--text);font-size:.95rem}.faq-section summary:hover{color:var(--accent)}.faq-section details p{color:var(--text-muted);margin-top:.75rem;line-height:1.7}
+.related-tools{max-width:780px;margin:2.5rem auto}.related-tools h2{font-size:1.1rem;color:var(--accent);margin-bottom:1rem}.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}.related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-decoration:none;transition:border-color .2s}.related-card:hover{border-color:var(--accent);text-decoration:none}.related-card h3{font-size:.9rem;color:var(--text);margin-bottom:.25rem}.related-card p{font-size:.8rem;color:var(--text-muted);margin:0}
+.author-bio{max-width:780px;margin:2.5rem auto;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}.author-bio h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}.author-bio p{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin:0}.author-bio a{color:var(--accent)}
+</style>
+<style id="support-cta-css">.support-cta{background:var(--bg-card,#141414);border:1px solid var(--border,#222);border-left:3px solid var(--accent,#34D399);border-radius:var(--radius,6px);padding:1rem 1.25rem;margin:1.5rem 0;color:var(--text,#e8e8e8);text-align:left;font-family:var(--font-body,'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif);font-size:.9rem;line-height:1.6}.support-cta p{margin:0 0 .75rem;color:var(--text,#e8e8e8);font-size:.9rem}.support-cta .support-cta__title{font-weight:700;font-size:1rem;color:var(--text,#e8e8e8);margin:0 0 .25rem}.support-cta__actions{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;margin:0!important}.support-cta__btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;padding:.6rem 1.25rem;box-sizing:border-box;border-radius:var(--radius,6px);border:1.5px solid var(--accent,#34D399);background:var(--accent,#34D399);color:#000;font-family:inherit;font-size:.88rem;font-weight:600;line-height:1.2;text-decoration:none}.support-cta__btn:hover{text-decoration:none;opacity:.9;color:#000}.support-cta__btn--alt{background:transparent;color:var(--accent,#34D399)}.support-cta__btn--alt:hover{background:var(--accent,#34D399);color:#000;opacity:1}.support-cta a:focus-visible{outline:2px solid var(--accent,#34D399);outline-offset:3px}.support-cta__why{color:var(--accent,#34D399);font-size:.88rem;text-decoration:underline;text-underline-offset:3px}.support-cta__fine{font-size:.78rem;color:var(--text-muted,#999)!important;margin:.6rem 0 0!important}.support-cta-wrap{max-width:720px;margin:1.5rem auto 0;padding:0 1rem;box-sizing:border-box}.support-cta-wrap .support-cta{margin:0 0 1.5rem}</style>
+<link rel="stylesheet" href="/assets/support-v3.css?v=4-github-20261017">
+<script src="/assets/support-v3.js?v=3"></script>
+</head>
+<header><div class="container"><a href="/" class="logo">gpt0x</a><nav><a href="/">Database</a><a href="/research/">Research</a><a href="/tools/">Tools</a><a href="/answers/">Answers</a><a href="/blog/">Blog</a><a href="/about.html">About</a><div class="nav-right"><a href="https://zovo.one/pricing?utm_source=gpt0x&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a><a href="https://zovo.one/tools?utm_source=gpt0x&amp;utm_medium=nav&amp;utm_campaign=answers-long-context-degradation" class="nav-zovo">Zovo Tools</a></div></nav></div></header>
+
+<main class="tool-container">
+  <div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/answers/">Answers</a> &rsaquo; Long-context degradation</div>
+  <h1>Does model quality degrade in long contexts?</h1>
+  <p class="page-lead" style="font-size:1.05rem;line-height:1.65">Yes, quality degrades unevenly. Models usually find one fact near the start or the end of a long prompt, and get worse when the fact sits in the middle, when several facts must be combined, or when the prompt is full of near-miss distractors. The advertised context limit is a capacity, not a quality guarantee.</p>
+  <p style="font-size:.85rem;opacity:.75">Updated <time datetime="2026-10-28">October 28, 2026</time></p>
+
+  <article class="answer-body" style="line-height:1.7">
+
+<h2>Position matters: the lost-in-the-middle effect</h2>
+<p>Long-context tests that place one relevant sentence at different depths in a long document show a U-shaped curve. Accuracy is highest when the sentence is near the beginning or the end of the prompt and lowest when it sits in the middle. The effect was documented in the paper "Lost in the Middle: How Language Models Use Long Contexts" (Liu et al.), and it still shows up in practice. A prompt that fits inside the window can therefore produce a worse answer than the same question with a shorter, cleaner context.</p>
+
+<h2>Task shape matters more than length</h2>
+<p>Single-fact retrieval is the easy case, and it is the case vendors demonstrate. Real work looks different:</p>
+<ul>
+<li><strong>Multi-fact aggregation</strong> — sum totals, compare clauses or count items scattered through a long document. Each additional fact lowers the chance that all of them are used.</li>
+<li><strong>Distractors</strong> — documents that mention the same entities but answer a different question. Near-misses are worse than unrelated text, because they look relevant to the retriever.</li>
+<li><strong>Ordering conflicts</strong> — two passages that disagree. The model often prefers the earlier one, or blends them into a single wrong statement.</li>
+<li><strong>Instruction drift</strong> — a rule stated at the top of a very long prompt is applied less reliably by the end of a long generation.</li>
+</ul>
+
+<h2>Advertised context versus effective context</h2>
+<p>A model that accepts one million tokens does not use one million tokens equally well. The usable region depends on the task, the number of distractors and the position of the evidence. Treat the effective context as something you measure for your own workload, and treat the advertised number as a hard limit that you should not fill on purpose.</p>
+
+<h2>Test degradation on your own documents</h2>
+<ol>
+<li>Pick 20 questions whose answers are single sentences in your corpus.</li>
+<li>For each, build three prompts: evidence at the start, evidence in the middle, evidence at the end, with the same total length.</li>
+<li>Score exact matches or a strict rubric, not whether the answer sounds plausible.</li>
+<li>Repeat with a second document set at half the length. If accuracy is stable at half length and drops at full length, you have measured degradation rather than a bad question set.</li>
+<li>Repeat the middle case with five facts instead of one. The drop tells you how much aggregation your workload can take.</li>
+</ol>
+<p>Run the same grid on any candidate model before you switch. A model with a smaller window can beat a larger one on your documents, and the grid is the cheapest way to find out.</p>
+
+<h2>What to do about it</h2>
+<ul>
+<li><strong>Retrieve instead of stuff.</strong> Send the three chunks that answer the question, not the forty that mention it. Retrieval quality beats context size for most production workloads.</li>
+<li><strong>Put the question first and repeat the constraint last.</strong> Both edges of the prompt are read more reliably than the middle.</li>
+<li><strong>Ask for citations.</strong> Requiring the model to name the passage it used makes ignored evidence visible in the output.</li>
+<li><strong>Split aggregation tasks.</strong> Ask for one fact per call and combine the results in code, rather than asking for twelve facts in one pass.</li>
+<li><strong>Measure, then choose.</strong> Run the grid above on the exact documents your users bring; published benchmark tables do not describe your corpus.</li>
+</ul>
+<p>Treat long context as a tool for a specific job, not as a replacement for retrieval. The two work best together: retrieve a small candidate set, then give the model enough room to reason over it.</p>
+
+  </article>
+
+  <section class="related-links" style="margin:2rem 0;padding:1rem 1.25rem;border:1px solid rgba(127,127,127,.3);border-radius:8px">
+    <h2 style="margin-top:0">Related tools and answers</h2>
+    <ul>
+      <li><a href="/answers/llm-context-window-comparison.html">LLM context window comparison</a></li>
+      <li><a href="/tools/context-window-packing-optimizer/">Context window packing optimizer</a></li>
+      <li><a href="/tools/token-counter.html">Token counter</a></li>
+      <li><a href="/guides/rag-pipeline-builder.html">RAG pipeline builder</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Zovo Tools</div><div class="footer-tagline">Free developer tools by a solo dev. Some pages show Google ads.</div><a href="https://zovo.one/pricing?utm_source=gpt0x&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a><div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=gpt0x&amp;utm_medium=footer&amp;utm_campaign=answers-long-context-degradation">Zovo</a></div></div><div class="support-cta-wrap"><aside class="support-cta" data-support-cta="footer" aria-label="Support gpt0x"><p class="support-cta__title">Made by Michael, one person and a lot of coffee.</p><p class="sct-maker"><img class="sct-face" src="/assets/michael-128.webp" width="44" height="44" loading="lazy" alt="Michael Lip"><span>If gpt0x has helped you, you can buy me a coffee. It honestly makes my day, and I read every note that comes with one.</span></p><div class="sct-actions"><span class="sct-card-rail"><a class="support-cta__btn" href="https://paypal.me/najzzz/5USD" target="_blank" rel="noopener" data-rail="paypal">Buy me a coffee · $5</a><small>via PayPal</small></span><a class="support-cta__btn support-cta__btn--alt" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" data-rail="bmc">Card, any amount or monthly</a><a class="support-cta__btn sct-github" href="https://github.com/sponsors/theluckystrike" data-rail="github" target="_blank" rel="noopener">Sponsor on GitHub<small>monthly or one-time</small></a><a class="support-cta__why" href="/support/">Why I ask</a></div></aside></div>
+</footer>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Does model quality degrade in long contexts?",
+  "description": "Why long-context quality depends on where facts sit and how many facts you ask for, how advertised context differs from effective context, and how to test degradation on your own documents.",
+  "url": "https://gpt0x.com/answers/long-context-degradation.html",
+  "datePublished": "2026-10-28",
+  "dateModified": "2026-10-28",
+  "author": {
+    "@type": "Person",
+    "name": "Michael Lip",
+    "url": "https://zovo.one"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "GPT0X",
+    "url": "https://gpt0x.com"
+  },
+  "mainEntityOfPage": "https://gpt0x.com/answers/long-context-degradation.html",
+  "inLanguage": "en"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://gpt0x.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Answers",
+      "item": "https://gpt0x.com/answers/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Long-context degradation",
+      "item": "https://gpt0x.com/answers/long-context-degradation.html"
+    }
+  ]
+}
+</script>
+</body>
+</html>
